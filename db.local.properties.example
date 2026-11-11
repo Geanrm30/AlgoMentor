@@ -1,0 +1,5 @@
+# Copia este archivo como db.local.properties y pon tus datos reales.
+# db.local.properties NO se sube a Git (esta en .gitignore).
+db.url=jdbc:postgresql://localhost:5432/algomentor
+db.user=postgres
+db.password=CAMBIAR_ESTA_CLAVE
