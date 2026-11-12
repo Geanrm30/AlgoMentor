@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.GestionContenidoController">
+    <top>
+        <VBox spacing="5" styleClass="page-header">
+            <Label text="AlgoMentor" styleClass="brand" />
+            <Label text="Gestión de contenido" styleClass="page-title" />
+            <Label text="Algoritmos, ejercicios y consultas del laboratorio de persistencia" styleClass="subtitle" />
+        </VBox>
+    </top>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-tabs">
+            <tabs>
+                <Tab text="Algoritmos">
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                        <content>
+                            <VBox spacing="18" styleClass="tab-content">
+                                <GridPane hgap="14" vgap="12" styleClass="card">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="50" />
+                                        <ColumnConstraints percentWidth="50" />
+                                    </columnConstraints>
+                                    <Label text="Datos del algoritmo" styleClass="section-title" GridPane.columnSpan="2" />
+                                    <VBox spacing="6" GridPane.rowIndex="1">
+                                        <Label text="Nombre" />
+                                        <TextField fx:id="txtNombreAlgoritmo" promptText="Ej. Gauss-Jordan" />
+                                    </VBox>
+                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label text="Categoría" />
+                                        <ComboBox fx:id="cmbCategoria" maxWidth="Infinity" promptText="Seleccionar" />
+                                    </VBox>
+                                    <VBox spacing="6" GridPane.rowIndex="2">
+                                        <Label text="Complejidad" />
+                                        <TextField fx:id="txtComplejidad" promptText="Ej. O(n³)" />
+                                    </VBox>
+                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label text="Descripción" />
+                                        <TextArea fx:id="txtDescripcionAlgoritmo" prefRowCount="2" wrapText="true" />
+                                    </VBox>
+                                </GridPane>
+                                <HBox spacing="10" styleClass="actions">
+                                    <Button text="Guardar" onAction="#guardarAlgoritmo" styleClass="primary-button" />
+                                    <Button text="Actualizar" onAction="#actualizarAlgoritmo" />
+                                    <Button text="Eliminar" onAction="#eliminarAlgoritmo" />
+                                    <Button text="Limpiar" onAction="#limpiarAlgoritmo" />
+                                </HBox>
+                                <TableView fx:id="tblAlgoritmos" prefHeight="260" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colNombreAlgoritmo" text="Nombre" prefWidth="190" />
+                                        <TableColumn fx:id="colCategoria" text="Categoría" prefWidth="145" />
+                                        <TableColumn fx:id="colComplejidad" text="Complejidad" prefWidth="120" />
+                                        <TableColumn fx:id="colDescripcion" text="Descripción" prefWidth="340" />
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </Tab>
+                <Tab text="Ejercicios">
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                        <content>
+                            <VBox spacing="18" styleClass="tab-content">
+                                <GridPane hgap="14" vgap="12" styleClass="card">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="50" />
+                                        <ColumnConstraints percentWidth="50" />
+                                    </columnConstraints>
+                                    <Label text="Datos del ejercicio" styleClass="section-title" GridPane.columnSpan="2" />
+                                    <VBox spacing="6" GridPane.rowIndex="1">
+                                        <Label text="Algoritmo" />
+                                        <ComboBox fx:id="cmbAlgoritmoEjercicio" maxWidth="Infinity" promptText="Seleccionar" />
+                                    </VBox>
+                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label text="Origen" />
+                                        <ComboBox fx:id="cmbOrigen" maxWidth="Infinity" promptText="Seleccionar" />
+                                    </VBox>
+                                    <VBox spacing="6" GridPane.rowIndex="2">
+                                        <Label text="Dificultad (1–5)" />
+                                        <Spinner fx:id="spDificultad" editable="false" maxWidth="Infinity" />
+                                    </VBox>
+                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label text="Datos de entrada" />
+                                        <TextArea fx:id="txtDatosEjercicio" prefRowCount="3" promptText="Ej. 8, 3, 6, 1" wrapText="true" />
+                                    </VBox>
+                                </GridPane>
+                                <HBox spacing="10" styleClass="actions">
+                                    <Button text="Guardar" onAction="#guardarEjercicio" styleClass="primary-button" />
+                                    <Button text="Actualizar" onAction="#actualizarEjercicio" />
+                                    <Button text="Eliminar" onAction="#eliminarEjercicio" />
+                                    <Button text="Limpiar" onAction="#limpiarEjercicio" />
+                                </HBox>
+                                <TableView fx:id="tblEjercicios" prefHeight="260" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colAlgoritmoEjercicio" text="Algoritmo" prefWidth="190" />
+                                        <TableColumn fx:id="colDatos" text="Datos" prefWidth="330" />
+                                        <TableColumn fx:id="colDificultad" text="Dificultad" prefWidth="110" />
+                                        <TableColumn fx:id="colOrigen" text="Origen" prefWidth="150" />
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </Tab>
+                <Tab text="Consultas">
+                    <VBox spacing="18" styleClass="tab-content">
+                        <HBox spacing="10" styleClass="card">
+                            <ComboBox fx:id="cmbFiltroAlgoritmo" maxWidth="Infinity" promptText="Algoritmo" HBox.hgrow="ALWAYS" />
+                            <Button text="Buscar ejercicios" onAction="#buscarEjercicios" styleClass="primary-button" />
+                            <ComboBox fx:id="cmbFiltroPerfil" maxWidth="Infinity" promptText="Perfil" HBox.hgrow="ALWAYS" />
+                            <Button text="Ver historial" onAction="#verHistorial" />
+                        </HBox>
+                        <Label text="Resultados de las consultas HQL" styleClass="section-title" />
+                        <TableView fx:id="tblResultados" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colResultadoAlgoritmo" text="Algoritmo" prefWidth="190" />
+                                <TableColumn fx:id="colResultadoEjercicio" text="Ejercicio" prefWidth="330" />
+                                <TableColumn fx:id="colResultadoDetalle" text="Detalle" prefWidth="260" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <bottom>
+        <Label fx:id="lblEstado" text="Listo" styleClass="status-bar" />
+    </bottom>
+</BorderPane>
