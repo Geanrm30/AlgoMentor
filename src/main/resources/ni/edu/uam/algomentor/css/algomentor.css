@@ -1,0 +1,123 @@
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #111827;
+}
+
+.page-header {
+    -fx-padding: 22 28 18 28;
+    -fx-background-color: #1f2937;
+}
+
+.brand {
+    -fx-text-fill: #38bdf8;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.page-title {
+    -fx-text-fill: #f9fafb;
+    -fx-font-size: 27px;
+    -fx-font-weight: bold;
+}
+
+.subtitle, .label {
+    -fx-text-fill: #d1d5db;
+}
+
+.content-tabs, .content-tabs .tab-content-area, .scroll-pane, .scroll-pane > .viewport {
+    -fx-background-color: #111827;
+}
+
+.content-tabs .tab-header-area .tab-header-background {
+    -fx-background-color: #1f2937;
+}
+
+.content-tabs .tab {
+    -fx-background-color: #374151;
+    -fx-padding: 8 16;
+}
+
+.content-tabs .tab:selected {
+    -fx-background-color: #0284c7;
+}
+
+.content-tabs .tab .tab-label {
+    -fx-text-fill: #f9fafb;
+}
+
+.tab-content {
+    -fx-padding: 22 28 28 28;
+    -fx-background-color: #111827;
+}
+
+.card {
+    -fx-padding: 20;
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 12;
+}
+
+.section-title {
+    -fx-text-fill: #f9fafb;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+
+.text-field, .text-area, .combo-box, .spinner {
+    -fx-background-color: #374151;
+    -fx-text-fill: #f9fafb;
+}
+
+.text-area .content, .combo-box .list-cell, .spinner .text-field {
+    -fx-background-color: #374151;
+    -fx-text-fill: #f9fafb;
+}
+
+.button {
+    -fx-background-color: #374151;
+    -fx-text-fill: #f9fafb;
+    -fx-padding: 9 18;
+    -fx-background-radius: 7;
+}
+
+.button.primary-button {
+    -fx-background-color: #0284c7;
+}
+
+.button:disabled {
+    -fx-opacity: 0.55;
+}
+
+.table-view {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #374151;
+}
+
+.table-view .column-header-background, .table-view .column-header {
+    -fx-background-color: #374151;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #f9fafb;
+}
+
+.table-row-cell {
+    -fx-background-color: #1f2937;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #273244;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #075985;
+}
+
+.table-cell {
+    -fx-text-fill: #f9fafb;
+}
+
+.status-bar {
+    -fx-background-color: #1f2937;
+    -fx-padding: 10 28;
+    -fx-max-width: Infinity;
+}

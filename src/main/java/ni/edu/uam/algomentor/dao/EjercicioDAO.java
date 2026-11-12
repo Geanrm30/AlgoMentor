@@ -13,6 +13,15 @@ public class EjercicioDAO extends BaseDAO<Ejercicio> {
         super(Ejercicio.class);
     }
 
+    public List<Ejercicio> listarConAlgoritmo() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "SELECT e FROM Ejercicio e JOIN FETCH e.algoritmo ORDER BY e.id",
+                    Ejercicio.class
+            ).getResultList();
+        }
+    }
+
     public List<Ejercicio> listarPorAlgoritmo(Long algoritmoId) {
 
         if (algoritmoId == null || algoritmoId <= 0) {
