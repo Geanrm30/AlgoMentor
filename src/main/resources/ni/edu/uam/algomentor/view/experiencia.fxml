@@ -29,6 +29,9 @@
                 <Tab text="Comparar">
                     <fx:include source="comparador.fxml" />
                 </Tab>
+                <Tab text="Progreso">
+                    <fx:include source="progreso.fxml" />
+                </Tab>
             </tabs>
         </TabPane>
     </center>

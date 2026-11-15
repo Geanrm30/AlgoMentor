@@ -20,6 +20,11 @@
                 <Label fx:id="lblPaso" text="Prepara una entrada para empezar." wrapText="true" />
                 <Label fx:id="lblExplicacion" wrapText="true" />
                 <HBox spacing="10">
+                    <Button fx:id="btnCargarAudio" text="Cargar audio del paso" onAction="#cargarAudio" disable="true" />
+                    <Button fx:id="btnAudio" text="Reproducir" onAction="#reproducirAudio" disable="true" />
+                </HBox>
+                <Label fx:id="lblAudio" text="La explicación escrita está disponible para cada paso. Puedes adjuntar un audio MP3 o WAV." wrapText="true" />
+                <HBox spacing="10">
                     <Button fx:id="btnAnterior" text="Anterior" onAction="#anterior" disable="true" />
                     <Button fx:id="btnSiguiente" text="Siguiente" onAction="#siguiente" disable="true" styleClass="primary-button" />
                 </HBox>
