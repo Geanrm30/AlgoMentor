@@ -61,6 +61,9 @@ public class SimuladorController {
         cmbAlgoritmo.setItems(FXCollections.observableArrayList("Bubble Sort", "Insertion Sort", "Gauss", "Gauss-Jordan"));
         cmbAlgoritmo.valueProperty().addListener((obs, anterior, actual) -> {
             limpiarResultado();
+            if (actual == null) {
+                return;
+            }
             matricial = actual.startsWith("Gauss");
             txtArreglo.setVisible(!matricial);
             txtArreglo.setManaged(!matricial);
