@@ -69,6 +69,22 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 - **Terminal:** escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema operativo.
 - **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
 - **Progreso:** consulta los intentos y aciertos por habilidad del perfil seleccionado.
+- **Repaso API:** carga preguntas de opción múltiple de computación desde Open Trivia DB, permite seleccionar una respuesta y muestra el resultado. Esta función no guarda respuestas en PostgreSQL.
+
+### Repaso conceptual con Open Trivia DB
+
+La pestaña **Repaso API** requiere conexión a Internet. La aplicación consulta Open Trivia DB
+sin necesitar una clave de API y limita las solicitudes a una por cada cinco segundos para
+respetar el límite del servicio. Si la API no está disponible, devuelve un error o no tiene
+preguntas disponibles, la aplicación informa el problema y permite volver a intentarlo.
+
+Las preguntas provienen de un servicio externo y son un recurso complementario de repaso;
+no sustituyen las explicaciones ni la verificación de ejercicios del simulador. Para ejecutar
+las pruebas del cliente y del mapeo JSON:
+
+```powershell
+.\mvnw.cmd "-Dtest=OpenTriviaClientTest,OpenTriviaResponseTest" test
+```
 
 En Gestión de contenido, crea los ejercicios con el mismo nombre de algoritmo que aparece en el simulador. Los datos pueden ser simples (`8,3,6,1` o `2,1,5` seguido de otra fila) o usar el formato versionado `v1;ARREGLO;8,3,6,1` y `v1;MATRIZ;2x3;2,1,5|1,-1,1`. Ejecuta `schema.sql` antes de guardar intentos, pues crea las cuatro habilidades iniciales.
 
