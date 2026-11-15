@@ -20,8 +20,20 @@
             </VBox>
             <VBox spacing="10" styleClass="card">
                 <Label text="Tu respuesta" styleClass="section-title" />
-                <Label text="Ordenamiento: arreglo final separado por comas. Sistemas: solución por variable, o INFINITAS / SIN_SOLUCION." wrapText="true" />
-                <TextField fx:id="txtRespuesta" promptText="Ej. 1, 2, 3" accessibleText="Respuesta del ejercicio" />
+                <VBox fx:id="panelOrdenamiento" spacing="8">
+                    <Label text="Escribe el arreglo final separado por comas." />
+                    <TextField fx:id="txtRespuesta" promptText="Ej. 1, 2, 3" accessibleText="Respuesta del ejercicio" />
+                </VBox>
+                <VBox fx:id="panelMatriz" spacing="8" visible="false" managed="false">
+                    <Label text="Aplica una operación elemental a la matriz inicial y escribe la matriz resultante completa." wrapText="true" />
+                    <ComboBox fx:id="cmbOperacion" promptText="Operación de filas" maxWidth="Infinity" />
+                    <HBox spacing="8">
+                        <TextField fx:id="txtDestino" promptText="Fila destino (1, 2...)" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="txtOrigen" promptText="Fila origen, si aplica" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="txtFactor" promptText="Factor, si aplica" HBox.hgrow="ALWAYS" />
+                    </HBox>
+                    <TextArea fx:id="txtMatrizEscrita" prefRowCount="4" promptText="Una fila por línea; celdas separadas por coma" accessibleText="Matriz resultante escrita por el estudiante" />
+                </VBox>
                 <HBox spacing="10">
                     <Button text="Verificar" onAction="#verificar" styleClass="primary-button" />
                     <Button fx:id="btnGuardar" text="Guardar intento" onAction="#guardarIntento" disable="true" />
