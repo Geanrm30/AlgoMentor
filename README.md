@@ -65,12 +65,12 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 
 - **Simulador:** elige Bubble Sort, Insertion Sort, Gauss o Gauss-Jordan. Escribe enteros separados por comas, o una matriz ampliada con una ecuación por línea y celdas separadas por comas. Usa **Anterior** y **Siguiente** para recorrer los pasos.
 - **Audio:** en un paso puedes cargar un MP3 o WAV local y reproducirlo. El texto del paso permanece visible. Los audios no se guardan en la base de datos ni se incluyen en el repositorio.
-- **Práctica:** crea un perfil y selecciona un ejercicio guardado. Para ordenamiento responde con el arreglo final; para sistemas con la solución separada por comas o con `INFINITAS` / `SIN_SOLUCION`. Verifica y luego guarda el intento. Los resultados actualizan la habilidad `Procedimiento` del esquema inicial.
+- **Práctica:** crea un perfil y selecciona un ejercicio guardado. Para ordenamiento responde con el arreglo final. Para Gauss y Gauss-Jordan selecciona una operación de filas, indica las filas con números desde 1 y el factor cuando aplique, y escribe la matriz resultante completa. Verifica y luego guarda el intento. Los errores muestran fila y columna y se asocian a Signos, Fracciones, Aritmetica o Procedimiento; los pasos correctos cuentan en Procedimiento.
 - **Terminal:** escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema operativo.
 - **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
 - **Progreso:** consulta los intentos y aciertos por habilidad del perfil seleccionado.
 
-En Gestión de contenido, crea los ejercicios con el mismo nombre de algoritmo que aparece en el simulador. Los datos pueden ser simples (`8,3,6,1` o `2,1,5` seguido de otra fila) o usar el formato versionado `v1;ARREGLO;8,3,6,1` y `v1;MATRIZ;2x3;2,1,5|1,-1,1`. Ejecuta `schema.sql` antes de guardar intentos, pues crea la habilidad `Procedimiento`.
+En Gestión de contenido, crea los ejercicios con el mismo nombre de algoritmo que aparece en el simulador. Los datos pueden ser simples (`8,3,6,1` o `2,1,5` seguido de otra fila) o usar el formato versionado `v1;ARREGLO;8,3,6,1` y `v1;MATRIZ;2x3;2,1,5|1,-1,1`. Ejecuta `schema.sql` antes de guardar intentos, pues crea las cuatro habilidades iniciales.
 
 ## Trabajo en equipo
 
