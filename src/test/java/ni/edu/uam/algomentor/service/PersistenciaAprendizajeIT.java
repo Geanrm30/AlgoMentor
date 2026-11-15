@@ -4,7 +4,7 @@ import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.engine.TipoError;
 import ni.edu.uam.algomentor.model.*;
 import ni.edu.uam.algomentor.util.HibernateUtil;
-
+import ni.edu.uam.algomentor.engine.FormatoDatos;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -160,7 +160,9 @@ class PersistenciaAprendizajeIT {
 
                 Ejercicio ejercicio = new Ejercicio();
                 ejercicio.setAlgoritmo(algoritmo);
-                ejercicio.setDatos("[3, 1, 2]");
+                ejercicio.setDatos(
+                        FormatoDatos.serializarArreglo(new int[]{3, 1, 2})
+                );
                 ejercicio.setDificultad(1);
                 ejercicio.setOrigen("MANUAL");
 

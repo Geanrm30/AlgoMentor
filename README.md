@@ -65,3 +65,75 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 
 Cada integrante desarrolla en su rama y abre un Pull Request revisado por otra persona.
 La rama `main` debe compilar y ejecutarse después de cada integración.
+
+
+## Persistencia del aprendizaje
+
+AlgoMentor utiliza Hibernate ORM y PostgreSQL para
+almacenar el historial de aprendizaje de los estudiantes.
+
+El sistema permite:
+
+- Registrar perfiles de estudiantes.
+- Guardar intentos y sus pasos.
+- Asociar errores detectados con habilidades.
+- Actualizar aciertos y errores por habilidad.
+- Consultar estadísticas mediante HQL.
+
+### Transacciones
+
+El registro de intentos, pasos, errores y progreso
+utiliza una única transacción de Hibernate.
+
+Si alguna operación falla, se ejecuta rollback
+para evitar registros parcialmente guardados.
+
+### Ejecución de pruebas
+
+Para ejecutar las pruebas unitarias:
+
+```powershell
+.\mvnw.cmd clean test
+```
+
+Para ejecutar la prueba de integración con PostgreSQL:
+
+```powershell
+.\mvnw.cmd "-Dtest=PersistenciaAprendizajeIT" test
+```
+
+La prueba de integración requiere PostgreSQL configurado
+y el esquema de AlgoMentor creado.
+
+La clase PersistenciaAprendizajeIT no se ejecuta
+automáticamente mediante mvn test debido a su nombre.
+
+### Correspondencia de habilidades
+
+Los errores del motor se relacionan con las habilidades
+mediante HabilidadErrorResolver:
+
+- SIGNO: Signos
+- FRACCION: Fracciones
+- ARITMETICO: Aritmetica
+- OPERACION_INVALIDA: Procedimiento
+
+Los identificadores se consultan mediante Hibernate,
+sin depender de IDs fijos.
+
+### Concurrencia
+
+IntentoService utiliza un bloqueo pesimista sobre
+el perfil durante el registro del intento.
+
+Las actualizaciones de progreso se realizan en un
+orden consistente de identificadores de habilidades.
+
+Estas medidas reducen los conflictos de concurrencia
+cuando las operaciones utilizan IntentoService.
+
+Las actualizaciones realizadas por otros servicios
+deben respetar la misma estrategia de bloqueo.
+
+La concurrencia real y el rollback deben comprobarse
+mediante pruebas de integración con PostgreSQL.

@@ -8,7 +8,7 @@ import ni.edu.uam.algomentor.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
+import org.hibernate.LockMode;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -105,8 +105,10 @@ public class IntentoService {
 
             try {
 
-                Perfil perfil = session.find(
-                        Perfil.class, perfilId
+                Perfil perfil = session.get(
+                        Perfil.class,
+                        perfilId,
+                        LockMode.PESSIMISTIC_WRITE
                 );
 
                 if (perfil == null) {
