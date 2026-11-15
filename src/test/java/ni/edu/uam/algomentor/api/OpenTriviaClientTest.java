@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -84,5 +85,21 @@ class OpenTriviaClientTest {
     void validaCantidadAntesDeEnviarLaSolicitud() {
         assertThrows(IllegalArgumentException.class,
                 () -> client.obtenerPreguntasComputacion(0));
+    }
+
+    @Test
+    void esperaElIntervaloConfiguradoEntreSolicitudes() throws Exception {
+        OpenTriviaClient clienteConIntervalo = new OpenTriviaClient(
+                URI.create("http://localhost:" + server.getAddress().getPort() + "/api.php"),
+                Duration.ofMillis(100));
+
+        clienteConIntervalo.obtenerPreguntasComputacion(1);
+        long inicioSegundaSolicitud = System.nanoTime();
+        clienteConIntervalo.obtenerPreguntasComputacion(1);
+        long transcurridoMillis = Duration.ofNanos(
+                System.nanoTime() - inicioSegundaSolicitud).toMillis();
+
+        assertTrue(transcurridoMillis >= 80,
+                "La segunda solicitud debe esperar el intervalo configurado");
     }
 }
