@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record OpenTriviaResponse(
@@ -11,6 +12,7 @@ public record OpenTriviaResponse(
         List<OpenTriviaQuestion> results
 ) {
     public OpenTriviaResponse {
-        results = List.copyOf(results);
+        results = List.copyOf(Objects.requireNonNull(
+                results, "La lista de resultados de Open Trivia DB no puede ser nula"));
     }
 }
