@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ni.edu.uam.algomentor.controller.RepasoApiController">
+    <content>
+        <VBox spacing="18" styleClass="tab-content">
+            <VBox spacing="10" styleClass="card">
+                <Label text="Repaso conceptual de computación" styleClass="section-title" />
+                <Label text="Preguntas de opción múltiple obtenidas desde Open Trivia DB."
+                       wrapText="true" />
+                <Button fx:id="btnCargar" text="Cargar 5 preguntas"
+                        onAction="#cargarPreguntas" styleClass="primary-button" />
+                <Label fx:id="lblEstado" text="Pulsa el botón para consultar la API."
+                       wrapText="true" />
+            </VBox>
+            <VBox spacing="12" styleClass="card">
+                <Label fx:id="lblProgreso" text="Sin preguntas cargadas."
+                       styleClass="section-title" />
+                <Label fx:id="lblPregunta" wrapText="true" />
+                <VBox fx:id="contenedorRespuestas" spacing="8" />
+                <HBox spacing="10">
+                    <Button fx:id="btnVerificar" text="Verificar respuesta"
+                            onAction="#verificarRespuesta" styleClass="primary-button"
+                            disable="true" />
+                    <Button fx:id="btnSiguiente" text="Siguiente pregunta"
+                            onAction="#siguientePregunta" disable="true" />
+                </HBox>
+                <Label fx:id="lblResultado" wrapText="true" />
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>
