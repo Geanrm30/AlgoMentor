@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.PracticaController">
+    <content>
+        <VBox spacing="18" styleClass="tab-content">
+            <VBox spacing="10" styleClass="card">
+                <Label text="Perfil y ejercicio" styleClass="section-title" />
+                <HBox spacing="10">
+                    <ComboBox fx:id="cmbPerfil" promptText="Perfil" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                    <Button text="Actualizar" onAction="#recargar" />
+                </HBox>
+                <HBox spacing="10">
+                    <TextField fx:id="txtNuevoPerfil" promptText="Nombre del nuevo perfil" HBox.hgrow="ALWAYS" />
+                    <Button text="Crear perfil" onAction="#crearPerfil" />
+                </HBox>
+                <ComboBox fx:id="cmbEjercicio" promptText="Ejercicio guardado" maxWidth="Infinity" />
+                <Label fx:id="lblEnunciado" text="Selecciona un ejercicio de la base de datos." wrapText="true" />
+            </VBox>
+            <VBox spacing="10" styleClass="card">
+                <Label text="Tu respuesta" styleClass="section-title" />
+                <VBox fx:id="panelOrdenamiento" spacing="8">
+                    <Label text="Escribe el arreglo final separado por comas." />
+                    <TextField fx:id="txtRespuesta" promptText="Ej. 1, 2, 3" accessibleText="Respuesta del ejercicio" />
+                </VBox>
+                <VBox fx:id="panelMatriz" spacing="8" visible="false" managed="false">
+                    <Label text="Aplica una operación elemental a la matriz inicial y escribe la matriz resultante completa." wrapText="true" />
+                    <ComboBox fx:id="cmbOperacion" promptText="Operación de filas" maxWidth="Infinity" />
+                    <HBox spacing="8">
+                        <TextField fx:id="txtDestino" promptText="Fila destino (1, 2...)" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="txtOrigen" promptText="Fila origen, si aplica" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="txtFactor" promptText="Factor, si aplica" HBox.hgrow="ALWAYS" />
+                    </HBox>
+                    <TextArea fx:id="txtMatrizEscrita" prefRowCount="4" promptText="Una fila por línea; celdas separadas por coma" accessibleText="Matriz resultante escrita por el estudiante" />
+                </VBox>
+                <HBox spacing="10">
+                    <Button text="Verificar" onAction="#verificar" styleClass="primary-button" />
+                    <Button fx:id="btnGuardar" text="Guardar intento" onAction="#guardarIntento" disable="true" />
+                </HBox>
+                <Label fx:id="lblResultado" wrapText="true" />
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

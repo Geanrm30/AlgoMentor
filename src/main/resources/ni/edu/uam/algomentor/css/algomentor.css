@@ -121,3 +121,16 @@
     -fx-padding: 10 28;
     -fx-max-width: Infinity;
 }
+
+.valor-arreglo, .valor-activo {
+    -fx-background-color: #374151;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-text-fill: #f9fafb;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.valor-activo {
+    -fx-background-color: #0284c7;
+}

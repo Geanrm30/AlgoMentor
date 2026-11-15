@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <VBox spacing="5" styleClass="page-header">
+            <Label text="AlgoMentor" styleClass="brand" />
+            <Label text="Aprende algoritmos paso a paso" styleClass="page-title" />
+            <Label text="Simula, practica y consulta tu progreso" styleClass="subtitle" />
+        </VBox>
+    </top>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-tabs">
+            <tabs>
+                <Tab text="Simulador">
+                    <fx:include source="simulador.fxml" />
+                </Tab>
+                <Tab text="Práctica">
+                    <fx:include source="practica.fxml" />
+                </Tab>
+                <Tab text="Terminal">
+                    <fx:include source="terminal.fxml" />
+                </Tab>
+                <Tab text="Comparar">
+                    <fx:include source="comparador.fxml" />
+                </Tab>
+                <Tab text="Progreso">
+                    <fx:include source="progreso.fxml" />
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.SimuladorController">
+    <content>
+        <VBox spacing="18" styleClass="tab-content">
+            <VBox spacing="10" styleClass="card">
+                <Label text="Configura la simulación" styleClass="section-title" />
+                <ComboBox fx:id="cmbAlgoritmo" maxWidth="Infinity" accessibleText="Algoritmo" />
+                <TextField fx:id="txtArreglo" promptText="Ej. 8, 3, 6, 1" accessibleText="Números enteros separados por coma" />
+                <TextArea fx:id="txtMatriz" prefRowCount="3" promptText="2, 1, 5&#10;1, -1, 1" accessibleText="Matriz ampliada, una fila por línea, celdas separadas por coma" />
+                <Label fx:id="lblFormato" wrapText="true" />
+                <Button text="Simular" onAction="#simular" styleClass="primary-button" />
+            </VBox>
+            <VBox spacing="12" styleClass="card">
+                <Label text="Estado del algoritmo" styleClass="section-title" />
+                <HBox fx:id="contenedorArreglo" alignment="BOTTOM_CENTER" spacing="8" />
+                <VBox fx:id="contenedorMatriz" alignment="CENTER" spacing="6" />
+                <Label fx:id="lblPaso" text="Prepara una entrada para empezar." wrapText="true" />
+                <Label fx:id="lblExplicacion" wrapText="true" />
+                <HBox spacing="10">
+                    <Button fx:id="btnCargarAudio" text="Cargar audio del paso" onAction="#cargarAudio" disable="true" />
+                    <Button fx:id="btnAudio" text="Reproducir" onAction="#reproducirAudio" disable="true" />
+                </HBox>
+                <Label fx:id="lblAudio" text="La explicación escrita está disponible para cada paso. Puedes adjuntar un audio MP3 o WAV." wrapText="true" />
+                <HBox spacing="10">
+                    <Button fx:id="btnAnterior" text="Anterior" onAction="#anterior" disable="true" />
+                    <Button fx:id="btnSiguiente" text="Siguiente" onAction="#siguiente" disable="true" styleClass="primary-button" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>
