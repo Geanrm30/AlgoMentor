@@ -94,7 +94,10 @@ public class ProgresoHabilidadService {
         }
 
         for (Map.Entry<Long, Resultado> entrada
-                : resultados.entrySet()) {
+                : resultados.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .toList()) {
 
             Long habilidadId = entrada.getKey();
             Resultado resultado = entrada.getValue();
