@@ -20,6 +20,9 @@
                 <Tab text="Simulador">
                     <fx:include source="simulador.fxml" />
                 </Tab>
+                <Tab text="Práctica">
+                    <fx:include source="practica.fxml" />
+                </Tab>
             </tabs>
         </TabPane>
     </center>
