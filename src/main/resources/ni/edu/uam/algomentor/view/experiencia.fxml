@@ -23,6 +23,12 @@
                 <Tab text="Práctica">
                     <fx:include source="practica.fxml" />
                 </Tab>
+                <Tab text="Terminal">
+                    <fx:include source="terminal.fxml" />
+                </Tab>
+                <Tab text="Comparar">
+                    <fx:include source="comparador.fxml" />
+                </Tab>
             </tabs>
         </TabPane>
     </center>
