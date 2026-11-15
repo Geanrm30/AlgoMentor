@@ -33,6 +33,9 @@ public class RegistroPracticaService {
             try {
                 return resolverId.apply(clave);
             } catch (IllegalStateException e) {
+                if (e.getMessage() == null || !e.getMessage().startsWith("No existe la habilidad:")) {
+                    throw e;
+                }
                 throw new IllegalStateException("Falta la habilidad "
                         + HabilidadErrorResolver.nombreHabilidad(clave)
                         + ". Carga schema.sql y vuelve a intentar.", e);

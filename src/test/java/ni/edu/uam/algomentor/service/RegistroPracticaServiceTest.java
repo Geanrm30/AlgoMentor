@@ -2,9 +2,11 @@ package ni.edu.uam.algomentor.service;
 
 import ni.edu.uam.algomentor.engine.TipoError;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
+import ni.edu.uam.algomentor.engine.ErrorOperacion;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,10 +30,30 @@ class RegistroPracticaServiceTest {
 
     @Test
     void pideCargarElSeedCuandoFaltaUnaHabilidad() {
-        var error = new ni.edu.uam.algomentor.engine.ErrorOperacion(TipoError.FRACCION, 0, 0, "Error");
+        var error = new ErrorOperacion(TipoError.FRACCION, 0, 0, "Error");
         var fallo = assertThrows(IllegalStateException.class,
-                () -> RegistroPracticaService.construirPaso("x", false, java.util.List.of(error),
-                        tipo -> { throw new IllegalStateException("No existe la habilidad"); }));
+                () -> RegistroPracticaService.construirPaso("x", false, List.of(error),
+                        tipo -> { throw new IllegalStateException("No existe la habilidad: Fracciones"); }));
         assertTrue(fallo.getMessage().contains("schema.sql"));
+    }
+
+    @Test
+    void noConfundeUnaFallaDeConexionConDatosInicialesAusentes() {
+        var error = new ErrorOperacion(TipoError.FRACCION, 0, 0, "Error");
+        var fallo = assertThrows(IllegalStateException.class,
+                () -> RegistroPracticaService.construirPaso("x", false, List.of(error),
+                        tipo -> { throw new IllegalStateException("Falta db.url"); }));
+        assertEquals("Falta db.url", fallo.getMessage());
+    }
+
+    @Test
+    void reparteUnaEvaluacionEntreHabilidadesDistintas() {
+        var errores = List.of(new ErrorOperacion(TipoError.SIGNO, 0, 0, "Signo"),
+                new ErrorOperacion(TipoError.FRACCION, 0, 1, "Fracción"));
+        var paso = RegistroPracticaService.construirPaso("x", false, errores,
+                Map.of(TipoError.SIGNO, 11L, TipoError.FRACCION, 12L)::get);
+        var progreso = IntentoService.calcularResultados("PRACTICA", List.of(paso));
+        assertEquals(1, progreso.get(11L).errores());
+        assertEquals(1, progreso.get(12L).errores());
     }
 }
