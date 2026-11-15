@@ -13,8 +13,8 @@ import ni.edu.uam.algomentor.dao.EjercicioDAO;
 import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.EvaluadorPractica;
-import ni.edu.uam.algomentor.service.IntentoService;
 import ni.edu.uam.algomentor.service.PerfilService;
+import ni.edu.uam.algomentor.service.RegistroPracticaService;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -131,10 +131,10 @@ public class PracticaController {
         btnGuardar.setDisable(true);
         lblResultado.setText("Guardando intento…");
         ejecutarEnSegundoPlano(() -> {
-            new IntentoService().registrarIntento(perfil.getId(), ejercicio.getId(), "PRACTICA",
-                    correcto, duracion, List.of(new IntentoService.PasoRegistrado(1, respuesta, correcto)));
+            new RegistroPracticaService().registrar(perfil.getId(), ejercicio.getId(), respuesta, correcto, duracion);
             Platform.runLater(() -> lblResultado.setText("Intento guardado. " + (correcto ? "Correcto." : "Incorrecto.")));
-        }, "No se pudo guardar el intento. Revisa la conexión y el esquema.");
+        }, "No se pudo guardar el intento. Revisa la conexión y el esquema.",
+                () -> btnGuardar.setDisable(false));
     }
 
     private void invalidarEvaluacion() {
@@ -144,12 +144,19 @@ public class PracticaController {
     }
 
     private void ejecutarEnSegundoPlano(Runnable accion, String mensajeError) {
+        ejecutarEnSegundoPlano(accion, mensajeError, () -> { });
+    }
+
+    private void ejecutarEnSegundoPlano(Runnable accion, String mensajeError, Runnable alFallar) {
         Thread hilo = new Thread(() -> {
             try {
                 accion.run();
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, mensajeError, e);
-                Platform.runLater(() -> lblResultado.setText(mensajeError));
+                Platform.runLater(() -> {
+                    lblResultado.setText(mensajeError);
+                    alFallar.run();
+                });
             }
         }, "algomentor-persistencia");
         hilo.setDaemon(true);
