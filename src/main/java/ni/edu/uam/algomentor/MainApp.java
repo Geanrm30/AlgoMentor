@@ -19,7 +19,7 @@ public class MainApp extends Application {
         Parent experiencia = cargarVista("experiencia.fxml");
         Parent gestion = cargarVista("gestion-contenido.fxml");
         TabPane navegacion = new TabPane();
-        navegacion.getStyleClass().add("content-tabs");
+        navegacion.getStyleClass().addAll("content-tabs", "nav-principal");
         navegacion.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         navegacion.getTabs().addAll(new Tab("Aprender", experiencia), new Tab("Gestión de contenido", gestion));
         Scene scene = new Scene(navegacion, 1100, 720);
