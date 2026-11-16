@@ -163,6 +163,7 @@ public class ProgresoController {
         private final ProgressBar barra = new ProgressBar(0);
         private final Label etiqueta = new Label();
         private final HBox contenido = new HBox(10, barra, etiqueta);
+        private Double animado;
 
         private CeldaPorcentaje() {
             barra.setPrefWidth(100);
@@ -174,6 +175,7 @@ public class ProgresoController {
         protected void updateItem(Double porcentaje, boolean vacia) {
             super.updateItem(porcentaje, vacia);
             if (vacia || porcentaje == null) {
+                animado = null;
                 setGraphic(null);
                 return;
             }
@@ -182,7 +184,10 @@ public class ProgresoController {
                     : porcentaje >= UMBRAL_MEDIO ? "barra-media" : "barra-baja");
             etiqueta.setText(String.format("%.1f%%", porcentaje));
             setGraphic(contenido);
-            Animaciones.animarProgreso(barra, porcentaje / 100);
+            if (!porcentaje.equals(animado)) {
+                animado = porcentaje;
+                Animaciones.animarProgreso(barra, porcentaje / 100);
+            }
         }
     }
 
