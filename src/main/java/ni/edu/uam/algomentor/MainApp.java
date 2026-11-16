@@ -1,12 +1,14 @@
 package ni.edu.uam.algomentor;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
+import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.HibernateUtil;
 
 import java.io.IOException;
@@ -28,6 +30,9 @@ public class MainApp extends Application {
             throw new IOException("No se encontró la hoja de estilos de AlgoMentor");
         }
         scene.getStylesheets().add(stylesheet.toExternalForm());
+        Animaciones.instalarEfectosBoton(scene);
+        Animaciones.animarPestanas(navegacion);
+        animarPestanasInternas(experiencia, gestion);
 
         stage.setTitle("AlgoMentor");
         stage.setMinWidth(760);
@@ -35,6 +40,16 @@ public class MainApp extends Application {
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> HibernateUtil.shutdown());
         stage.show();
+        Platform.runLater(() -> Animaciones.entrarContenido(navegacion.getSelectionModel().getSelectedItem().getContent()));
+    }
+
+    private void animarPestanasInternas(Parent... vistas) {
+        for (Parent vista : vistas) {
+            vista.lookupAll(".content-tabs").stream()
+                    .filter(TabPane.class::isInstance)
+                    .map(TabPane.class::cast)
+                    .forEach(Animaciones::animarPestanas);
+        }
     }
 
     private Parent cargarVista(String nombre) throws IOException {

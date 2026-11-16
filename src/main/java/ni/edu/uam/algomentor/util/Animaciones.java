@@ -30,7 +30,15 @@ public final class Animaciones {
     private static final String CLAVE_ANIMACION = "algomentor.animacion";
     private static final String CLAVE_ESCALA_BOTON = "algomentor.escalaBoton";
     private static final Interpolator SUAVE = Interpolator.SPLINE(0.16, 1, 0.3, 1);
-    private static final Interpolator REBOTE = Interpolator.SPLINE(0.34, 1.56, 0.64, 1);
+    private static final Interpolator REBOTE = new Interpolator() {
+        @Override
+        protected double curve(double t) {
+            double c1 = 1.70158;
+            double c3 = c1 + 1;
+            double u = t - 1;
+            return 1 + c3 * u * u * u + c1 * u * u;
+        }
+    };
     private static final double PASO_ESCALONADO_MS = 70;
     private static final double RETRASO_MAXIMO_MS = 420;
 
