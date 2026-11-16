@@ -32,8 +32,8 @@
                 <Tab text="Progreso">
                     <fx:include source="progreso.fxml" />
                 </Tab>
-                <Tab text="Repaso API">
-                    <fx:include source="repaso-api.fxml" />
+                <Tab text="Intercambio API">
+                    <fx:include source="intercambio-ejercicios.fxml" />
                 </Tab>
             </tabs>
         </TabPane>

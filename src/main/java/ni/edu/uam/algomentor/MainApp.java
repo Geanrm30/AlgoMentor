@@ -9,6 +9,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import ni.edu.uam.algomentor.util.Animaciones;
+import ni.edu.uam.algomentor.api.EjerciciosApiServer;
 import ni.edu.uam.algomentor.util.HibernateUtil;
 import ni.edu.uam.algomentor.util.Tema;
 
@@ -39,7 +40,10 @@ public class MainApp extends Application {
         stage.setMinWidth(760);
         stage.setMinHeight(560);
         stage.setScene(scene);
-        stage.setOnCloseRequest(event -> HibernateUtil.shutdown());
+        stage.setOnCloseRequest(event -> {
+            EjerciciosApiServer.detener();
+            HibernateUtil.shutdown();
+        });
         stage.show();
         Platform.runLater(() -> Animaciones.entrarContenido(navegacion.getSelectionModel().getSelectedItem().getContent()));
     }

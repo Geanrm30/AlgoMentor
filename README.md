@@ -69,12 +69,12 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 - **Terminal:** escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema operativo.
 - **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
 - **Progreso:** selecciona un perfil para consultar sus intentos y aciertos por habilidad. Pulsa **Exportar PDF** para guardar un informe con el resumen de intentos y los resultados por habilidad. El informe se genera usando JasperReports y los datos consultados mediante Hibernate.
-- **Repaso API:** carga preguntas de opción múltiple de computación desde Open Trivia DB, permite seleccionar una respuesta y muestra el resultado. Esta función no guarda respuestas en PostgreSQL.
+- **Intercambio API:** exporta ejercicios a JSON e importa lotes compartidos por otros equipos mediante una API HTTP local. Los ejercicios se relacionan por nombre de algoritmo, sin compartir identificadores de la base de datos.
 
 ### Interfaz y animaciones
 
 - **Tema oscuro:** la hoja de estilos `algomentor.css` define la paleta (cian y violeta), las tarjetas, los botones, las tablas y los diálogos. Los cuadros de alerta usan el mismo tema.
-- **Animaciones:** `Animaciones` reúne las transiciones de JavaFX. Las pestañas y las tarjetas aparecen de forma escalonada, los botones reaccionan al pasar el cursor y al pulsarlos, y la retroalimentación de Práctica y Repaso API aparece con un estado correcto o de error.
+- **Animaciones:** `Animaciones` reúne las transiciones de JavaFX. Las pestañas y las tarjetas aparecen de forma escalonada, los botones reaccionan al pasar el cursor y al pulsarlos, y la retroalimentación de Práctica e Intercambio API aparece con un estado correcto o de error.
 - **Simulador:** las celdas aparecen con rebote al simular. Cuando cambia el estado entre pasos, las celdas de un arreglo se deslizan de su posición anterior a la nueva (`MovimientoCeldas` calcula ese desplazamiento) y las celdas activas pulsan. En las matrices se resaltan las celdas que cambiaron.
 - **Progreso:** cada habilidad muestra una barra animada. Verde desde 70 %, ámbar desde 40 % y roja por debajo.
 
@@ -91,22 +91,28 @@ Si el perfil no tiene progreso por habilidad, se genera el PDF con el resumen de
 .\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest" test
 ```
 
-JasperReports compila la plantilla JRXML al generar el informe. La aplicación requiere Internet solo para descargar dependencias Maven la primera vez que se compila; la generación del PDF no consulta la API externa.
+JasperReports compila la plantilla JRXML al generar el informe. La aplicación requiere Internet solo para descargar dependencias Maven la primera vez que se compila; la generación del PDF no utiliza la API de ejercicios.
 
-### Repaso conceptual con Open Trivia DB
+### Intercambio de ejercicios por API
 
-La pestaña **Repaso API** requiere conexión a Internet. La aplicación consulta Open Trivia DB
-sin necesitar una clave de API y limita las solicitudes a una por cada cinco segundos para
-respetar el límite del servicio. Si la API no está disponible, devuelve un error o no tiene
-preguntas disponibles, la aplicación informa el problema y permite volver a intentarlo.
+La pestaña **Intercambio API** inicia un servidor HTTP local en `127.0.0.1:8765` y lo consume
+desde JavaFX. Requiere PostgreSQL configurado y el esquema cargado; no necesita Internet.
+**Exportar JSON** guarda los ejercicios en un archivo portable. **Importar JSON** lee un archivo
+de hasta 1 MB y carga como máximo 500 ejercicios por lote. El algoritmo de cada ejercicio debe
+existir previamente con el mismo nombre en la base de datos receptora. La importación es una
+sola transacción: si hay un dato inválido, no se guarda ningún ejercicio del lote. Los ejercicios
+idénticos que ya existan se omiten.
 
-Las preguntas provienen de un servicio externo y son un recurso complementario de repaso;
-no sustituyen las explicaciones ni la verificación de ejercicios del simulador. Para ejecutar
-las pruebas del cliente y del mapeo JSON:
+Los endpoints son `GET http://127.0.0.1:8765/api/ejercicios/exportar` y
+`POST http://127.0.0.1:8765/api/ejercicios/importar` con `Content-Type: application/json`.
+El cuerpo usa este formato:
 
-```powershell
-.\mvnw.cmd "-Dtest=OpenTriviaClientTest,OpenTriviaResponseTest" test
+```json
+{"version":1,"ejercicios":[{"algoritmo":"Bubble Sort","datos":"8,3,6,1","dificultad":2,"origen":"MANUAL"}]}
 ```
+
+El servidor escucha solo en la computadora local. Para compartir entre equipos, se envía el
+archivo JSON exportado y el otro equipo lo importa desde su propia instalación.
 
 En Gestión de contenido, crea los ejercicios con el mismo nombre de algoritmo que aparece en el simulador. Los datos pueden ser simples (`8,3,6,1` o `2,1,5` seguido de otra fila) o usar el formato versionado `v1;ARREGLO;8,3,6,1` y `v1;MATRIZ;2x3;2,1,5|1,-1,1`. Ejecuta `schema.sql` antes de guardar intentos, pues crea las cuatro habilidades iniciales.
 
