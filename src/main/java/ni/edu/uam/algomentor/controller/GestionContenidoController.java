@@ -22,6 +22,7 @@ import ni.edu.uam.algomentor.model.Algoritmo;
 import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Intento;
 import ni.edu.uam.algomentor.model.Perfil;
+import ni.edu.uam.algomentor.util.Tema;
 import ni.edu.uam.algomentor.util.ValidacionesFormulario;
 
 import java.util.List;
@@ -277,6 +278,7 @@ public class GestionContenidoController {
 
     private boolean confirmarEliminacion(String nombre) {
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle("Confirmar eliminación");
         alerta.setContentText("¿Eliminar " + nombre + "?");
@@ -298,6 +300,7 @@ public class GestionContenidoController {
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);

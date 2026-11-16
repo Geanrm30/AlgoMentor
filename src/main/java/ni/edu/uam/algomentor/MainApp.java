@@ -10,6 +10,7 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.HibernateUtil;
+import ni.edu.uam.algomentor.util.Tema;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +26,7 @@ public class MainApp extends Application {
         navegacion.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         navegacion.getTabs().addAll(new Tab("Aprender", experiencia), new Tab("Gestión de contenido", gestion));
         Scene scene = new Scene(navegacion, 1100, 720);
-        URL stylesheet = MainApp.class.getResource("/ni/edu/uam/algomentor/css/algomentor.css");
+        URL stylesheet = Tema.hojaEstilos();
         if (stylesheet == null) {
             throw new IOException("No se encontró la hoja de estilos de AlgoMentor");
         }

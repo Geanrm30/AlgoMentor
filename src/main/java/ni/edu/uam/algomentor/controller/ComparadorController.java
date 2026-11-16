@@ -9,6 +9,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import ni.edu.uam.algomentor.service.ComparadorOrdenamientos;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
+import ni.edu.uam.algomentor.util.Tema;
 
 public class ComparadorController {
 
@@ -42,6 +43,7 @@ public class ComparadorController {
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);

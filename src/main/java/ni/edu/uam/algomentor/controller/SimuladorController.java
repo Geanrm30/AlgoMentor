@@ -28,6 +28,7 @@ import ni.edu.uam.algomentor.engine.ResultadoMatriz;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
 import ni.edu.uam.algomentor.util.MovimientoCeldas;
+import ni.edu.uam.algomentor.util.Tema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -316,6 +317,7 @@ public class SimuladorController {
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);

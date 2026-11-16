@@ -21,6 +21,7 @@ import ni.edu.uam.algomentor.service.EvaluadorPractica;
 import ni.edu.uam.algomentor.service.EvaluadorPasoMatriz;
 import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.RegistroPracticaService;
+import ni.edu.uam.algomentor.util.Tema;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -235,6 +236,7 @@ public class PracticaController {
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);

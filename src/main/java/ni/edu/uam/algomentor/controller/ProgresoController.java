@@ -16,6 +16,7 @@ import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.ReporteProgresoService;
+import ni.edu.uam.algomentor.util.Tema;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -141,6 +142,7 @@ public class ProgresoController {
 
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setTitle(titulo);
         alerta.setHeaderText(null);
         alerta.setContentText(mensaje);
