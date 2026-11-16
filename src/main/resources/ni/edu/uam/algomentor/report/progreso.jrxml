@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="progreso_algomentor"
+              pageWidth="595"
+              pageHeight="842"
+              columnWidth="515"
+              leftMargin="40"
+              rightMargin="40"
+              topMargin="36"
+              bottomMargin="36"
+              whenNoDataType="AllSectionsNoDetail">
+    <parameter name="perfilNombre" class="java.lang.String"/>
+    <parameter name="fechaGeneracion" class="java.lang.String"/>
+    <parameter name="totalIntentos" class="java.lang.Long"/>
+    <parameter name="intentosCorrectos" class="java.lang.Long"/>
+    <parameter name="intentosIncorrectos" class="java.lang.Long"/>
+    <parameter name="intentosSinCalificar" class="java.lang.Long"/>
+    <field name="nombre" class="java.lang.String"/>
+    <field name="aciertos" class="java.lang.Integer"/>
+    <field name="errores" class="java.lang.Integer"/>
+    <field name="porcentajeAciertos" class="java.lang.Double"/>
+    <title height="150">
+        <element kind="textField" x="0" y="0" width="515" height="32" fontSize="20.0" bold="true">
+            <expression><![CDATA["AlgoMentor | Informe de progreso"]]></expression>
+        </element>
+        <element kind="textField" x="0" y="42" width="515" height="20">
+            <expression><![CDATA["Perfil: " + $P{perfilNombre}]]></expression>
+        </element>
+        <element kind="textField" x="0" y="64" width="515" height="20">
+            <expression><![CDATA["Generado: " + $P{fechaGeneracion}]]></expression>
+        </element>
+        <element kind="textField" x="0" y="92" width="515" height="20">
+            <expression><![CDATA["Intentos: " + $P{totalIntentos}
+                    + " | Correctos: " + $P{intentosCorrectos}
+                    + " | Incorrectos: " + $P{intentosIncorrectos}
+                    + " | Sin calificar: " + $P{intentosSinCalificar}]]></expression>
+        </element>
+        <element kind="textField" x="0" y="125" width="515" height="20" fontSize="13.0" bold="true">
+            <expression><![CDATA["Resultados por habilidad"]]></expression>
+        </element>
+    </title>
+    <columnHeader height="26">
+        <element kind="textField" x="0" y="0" width="235" height="26" bold="true" vTextAlign="Middle">
+            <expression><![CDATA["Habilidad"]]></expression>
+        </element>
+        <element kind="textField" x="235" y="0" width="90" height="26" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["Aciertos"]]></expression>
+        </element>
+        <element kind="textField" x="325" y="0" width="90" height="26" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["Errores"]]></expression>
+        </element>
+        <element kind="textField" x="415" y="0" width="100" height="26" bold="true" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["Acierto %"]]></expression>
+        </element>
+    </columnHeader>
+    <detail>
+        <band height="24">
+            <element kind="textField" x="0" y="0" width="235" height="24" vTextAlign="Middle">
+                <expression><![CDATA[$F{nombre}]]></expression>
+            </element>
+            <element kind="textField" x="235" y="0" width="90" height="24" hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA[$F{aciertos}]]></expression>
+            </element>
+            <element kind="textField" x="325" y="0" width="90" height="24" hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA[$F{errores}]]></expression>
+            </element>
+            <element kind="textField" x="415" y="0" width="100" height="24" pattern="#,##0.0'%'"
+                     hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA[$F{porcentajeAciertos}]]></expression>
+            </element>
+        </band>
+    </detail>
+    <noData height="28">
+        <element kind="textField" x="0" y="0" width="515" height="24" vTextAlign="Middle">
+            <expression><![CDATA["No hay progreso por habilidad registrado para este perfil."]]></expression>
+        </element>
+    </noData>
+</jasperReport>
