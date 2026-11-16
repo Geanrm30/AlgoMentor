@@ -2,6 +2,7 @@ package ni.edu.uam.algomentor.controller;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -9,6 +10,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import ni.edu.uam.algomentor.api.OpenTriviaClient;
 import ni.edu.uam.algomentor.api.OpenTriviaQuestion;
+import ni.edu.uam.algomentor.util.Animaciones;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +46,7 @@ public class RepasoApiController {
         lblEstado.setText("Consultando Open Trivia DB…");
         lblProgreso.setText("Cargando preguntas…");
         lblPregunta.setText("");
-        lblResultado.setText("");
+        Animaciones.mostrarResultado(lblResultado, "", Animaciones.Estado.NEUTRO);
         contenedorRespuestas.getChildren().clear();
 
         Task<List<OpenTriviaQuestion>> task = new Task<>() {
@@ -87,7 +89,7 @@ public class RepasoApiController {
                 .findFirst()
                 .orElse(null);
         if (seleccion == null) {
-            lblResultado.setText("Selecciona una respuesta antes de verificar.");
+            Animaciones.mostrarResultado(lblResultado, "Selecciona una respuesta antes de verificar.", Animaciones.Estado.ERROR);
             return;
         }
 
@@ -95,12 +97,14 @@ public class RepasoApiController {
         respuestaVerificada = true;
         btnVerificar.setDisable(true);
         contenedorRespuestas.setDisable(true);
+        marcarRespuestas(seleccion, pregunta.correctAnswer());
         if (seleccion.getText().equals(pregunta.correctAnswer())) {
             respuestasCorrectas++;
-            lblResultado.setText("¡Correcto!");
+            Animaciones.mostrarResultado(lblResultado, "¡Correcto!", Animaciones.Estado.CORRECTO);
+            Animaciones.pulso(seleccion);
         } else {
-            lblResultado.setText("Incorrecto. La respuesta correcta es: "
-                    + pregunta.correctAnswer());
+            Animaciones.mostrarResultado(lblResultado, "Incorrecto. La respuesta correcta es: "
+                    + pregunta.correctAnswer(), Animaciones.Estado.ERROR);
         }
         btnSiguiente.setDisable(false);
     }
@@ -115,8 +119,9 @@ public class RepasoApiController {
             lblProgreso.setText("Repaso terminado: " + respuestasCorrectas + " de "
                     + preguntas.size() + " respuestas correctas.");
             lblPregunta.setText("¡Terminaste el repaso!");
-            lblResultado.setText("");
+            Animaciones.mostrarResultado(lblResultado, "", Animaciones.Estado.NEUTRO);
             contenedorRespuestas.getChildren().clear();
+            Animaciones.entrar(lblPregunta, 0, 10);
             btnSiguiente.setDisable(true);
             return;
         }
@@ -141,9 +146,23 @@ public class RepasoApiController {
         lblProgreso.setText("Pregunta " + (indicePregunta + 1) + " de " + preguntas.size()
                 + " · Correctas: " + respuestasCorrectas);
         lblPregunta.setText(pregunta.question());
-        lblResultado.setText("");
+        Animaciones.mostrarResultado(lblResultado, "", Animaciones.Estado.NEUTRO);
         contenedorRespuestas.setDisable(false);
         btnVerificar.setDisable(false);
         btnSiguiente.setDisable(true);
+        Animaciones.entrar(lblPregunta, 0, 10);
+        Animaciones.entrarEscalonado(contenedorRespuestas.getChildren(), 12);
+    }
+
+    private void marcarRespuestas(RadioButton seleccion, String correcta) {
+        for (Node nodo : contenedorRespuestas.getChildren()) {
+            if (nodo instanceof RadioButton radio) {
+                if (radio.getText().equals(correcta)) {
+                    radio.getStyleClass().add("respuesta-correcta");
+                } else if (radio == seleccion) {
+                    radio.getStyleClass().add("respuesta-incorrecta");
+                }
+            }
+        }
     }
 }

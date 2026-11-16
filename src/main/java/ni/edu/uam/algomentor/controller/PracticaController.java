@@ -21,6 +21,7 @@ import ni.edu.uam.algomentor.service.EvaluadorPractica;
 import ni.edu.uam.algomentor.service.EvaluadorPasoMatriz;
 import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.RegistroPracticaService;
+import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.Tema;
 
 import java.util.List;
@@ -86,7 +87,7 @@ public class PracticaController {
 
     @FXML
     private void recargar() {
-        lblResultado.setText("Cargando perfiles y ejercicios…");
+        Animaciones.mostrarResultado(lblResultado, "Cargando perfiles y ejercicios…", Animaciones.Estado.NEUTRO);
         ejecutarEnSegundoPlano(() -> {
             List<Perfil> perfiles = new PerfilService().listarPerfiles();
             List<Ejercicio> ejercicios = new EjercicioDAO().listarConAlgoritmo().stream()
@@ -96,9 +97,9 @@ public class PracticaController {
             Platform.runLater(() -> {
                 cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));
                 cmbEjercicio.setItems(FXCollections.observableArrayList(ejercicios));
-                lblResultado.setText(ejercicios.isEmpty()
+                Animaciones.mostrarResultado(lblResultado, ejercicios.isEmpty()
                         ? "No hay ejercicios compatibles. Crea uno en Gestión de contenido."
-                        : "Selecciona un perfil y un ejercicio.");
+                        : "Selecciona un perfil y un ejercicio.", Animaciones.Estado.NEUTRO);
             });
         }, "No se pudieron cargar los datos. Revisa PostgreSQL y vuelve a intentar.");
     }
@@ -118,7 +119,7 @@ public class PracticaController {
                 cmbPerfil.getItems().add(perfil);
                 cmbPerfil.setValue(perfil);
                 txtNuevoPerfil.clear();
-                lblResultado.setText("Perfil creado.");
+                Animaciones.mostrarResultado(lblResultado, "Perfil creado.", Animaciones.Estado.CORRECTO);
             });
         }, "No se pudo crear el perfil. Puede que ya exista o que PostgreSQL no esté disponible.");
     }
@@ -137,13 +138,16 @@ public class PracticaController {
                         txtMatrizEscrita.getText());
                 errores = verificacion.errores();
                 evaluacion = new EvaluadorPractica.Resultado(verificacion.correcto(), "");
-                lblResultado.setText(verificacion.correcto() ? "Operación correcta." : describirErrores(errores));
+                Animaciones.mostrarResultado(lblResultado,
+                        verificacion.correcto() ? "Operación correcta." : describirErrores(errores),
+                        verificacion.correcto() ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
             } else {
                 evaluacion = EvaluadorPractica.evaluar(ejercicio.getAlgoritmo().getNombre(),
                         ejercicio.getDatos(), txtRespuesta.getText());
                 errores = List.of();
-                lblResultado.setText((evaluacion.correcto() ? "Correcto." : "Incorrecto.")
-                        + " Respuesta esperada: " + evaluacion.esperado());
+                Animaciones.mostrarResultado(lblResultado, (evaluacion.correcto() ? "Correcto." : "Incorrecto.")
+                        + " Respuesta esperada: " + evaluacion.esperado(),
+                        evaluacion.correcto() ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
             }
             respuestaEvaluada = respuestaActual(ejercicio);
             btnGuardar.setDisable(false);
@@ -166,10 +170,11 @@ public class PracticaController {
         List<ErrorOperacion> erroresEvaluados = errores;
         int duracion = (int) Math.min(Integer.MAX_VALUE, Math.max(0, (System.nanoTime() - inicioNanos) / 1_000_000_000L));
         btnGuardar.setDisable(true);
-        lblResultado.setText("Guardando intento…");
+        Animaciones.mostrarResultado(lblResultado, "Guardando intento…", Animaciones.Estado.NEUTRO);
         ejecutarEnSegundoPlano(() -> {
             new RegistroPracticaService().registrar(perfil.getId(), ejercicio.getId(), respuesta, correcto, duracion, erroresEvaluados);
-            Platform.runLater(() -> lblResultado.setText("Intento guardado. " + (correcto ? "Correcto." : "Incorrecto.")));
+            Platform.runLater(() -> Animaciones.mostrarResultado(lblResultado,
+                    "Intento guardado. " + (correcto ? "Correcto." : "Incorrecto."), Animaciones.Estado.CORRECTO));
         }, "No se pudo guardar el intento. Revisa la conexión y el esquema.",
                 () -> btnGuardar.setDisable(false));
     }
@@ -224,8 +229,8 @@ public class PracticaController {
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, mensajeError, e);
                 Platform.runLater(() -> {
-                    lblResultado.setText(e.getMessage() != null && e.getMessage().contains("schema.sql")
-                            ? e.getMessage() : mensajeError);
+                    Animaciones.mostrarResultado(lblResultado, e.getMessage() != null && e.getMessage().contains("schema.sql")
+                            ? e.getMessage() : mensajeError, Animaciones.Estado.ERROR);
                     alFallar.run();
                 });
             }
