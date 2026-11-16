@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ReporteProgresoService {
 
@@ -30,16 +31,39 @@ public class ReporteProgresoService {
     private static final DateTimeFormatter FORMATO_FECHA =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.forLanguageTag("es"));
 
-    private final PerfilService perfilService;
-    private final EstadisticasDAO estadisticasDAO;
+    @FunctionalInterface
+    public interface ProveedorPerfil {
+        Optional<Perfil> buscarPorId(Long perfilId);
+    }
+
+    public interface ProveedorEstadisticas {
+        EstadisticasDAO.ResumenIntentos obtenerResumenIntentos(Long perfilId);
+        List<EstadisticasDAO.EstadisticaHabilidad> listarProgresoPorHabilidad(Long perfilId);
+    }
+
+    private final ProveedorPerfil perfilService;
+    private final ProveedorEstadisticas estadisticasDAO;
 
     public ReporteProgresoService() {
-        this(new PerfilService(), new EstadisticasDAO());
+        this(
+                new PerfilService()::buscarPorId,
+                crearProveedorEstadisticas(new EstadisticasDAO())
+        );
     }
 
     public ReporteProgresoService(
             PerfilService perfilService,
             EstadisticasDAO estadisticasDAO
+    ) {
+        this(
+                Objects.requireNonNull(perfilService)::buscarPorId,
+                crearProveedorEstadisticas(Objects.requireNonNull(estadisticasDAO))
+        );
+    }
+
+    public ReporteProgresoService(
+            ProveedorPerfil perfilService,
+            ProveedorEstadisticas estadisticasDAO
     ) {
         this.perfilService = Objects.requireNonNull(perfilService);
         this.estadisticasDAO = Objects.requireNonNull(estadisticasDAO);
@@ -91,5 +115,23 @@ public class ReporteProgresoService {
         );
         byte[] pdf = JasperExportManager.exportReportToPdf(reporte);
         return Files.write(destino, pdf);
+    }
+
+    private static ProveedorEstadisticas crearProveedorEstadisticas(
+            EstadisticasDAO dao
+    ) {
+        return new ProveedorEstadisticas() {
+            @Override
+            public EstadisticasDAO.ResumenIntentos obtenerResumenIntentos(Long perfilId) {
+                return dao.obtenerResumenIntentos(perfilId);
+            }
+
+            @Override
+            public List<EstadisticasDAO.EstadisticaHabilidad> listarProgresoPorHabilidad(
+                    Long perfilId
+            ) {
+                return dao.listarProgresoPorHabilidad(perfilId);
+            }
+        };
     }
 }
