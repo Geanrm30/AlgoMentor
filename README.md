@@ -71,6 +71,13 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 - **Progreso:** selecciona un perfil para consultar sus intentos y aciertos por habilidad. Pulsa **Exportar PDF** para guardar un informe con el resumen de intentos y los resultados por habilidad. El informe se genera usando JasperReports y los datos consultados mediante Hibernate.
 - **Repaso API:** carga preguntas de opción múltiple de computación desde Open Trivia DB, permite seleccionar una respuesta y muestra el resultado. Esta función no guarda respuestas en PostgreSQL.
 
+### Interfaz y animaciones
+
+- **Tema oscuro:** la hoja de estilos `algomentor.css` define la paleta (cian y violeta), las tarjetas, los botones, las tablas y los diálogos. Los cuadros de alerta usan el mismo tema.
+- **Animaciones:** `Animaciones` reúne las transiciones de JavaFX. Las pestañas y las tarjetas aparecen de forma escalonada, los botones reaccionan al pasar el cursor y al pulsarlos, y la retroalimentación de Práctica y Repaso API aparece con un estado correcto o de error.
+- **Simulador:** las celdas aparecen con rebote al simular. Cuando cambia el estado entre pasos, las celdas de un arreglo se deslizan de su posición anterior a la nueva (`MovimientoCeldas` calcula ese desplazamiento) y las celdas activas pulsan. En las matrices se resaltan las celdas que cambiaron.
+- **Progreso:** cada habilidad muestra una barra animada. Verde desde 70 %, ámbar desde 40 % y roja por debajo.
+
 ### Informe PDF de progreso
 
 1. Configura PostgreSQL, ejecuta `schema.sql` e inicia la aplicación.
