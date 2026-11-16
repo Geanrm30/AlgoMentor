@@ -3,6 +3,7 @@ package ni.edu.uam.algomentor.controller;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -24,8 +25,12 @@ import ni.edu.uam.algomentor.engine.InsertionSort;
 import ni.edu.uam.algomentor.engine.Paso;
 import ni.edu.uam.algomentor.engine.ResultadoEjecucion;
 import ni.edu.uam.algomentor.engine.ResultadoMatriz;
+import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
+import ni.edu.uam.algomentor.util.MovimientoCeldas;
+import ni.edu.uam.algomentor.util.Tema;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 import java.util.logging.Level;
@@ -55,6 +60,7 @@ public class SimuladorController {
     private String conclusion = "";
     private MediaPlayer reproductor;
     private int pasoConAudio = -1;
+    private String[] celdasPrevias;
 
     @FXML
     private void initialize() {
@@ -94,6 +100,7 @@ public class SimuladorController {
                 conclusion = "Resultado: " + resultado.estadoFinal();
             }
             indice = -1;
+            celdasPrevias = null;
             actualizar();
         } catch (IllegalArgumentException e) {
             limpiarResultado();
@@ -136,6 +143,7 @@ public class SimuladorController {
         lblPaso.setText(paso == null ? "Estado inicial" : "Paso " + paso.numero() + " de " + resultado.pasos().size() + " · " + paso.tipo());
         lblExplicacion.setText(paso == null ? "Pulsa Siguiente para recorrer los pasos." : paso.explicacion()
                 + (indice == resultado.pasos().size() - 1 ? "\n" + conclusion : ""));
+        Animaciones.entrar(lblExplicacion, 0, 6);
         btnAnterior.setDisable(indice < 0);
         btnSiguiente.setDisable(indice + 1 >= resultado.pasos().size());
         btnCargarAudio.setDisable(indice < 0);
@@ -207,23 +215,81 @@ public class SimuladorController {
 
     private void mostrarArreglo(int[] valores, List<Integer> destacados) {
         contenedorMatriz.getChildren().clear();
+        double[] xPrevias = posicionesX(contenedorArreglo);
         contenedorArreglo.getChildren().clear();
+        String[] textos = new String[valores.length];
         for (int i = 0; i < valores.length; i++) {
-            contenedorArreglo.getChildren().add(celda(Integer.toString(valores[i]), destacados.contains(i)));
+            textos[i] = Integer.toString(valores[i]);
+            contenedorArreglo.getChildren().add(celda(textos[i], destacados.contains(i)));
+        }
+        animarArreglo(textos, destacados, xPrevias);
+        celdasPrevias = textos;
+    }
+
+    private void animarArreglo(String[] textos, List<Integer> destacados, double[] xPrevias) {
+        List<Node> celdas = contenedorArreglo.getChildren();
+        if (celdasPrevias == null || celdasPrevias.length != textos.length) {
+            aparecerEscalonado(celdas);
+            return;
+        }
+        contenedorArreglo.applyCss();
+        contenedorArreglo.layout();
+        int[] origen = MovimientoCeldas.origenes(celdasPrevias, textos);
+        for (int i = 0; i < celdas.size(); i++) {
+            Node celda = celdas.get(i);
+            if (origen[i] == -1) {
+                Animaciones.aparecerConRebote(celda, 0);
+            } else if (origen[i] != i) {
+                Animaciones.deslizarDesde(celda, xPrevias[origen[i]] - celda.getLayoutX());
+            } else if (destacados.contains(i)) {
+                Animaciones.pulso(celda);
+            }
         }
     }
 
     private void mostrarMatriz(Fraccion[][] matriz, List<Integer> destacados) {
         contenedorArreglo.getChildren().clear();
         contenedorMatriz.getChildren().clear();
+        List<String> textos = new ArrayList<>();
+        List<Node> celdas = new ArrayList<>();
         for (int i = 0; i < matriz.length; i++) {
             HBox fila = new HBox(8);
             fila.setAlignment(Pos.CENTER);
+            fila.getStyleClass().add("fila-matriz");
             for (Fraccion valor : matriz[i]) {
-                fila.getChildren().add(celda(valor.toString(), destacados.contains(i)));
+                Label celda = celda(valor.toString(), destacados.contains(i));
+                textos.add(valor.toString());
+                celdas.add(celda);
+                fila.getChildren().add(celda);
             }
             contenedorMatriz.getChildren().add(fila);
         }
+        String[] actuales = textos.toArray(new String[0]);
+        if (celdasPrevias == null || celdasPrevias.length != actuales.length) {
+            aparecerEscalonado(celdas);
+        } else {
+            for (int k = 0; k < actuales.length; k++) {
+                if (!actuales[k].equals(celdasPrevias[k])) {
+                    celdas.get(k).getStyleClass().add("valor-cambiado");
+                    Animaciones.aparecerConRebote(celdas.get(k), 0);
+                }
+            }
+        }
+        celdasPrevias = actuales;
+    }
+
+    private void aparecerEscalonado(List<? extends Node> celdas) {
+        for (int i = 0; i < celdas.size(); i++) {
+            Animaciones.aparecerConRebote(celdas.get(i), Math.min(i * 40.0, 400));
+        }
+    }
+
+    private double[] posicionesX(HBox contenedor) {
+        double[] posiciones = new double[contenedor.getChildren().size()];
+        for (int i = 0; i < posiciones.length; i++) {
+            posiciones[i] = contenedor.getChildren().get(i).getLayoutX();
+        }
+        return posiciones;
     }
 
     private Label celda(String valor, boolean activa) {
@@ -239,6 +305,7 @@ public class SimuladorController {
         liberarAudio();
         resultado = null;
         indice = -1;
+        celdasPrevias = null;
         contenedorArreglo.getChildren().clear();
         contenedorMatriz.getChildren().clear();
         lblPaso.setText("Prepara una entrada para empezar.");
@@ -250,6 +317,7 @@ public class SimuladorController {
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);

@@ -1,14 +1,19 @@
 package ni.edu.uam.algomentor.controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
@@ -16,6 +21,8 @@ import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.ReporteProgresoService;
+import ni.edu.uam.algomentor.util.Animaciones;
+import ni.edu.uam.algomentor.util.Tema;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,6 +35,8 @@ import net.sf.jasperreports.engine.JRException;
 public class ProgresoController {
 
     private static final Logger LOG = Logger.getLogger(ProgresoController.class.getName());
+    private static final double UMBRAL_ALTO = 70;
+    private static final double UMBRAL_MEDIO = 40;
 
     @FXML private ComboBox<Perfil> cmbPerfil;
     @FXML private Label lblResumen;
@@ -35,7 +44,7 @@ public class ProgresoController {
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colHabilidad;
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colAciertos;
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colErrores;
-    @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colPorcentaje;
+    @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, Double> colPorcentaje;
 
     @FXML
     private void initialize() {
@@ -46,7 +55,8 @@ public class ProgresoController {
         colHabilidad.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().nombre()));
         colAciertos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().aciertos())));
         colErrores.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().errores())));
-        colPorcentaje.setCellValueFactory(c -> new ReadOnlyStringWrapper(String.format("%.1f%%", c.getValue().porcentajeAciertos())));
+        colPorcentaje.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().porcentajeAciertos()));
+        colPorcentaje.setCellFactory(columna -> new CeldaPorcentaje());
         cargarPerfiles();
     }
 
@@ -141,10 +151,44 @@ public class ProgresoController {
 
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setTitle(titulo);
         alerta.setHeaderText(null);
         alerta.setContentText(mensaje);
         alerta.showAndWait();
+    }
+
+    private static final class CeldaPorcentaje extends TableCell<EstadisticasDAO.EstadisticaHabilidad, Double> {
+
+        private final ProgressBar barra = new ProgressBar(0);
+        private final Label etiqueta = new Label();
+        private final HBox contenido = new HBox(10, barra, etiqueta);
+        private Double animado;
+
+        private CeldaPorcentaje() {
+            barra.setPrefWidth(100);
+            etiqueta.getStyleClass().add("porcentaje-habilidad");
+            contenido.setAlignment(Pos.CENTER_LEFT);
+        }
+
+        @Override
+        protected void updateItem(Double porcentaje, boolean vacia) {
+            super.updateItem(porcentaje, vacia);
+            if (vacia || porcentaje == null) {
+                animado = null;
+                setGraphic(null);
+                return;
+            }
+            barra.getStyleClass().removeAll("barra-ok", "barra-media", "barra-baja");
+            barra.getStyleClass().add(porcentaje >= UMBRAL_ALTO ? "barra-ok"
+                    : porcentaje >= UMBRAL_MEDIO ? "barra-media" : "barra-baja");
+            etiqueta.setText(String.format("%.1f%%", porcentaje));
+            setGraphic(contenido);
+            if (!porcentaje.equals(animado)) {
+                animado = porcentaje;
+                Animaciones.animarProgreso(barra, porcentaje / 100);
+            }
+        }
     }
 
     private void ejecutarEnSegundoPlano(Runnable accion) {
