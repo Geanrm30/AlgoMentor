@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import ni.edu.uam.algomentor.dao.RankingDAO;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -37,8 +38,28 @@ public final class EjerciciosApiServer {
         HttpServer nuevo = HttpServer.create(direccion, 0);
         nuevo.createContext("/api/ejercicios/exportar", intercambio -> atender(intercambio, true, servicio));
         nuevo.createContext("/api/ejercicios/importar", intercambio -> atender(intercambio, false, servicio));
+        nuevo.createContext("/api/ranking", EjerciciosApiServer::atenderRanking);
         nuevo.start();
         return nuevo;
+    }
+
+    private static void atenderRanking(HttpExchange intercambio) throws IOException {
+        try (intercambio) {
+            ObjectMapper json = new ObjectMapper();
+            if (!"/api/ranking".equals(intercambio.getRequestURI().getPath())) {
+                responder(intercambio, json, 404, Map.of("error", "Ruta no encontrada."));
+            } else if (!"GET".equals(intercambio.getRequestMethod())) {
+                intercambio.getResponseHeaders().set("Allow", "GET");
+                responder(intercambio, json, 405, Map.of("error", "Método no permitido."));
+            } else {
+                try {
+                    responder(intercambio, json, 200, new RankingDAO().listar());
+                } catch (RuntimeException e) {
+                    responder(intercambio, json, 503,
+                            Map.of("error", "No se pudo consultar el ranking. Revisa PostgreSQL."));
+                }
+            }
+        }
     }
 
     private static void atender(HttpExchange intercambio, boolean exportar, IntercambioEjerciciosService servicio)
