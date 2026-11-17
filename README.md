@@ -70,7 +70,7 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 - **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
 - **Progreso:** selecciona un perfil para consultar sus intentos y aciertos por habilidad. Pulsa **Exportar PDF** para guardar un informe con el resumen de intentos y los resultados por habilidad. El informe se genera usando JasperReports y los datos consultados mediante Hibernate.
 - **Intercambio API:** exporta ejercicios a JSON e importa lotes compartidos por otros equipos mediante una API HTTP local. Los ejercicios se relacionan por nombre de algoritmo, sin compartir identificadores de la base de datos.
-- **Ranking:** consulta `GET /api/ranking` y presenta los perfiles ordenados por aciertos y porcentaje de intentos evaluados correctos. Los perfiles sin intentos aparecen con cero aciertos y cero por ciento. En los empates se ordenan por nombre.
+- **Verificar sistema API:** consulta el servicio externo math.js para resolver un sistema lineal de solución única y muestra su respuesta junto con la solución exacta del motor de AlgoMentor.
 
 ### Interfaz y animaciones
 
@@ -106,8 +106,16 @@ idénticos que ya existan se omiten.
 
 Los endpoints son `GET http://127.0.0.1:8765/api/ejercicios/exportar` y
 `POST http://127.0.0.1:8765/api/ejercicios/importar` con `Content-Type: application/json`.
-La misma API ofrece `GET http://127.0.0.1:8765/api/ranking`. La pestaña **Ranking**
-consulta ese endpoint y permite actualizar la clasificación después de guardar prácticas.
+
+### Verificación externa de sistemas lineales
+
+En **Aprender > Verificar sistema API**, escribe una matriz ampliada cuadrada, con una fila
+por línea y valores separados por comas. Por ejemplo, `2,1,5` y `1,-1,1` en líneas distintas.
+AlgoMentor muestra su solución exacta con Gauss y envía los coeficientes y términos
+independientes por HTTPS a `https://api.mathjs.org/v4/` mediante `POST` JSON. La respuesta
+de math.js muestra una solución calculada de forma independiente. Esta consulta requiere
+Internet y acepta sistemas con solución única. Si el servicio falla, la solución local
+permanece visible. La API local de intercambio de ejercicios sigue disponible por separado.
 El cuerpo usa este formato:
 
 ```json
