@@ -70,6 +70,7 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 - **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
 - **Progreso:** selecciona un perfil para consultar sus intentos y aciertos por habilidad. Pulsa **Exportar PDF** para guardar un informe con el resumen de intentos y los resultados por habilidad. El informe se genera usando JasperReports y los datos consultados mediante Hibernate.
 - **Intercambio API:** exporta ejercicios a JSON e importa lotes compartidos por otros equipos mediante una API HTTP local. Los ejercicios se relacionan por nombre de algoritmo, sin compartir identificadores de la base de datos.
+- **Ranking:** consulta `GET /api/ranking` y presenta los perfiles ordenados por aciertos y porcentaje de intentos evaluados correctos. Los perfiles sin intentos aparecen con cero aciertos y cero por ciento. En los empates se ordenan por nombre.
 
 ### Interfaz y animaciones
 
@@ -105,6 +106,8 @@ idénticos que ya existan se omiten.
 
 Los endpoints son `GET http://127.0.0.1:8765/api/ejercicios/exportar` y
 `POST http://127.0.0.1:8765/api/ejercicios/importar` con `Content-Type: application/json`.
+La misma API ofrece `GET http://127.0.0.1:8765/api/ranking`. La pestaña **Ranking**
+consulta ese endpoint y permite actualizar la clasificación después de guardar prácticas.
 El cuerpo usa este formato:
 
 ```json

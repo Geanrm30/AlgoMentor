@@ -35,6 +35,9 @@
                 <Tab text="Intercambio API">
                     <fx:include source="intercambio-ejercicios.fxml" />
                 </Tab>
+                <Tab text="Ranking">
+                    <fx:include source="ranking.fxml" />
+                </Tab>
             </tabs>
         </TabPane>
     </center>
