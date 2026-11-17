@@ -2,6 +2,7 @@ package ni.edu.uam.algomentor.service;
 
 import ni.edu.uam.algomentor.engine.*;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
+import ni.edu.uam.algomentor.util.TextoInterfaz;
 
 import java.util.Arrays;
 
@@ -15,7 +16,9 @@ public final class ComandosTerminal {
         }
         String[] partes = comando.strip().split("\\s+", 3);
         if (partes[0].equalsIgnoreCase("ayuda") && partes.length == 1) {
-            return "ayuda\nordenar bubble 4,2,1\nordenar insertion 4,2,1\nresolver gauss 1,1,3;1,-1,1\nresolver jordan 1,1,3;1,-1,1\nlimpiar";
+            return "Métodos: bubble (burbuja), insertion (inserción), gauss y jordan.\n"
+                    + "Ejemplos:\nordenar bubble 4,2,1\nordenar insertion 4,2,1\n"
+                    + "resolver gauss 1,1,3;1,-1,1\nresolver jordan 1,1,3;1,-1,1\nlimpiar";
         }
         if (partes[0].equalsIgnoreCase("limpiar") && partes.length == 1) {
             return "";
@@ -39,8 +42,8 @@ public final class ComandosTerminal {
                 case "jordan" -> new GaussJordan().ejecutar(datos);
                 default -> throw new IllegalArgumentException("Método matricial desconocido.");
             };
-            return describir(resultado.ejecucion()) + "Sistema: " + resultado.clasificacion()
-                    + (resultado.solucion().isEmpty() ? "" : " · " + resultado.solucion());
+            return describir(resultado.ejecucion()) + "Sistema: " + TextoInterfaz.clasificacion(resultado.clasificacion())
+                    + (resultado.solucion().isEmpty() ? "" : " · " + TextoInterfaz.solucion(resultado.solucion()));
         }
         throw new IllegalArgumentException("Comando desconocido. Usa ayuda para ver las opciones.");
     }

@@ -8,12 +8,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.engine.ErrorOperacion;
 import ni.edu.uam.algomentor.engine.ResultadoVerificacion;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
+import ni.edu.uam.algomentor.engine.FormatoDatos;
+import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.dao.EjercicioDAO;
 import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Perfil;
@@ -22,7 +23,10 @@ import ni.edu.uam.algomentor.service.EvaluadorPasoMatriz;
 import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.RegistroPracticaService;
 import ni.edu.uam.algomentor.util.Animaciones;
+import ni.edu.uam.algomentor.util.EntradaAprendizaje;
+import ni.edu.uam.algomentor.util.EntradaMatrizVisual;
 import ni.edu.uam.algomentor.util.Tema;
+import ni.edu.uam.algomentor.util.TextoInterfaz;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -42,7 +46,7 @@ public class PracticaController {
     @FXML private TextField txtDestino;
     @FXML private TextField txtOrigen;
     @FXML private TextField txtFactor;
-    @FXML private TextArea txtMatrizEscrita;
+    @FXML private VBox entradaMatrizEscrita;
     @FXML private Label lblEnunciado;
     @FXML private Label lblResultado;
     @FXML private Button btnGuardar;
@@ -51,16 +55,22 @@ public class PracticaController {
     private String respuestaEvaluada;
     private List<ErrorOperacion> errores = List.of();
     private long inicioNanos;
+    private EntradaMatrizVisual matrizVisual;
 
     @FXML
     private void initialize() {
+        matrizVisual = new EntradaMatrizVisual();
+        matrizVisual.fijarDimensiones(true);
+        matrizVisual.alCambiar(this::invalidarEvaluacion);
+        entradaMatrizEscrita.getChildren().add(matrizVisual);
         cmbPerfil.setConverter(new StringConverter<>() {
             @Override public String toString(Perfil valor) { return valor == null ? "" : valor.getNombre(); }
             @Override public Perfil fromString(String texto) { return null; }
         });
         cmbEjercicio.setConverter(new StringConverter<>() {
             @Override public String toString(Ejercicio valor) {
-                return valor == null ? "" : "#" + valor.getId() + " · " + valor.getAlgoritmo().getNombre();
+                return valor == null ? "" : "#" + valor.getId() + " · "
+                        + TextoInterfaz.algoritmo(valor.getAlgoritmo().getNombre());
             }
             @Override public Ejercicio fromString(String texto) { return null; }
         });
@@ -73,11 +83,22 @@ public class PracticaController {
             panelMatriz.setManaged(matriz);
             panelOrdenamiento.setVisible(!matriz);
             panelOrdenamiento.setManaged(!matriz);
-            lblEnunciado.setText(actual == null ? "Selecciona un ejercicio de la base de datos."
-                    : "Algoritmo: " + actual.getAlgoritmo().getNombre() + "\nDatos: " + actual.getDatos());
+            if (matriz) {
+                try {
+                    Fraccion[][] datos = actual.getDatos().startsWith(FormatoDatos.VERSION + ";MATRIZ;")
+                            ? FormatoDatos.leerMatriz(actual.getDatos())
+                            : EntradaAprendizaje.leerMatriz(actual.getDatos());
+                    matrizVisual.cargar(datos);
+                } catch (IllegalArgumentException e) {
+                    matrizVisual.limpiar();
+                    lblResultado.setText("El ejercicio tiene una matriz inválida: " + e.getMessage());
+                }
+            }
+            lblEnunciado.setText(actual == null ? "Selecciona un ejercicio de la biblioteca."
+                    : "Algoritmo: " + TextoInterfaz.algoritmo(actual.getAlgoritmo().getNombre())
+                    + "\n" + TextoInterfaz.datos(actual));
         });
         txtRespuesta.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
-        txtMatrizEscrita.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
         txtDestino.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
         txtOrigen.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
         txtFactor.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
@@ -98,10 +119,10 @@ public class PracticaController {
                 cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));
                 cmbEjercicio.setItems(FXCollections.observableArrayList(ejercicios));
                 Animaciones.mostrarResultado(lblResultado, ejercicios.isEmpty()
-                        ? "No hay ejercicios compatibles. Crea uno en Gestión de contenido."
+                        ? "No hay ejercicios para practicar. Crea uno en Biblioteca > Ejercicios."
                         : "Selecciona un perfil y un ejercicio.", Animaciones.Estado.NEUTRO);
             });
-        }, "No se pudieron cargar los datos. Revisa PostgreSQL y vuelve a intentar.");
+        }, "No se pudieron cargar los datos. Revisa la conexión con la biblioteca e inténtalo de nuevo.");
     }
 
     @FXML
@@ -121,7 +142,7 @@ public class PracticaController {
                 txtNuevoPerfil.clear();
                 Animaciones.mostrarResultado(lblResultado, "Perfil creado.", Animaciones.Estado.CORRECTO);
             });
-        }, "No se pudo crear el perfil. Puede que ya exista o que PostgreSQL no esté disponible.");
+        }, "No se pudo crear el perfil. Es posible que ya exista o que la biblioteca no esté disponible.");
     }
 
     @FXML
@@ -135,7 +156,7 @@ public class PracticaController {
             if (esMatriz(ejercicio)) {
                 ResultadoVerificacion verificacion = new EvaluadorPasoMatriz().evaluar(ejercicio.getDatos(),
                         tipoOperacion(), txtDestino.getText(), txtOrigen.getText(), txtFactor.getText(),
-                        txtMatrizEscrita.getText());
+                        matrizVisual.texto());
                 errores = verificacion.errores();
                 evaluacion = new EvaluadorPractica.Resultado(verificacion.correcto(), "");
                 Animaciones.mostrarResultado(lblResultado,
@@ -202,7 +223,7 @@ public class PracticaController {
     private String respuestaActual(Ejercicio ejercicio) {
         return esMatriz(ejercicio)
                 ? String.join(" | ", String.valueOf(cmbOperacion.getValue()), txtDestino.getText(),
-                        txtOrigen.getText(), txtFactor.getText(), txtMatrizEscrita.getText())
+                        txtOrigen.getText(), txtFactor.getText(), matrizVisual.texto())
                 : txtRespuesta.getText();
     }
 
@@ -229,8 +250,7 @@ public class PracticaController {
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, mensajeError, e);
                 Platform.runLater(() -> {
-                    Animaciones.mostrarResultado(lblResultado, e.getMessage() != null && e.getMessage().contains("schema.sql")
-                            ? e.getMessage() : mensajeError, Animaciones.Estado.ERROR);
+                    Animaciones.mostrarResultado(lblResultado, mensajeError, Animaciones.Estado.ERROR);
                     alFallar.run();
                 });
             }

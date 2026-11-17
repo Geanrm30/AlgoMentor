@@ -4,7 +4,7 @@
 
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ComparadorController">
     <Label text="Comparar ordenamientos" styleClass="section-title" />
-    <Label text="Ejecuta Bubble Sort e Insertion Sort con la misma entrada. Las comparaciones y los intercambios se cuentan a partir de los pasos del motor." wrapText="true" />
+    <Label text="Compara los métodos burbuja e inserción con los mismos números. Verás cuántas comparaciones, intercambios y pasos necesita cada uno." wrapText="true" />
     <HBox spacing="10">
         <TextField fx:id="txtDatos" promptText="Ej. 5, 1, 4, 2" accessibleText="Números enteros separados por coma" HBox.hgrow="ALWAYS" />
         <Button text="Comparar" onAction="#comparar" styleClass="primary-button" />

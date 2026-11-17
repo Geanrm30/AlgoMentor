@@ -557,6 +557,22 @@
     -fx-border-width: 0 3 0 3;
 }
 
+.desplazamiento-matriz, .desplazamiento-matriz > .viewport {
+    -fx-background-color: -ac-surface;
+}
+
+.desplazamiento-matriz {
+    -fx-border-color: -ac-border;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 8;
+}
+
+.cabecera-matriz {
+    -fx-text-fill: -ac-accent;
+    -fx-font-weight: bold;
+}
+
 /* ---------- Diálogos ---------- */
 
 .dialog-pane {

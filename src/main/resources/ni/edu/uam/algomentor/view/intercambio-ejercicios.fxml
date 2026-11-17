@@ -9,10 +9,10 @@
         <VBox spacing="18" styleClass="tab-content">
             <VBox spacing="12" styleClass="card">
                 <Label text="Compartir ejercicios" styleClass="section-title" />
-                <Label text="Exporta los ejercicios a JSON para compartirlos con otro equipo, o importa un archivo recibido. El equipo receptor debe tener creados los algoritmos correspondientes." wrapText="true" />
+                <Label text="Guarda tus ejercicios en un archivo para compartirlos o carga los que recibiste. Antes de cargarlos, crea en la biblioteca los algoritmos que utilizan." wrapText="true" />
                 <HBox spacing="10">
-                    <Button fx:id="btnExportar" text="Exportar JSON" onAction="#exportar" styleClass="primary-button" />
-                    <Button fx:id="btnImportar" text="Importar JSON" onAction="#importar" />
+                    <Button fx:id="btnExportar" text="Guardar archivo" onAction="#exportar" styleClass="primary-button" />
+                    <Button fx:id="btnImportar" text="Cargar archivo" onAction="#importar" />
                 </HBox>
                 <Label fx:id="lblEstado" wrapText="true" />
             </VBox>

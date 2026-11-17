@@ -25,7 +25,7 @@ public class MainApp extends Application {
         TabPane navegacion = new TabPane();
         navegacion.getStyleClass().addAll("content-tabs", "nav-principal");
         navegacion.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        navegacion.getTabs().addAll(new Tab("Aprender", experiencia), new Tab("Gestión de contenido", gestion));
+        navegacion.getTabs().addAll(new Tab("Aprender", experiencia), new Tab("Biblioteca", gestion));
         Scene scene = new Scene(navegacion, 1100, 720);
         URL stylesheet = Tema.hojaEstilos();
         if (stylesheet == null) {

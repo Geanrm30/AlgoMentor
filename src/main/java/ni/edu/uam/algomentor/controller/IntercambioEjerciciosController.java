@@ -32,10 +32,10 @@ public class IntercambioEjerciciosController {
     private void initialize() {
         try {
             EjerciciosApiServer.iniciar();
-            lblEstado.setText("API local disponible en http://127.0.0.1:8765");
+            lblEstado.setText("Listo para compartir ejercicios.");
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "No se pudo iniciar la API de ejercicios", e);
-            lblEstado.setText("No se pudo iniciar la API. El puerto 8765 puede estar ocupado.");
+            lblEstado.setText("No se pudo preparar el intercambio. Comprueba si AlgoMentor ya está abierto en otra ventana.");
             btnExportar.setDisable(true);
             btnImportar.setDisable(true);
         }
@@ -44,7 +44,7 @@ public class IntercambioEjerciciosController {
     @FXML
     private void exportar() {
         FileChooser selector = new FileChooser();
-        selector.setTitle("Guardar ejercicios");
+        selector.setTitle("Guardar archivo de ejercicios");
         selector.setInitialFileName("ejercicios-algomentor.json");
         selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo JSON", "*.json"));
         java.io.File archivo = selector.showSaveDialog(btnExportar.getScene().getWindow());
@@ -66,7 +66,7 @@ public class IntercambioEjerciciosController {
     @FXML
     private void importar() {
         FileChooser selector = new FileChooser();
-        selector.setTitle("Importar ejercicios");
+        selector.setTitle("Cargar archivo de ejercicios");
         selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo JSON", "*.json"));
         java.io.File archivo = selector.showOpenDialog(btnImportar.getScene().getWindow());
         if (archivo == null) {
@@ -77,8 +77,8 @@ public class IntercambioEjerciciosController {
                 throw new IOException("El archivo supera 1 MB.");
             }
             ResultadoImportacion resultado = cliente.importar(Files.readAllBytes(archivo.toPath()));
-            return "Importados: " + resultado.importados() + " · Ya existentes: " + resultado.existentes()
-                    + ". Pulsa Actualizar en Práctica o Gestión de contenido.";
+            return "Ejercicios agregados: " + resultado.importados() + " · Ya existentes: " + resultado.existentes()
+                    + ". Pulsa Actualizar en Práctica o vuelve a Biblioteca.";
         });
     }
 
@@ -101,8 +101,13 @@ public class IntercambioEjerciciosController {
             btnExportar.setDisable(false);
             btnImportar.setDisable(false);
             LOG.log(Level.WARNING, "Falló el intercambio de ejercicios", tarea.getException());
-            String mensaje = tarea.getException() == null ? "Error desconocido" : tarea.getException().getMessage();
-            Animaciones.mostrarResultado(lblEstado, mensaje, Animaciones.Estado.ERROR);
+            String detalle = tarea.getException() == null ? "" : tarea.getException().getMessage();
+            boolean validacion = detalle != null && (detalle.startsWith("No existe el algoritmo")
+                    || detalle.startsWith("El archivo") || detalle.startsWith("Hay un ejercicio")
+                    || detalle.startsWith("El lote"));
+            Animaciones.mostrarResultado(lblEstado, validacion ? detalle
+                    : "No se pudo completar el intercambio. Revisa el archivo y la conexión con la biblioteca.",
+                    Animaciones.Estado.ERROR);
         });
         Thread hilo = new Thread(tarea, "algomentor-intercambio-ejercicios");
         hilo.setDaemon(true);

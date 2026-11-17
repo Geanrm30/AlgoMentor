@@ -2,19 +2,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21"
+<ScrollPane fx:id="scrollVista" fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="ni.edu.uam.algomentor.controller.VerificarSistemaApiController">
     <content>
         <VBox spacing="18" styleClass="tab-content">
             <VBox spacing="12" styleClass="card">
-                <Label text="Verificar un sistema lineal" styleClass="section-title" />
-                <Label text="Escribe una matriz ampliada cuadrada. Una ecuación por línea y valores separados por comas."
+                <Label text="Comprobar un sistema lineal" styleClass="section-title" />
+                <Label text="Elige igual número de ecuaciones e incógnitas y completa la matriz ampliada."
                        wrapText="true" />
-                <TextArea fx:id="txtMatriz" prefRowCount="5" promptText="2, 1, 5&#10;1, -1, 1"
-                          accessibleText="Matriz ampliada del sistema" />
-                <Button fx:id="btnConsultar" text="Resolver y consultar" onAction="#consultar"
+                <VBox fx:id="entradaMatriz" />
+                <Button fx:id="btnConsultar" text="Resolver y comparar" onAction="#consultar"
                         styleClass="primary-button" />
+                <Label fx:id="lblEstadoConsulta" wrapText="true" />
             </VBox>
             <VBox spacing="10" styleClass="card">
                 <Label text="Resultados" styleClass="section-title" />

@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="12" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.TerminalController">
-    <Label text="Terminal educativa" styleClass="section-title" />
+    <Label text="Practica con comandos" styleClass="section-title" />
     <Label text="Comandos disponibles: ayuda, ordenar, resolver y limpiar. Escribe ayuda para ver ejemplos." wrapText="true" />
     <TextArea fx:id="txtSalida" styleClass="terminal-salida" editable="false" wrapText="true" VBox.vgrow="ALWAYS" accessibleText="Salida de la terminal" />
     <HBox spacing="10">

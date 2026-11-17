@@ -141,7 +141,7 @@ public class ProgresoController {
                 Platform.runLater(() -> {
                     lblResumen.setText("No se pudo generar el informe.");
                     mostrarAlerta(Alert.AlertType.ERROR, "Error al generar informe",
-                            "No se pudo generar el PDF. Revisa la conexión con PostgreSQL y el destino seleccionado.");
+                            "No se pudo generar el informe. Revisa la conexión con la biblioteca y la carpeta elegida.");
                 });
             }
         }, "algomentor-reporte-progreso");
@@ -197,7 +197,7 @@ public class ProgresoController {
                 accion.run();
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, "No se pudo consultar el progreso", e);
-                Platform.runLater(() -> lblResumen.setText("No se pudo consultar el progreso. Revisa PostgreSQL y el esquema."));
+                Platform.runLater(() -> lblResumen.setText("No se pudo consultar el progreso. Revisa la conexión con la biblioteca."));
             }
         }, "algomentor-progreso");
         hilo.setDaemon(true);

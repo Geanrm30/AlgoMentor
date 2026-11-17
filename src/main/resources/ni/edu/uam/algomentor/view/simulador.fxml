@@ -9,7 +9,7 @@
                 <Label text="Configura la simulación" styleClass="section-title" />
                 <ComboBox fx:id="cmbAlgoritmo" maxWidth="Infinity" accessibleText="Algoritmo" />
                 <TextField fx:id="txtArreglo" promptText="Ej. 8, 3, 6, 1" accessibleText="Números enteros separados por coma" />
-                <TextArea fx:id="txtMatriz" prefRowCount="3" promptText="2, 1, 5&#10;1, -1, 1" accessibleText="Matriz ampliada, una fila por línea, celdas separadas por coma" />
+                <VBox fx:id="entradaMatriz" />
                 <Label fx:id="lblFormato" wrapText="true" />
                 <Button text="Simular" onAction="#simular" styleClass="primary-button" />
             </VBox>

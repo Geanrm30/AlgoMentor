@@ -8,7 +8,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -16,6 +15,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.engine.BubbleSort;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.Fraccion;
@@ -27,8 +27,10 @@ import ni.edu.uam.algomentor.engine.ResultadoEjecucion;
 import ni.edu.uam.algomentor.engine.ResultadoMatriz;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
+import ni.edu.uam.algomentor.util.EntradaMatrizVisual;
 import ni.edu.uam.algomentor.util.MovimientoCeldas;
 import ni.edu.uam.algomentor.util.Tema;
+import ni.edu.uam.algomentor.util.TextoInterfaz;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,7 @@ public class SimuladorController {
 
     @FXML private ComboBox<String> cmbAlgoritmo;
     @FXML private TextField txtArreglo;
-    @FXML private TextArea txtMatriz;
+    @FXML private VBox entradaMatriz;
     @FXML private Label lblFormato;
     @FXML private HBox contenedorArreglo;
     @FXML private VBox contenedorMatriz;
@@ -61,10 +63,17 @@ public class SimuladorController {
     private MediaPlayer reproductor;
     private int pasoConAudio = -1;
     private String[] celdasPrevias;
+    private EntradaMatrizVisual matrizVisual;
 
     @FXML
     private void initialize() {
+        matrizVisual = new EntradaMatrizVisual();
+        entradaMatriz.getChildren().add(matrizVisual);
         cmbAlgoritmo.setItems(FXCollections.observableArrayList("Bubble Sort", "Insertion Sort", "Gauss", "Gauss-Jordan"));
+        cmbAlgoritmo.setConverter(new StringConverter<>() {
+            @Override public String toString(String valor) { return valor == null ? "" : TextoInterfaz.algoritmo(valor); }
+            @Override public String fromString(String texto) { return texto; }
+        });
         cmbAlgoritmo.valueProperty().addListener((obs, anterior, actual) -> {
             limpiarResultado();
             if (actual == null) {
@@ -73,10 +82,10 @@ public class SimuladorController {
             matricial = actual.startsWith("Gauss");
             txtArreglo.setVisible(!matricial);
             txtArreglo.setManaged(!matricial);
-            txtMatriz.setVisible(matricial);
-            txtMatriz.setManaged(matricial);
+            entradaMatriz.setVisible(matricial);
+            entradaMatriz.setManaged(matricial);
             lblFormato.setText(matricial
-                    ? "Matriz ampliada: una ecuación por línea; coeficientes y resultado separados con comas. Admite fracciones como 1/2."
+                    ? "Completa los coeficientes y el término independiente b. Admite fracciones como 1/2."
                     : "Hasta 12 enteros separados por coma.");
         });
         cmbAlgoritmo.getSelectionModel().selectFirst();
@@ -87,12 +96,12 @@ public class SimuladorController {
         try {
             String algoritmo = cmbAlgoritmo.getValue();
             if (matricial) {
-                Fraccion[][] entrada = EntradaAprendizaje.leerMatriz(txtMatriz.getText());
+                Fraccion[][] entrada = matrizVisual.leerMatriz();
                 ResultadoMatriz matriz = "Gauss".equals(algoritmo)
                         ? new Gauss().ejecutar(entrada) : new GaussJordan().ejecutar(entrada);
                 resultado = matriz.ejecucion();
-                conclusion = "Sistema: " + matriz.clasificacion()
-                        + (matriz.solucion().isEmpty() ? "" : " · solución: " + matriz.solucion());
+                conclusion = "Sistema: " + TextoInterfaz.clasificacion(matriz.clasificacion())
+                        + (matriz.solucion().isEmpty() ? "" : " · " + TextoInterfaz.solucion(matriz.solucion()));
             } else {
                 int[] entrada = EntradaAprendizaje.leerArreglo(txtArreglo.getText());
                 resultado = "Bubble Sort".equals(algoritmo)
@@ -140,7 +149,7 @@ public class SimuladorController {
             mostrarArreglo(EntradaAprendizaje.leerArreglo(estado.substring(1, estado.length() - 1)),
                     paso == null ? List.of() : paso.indices());
         }
-        lblPaso.setText(paso == null ? "Estado inicial" : "Paso " + paso.numero() + " de " + resultado.pasos().size() + " · " + paso.tipo());
+        lblPaso.setText(paso == null ? "Estado inicial" : "Paso " + paso.numero() + " de " + resultado.pasos().size() + " · " + TextoInterfaz.operacion(paso.tipo()));
         lblExplicacion.setText(paso == null ? "Pulsa Siguiente para recorrer los pasos." : paso.explicacion()
                 + (indice == resultado.pasos().size() - 1 ? "\n" + conclusion : ""));
         Animaciones.entrar(lblExplicacion, 0, 6);

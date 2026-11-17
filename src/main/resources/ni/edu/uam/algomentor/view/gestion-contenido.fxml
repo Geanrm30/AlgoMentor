@@ -22,8 +22,8 @@
     <top>
         <VBox spacing="5" styleClass="page-header">
             <Label text="AlgoMentor" styleClass="brand" />
-            <Label text="Gestión de contenido" styleClass="page-title" />
-            <Label text="Algoritmos, ejercicios y consultas del laboratorio de persistencia" styleClass="subtitle" />
+            <Label text="Biblioteca de ejercicios" styleClass="page-title" />
+            <Label text="Crea algoritmos y ejercicios; consulta lo que has guardado y practicado" styleClass="subtitle" />
         </VBox>
     </top>
     <center>
@@ -96,10 +96,11 @@
                                         <Label text="Dificultad (1–5)" />
                                         <Spinner fx:id="spDificultad" editable="false" maxWidth="Infinity" />
                                     </VBox>
-                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <VBox fx:id="entradaTextoEjercicio" spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                         <Label text="Datos de entrada" />
                                         <TextArea fx:id="txtDatosEjercicio" prefRowCount="3" promptText="Ej. 8, 3, 6, 1" wrapText="true" />
                                     </VBox>
+                                    <VBox fx:id="entradaMatrizEjercicio" GridPane.rowIndex="3" GridPane.columnSpan="2" />
                                 </GridPane>
                                 <HBox spacing="10" styleClass="actions">
                                     <Button text="Guardar" onAction="#guardarEjercicio" styleClass="primary-button" />
@@ -109,7 +110,7 @@
                                 </HBox>
                                 <TableView fx:id="tblEjercicios" prefHeight="260" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="colAlgoritmoEjercicio" text="Algoritmo" prefWidth="190" />
+                                        <TableColumn fx:id="colAlgoritmoEjercicio" text="Algoritmo" prefWidth="240" />
                                         <TableColumn fx:id="colDatos" text="Datos" prefWidth="330" />
                                         <TableColumn fx:id="colDificultad" text="Dificultad" prefWidth="110" />
                                         <TableColumn fx:id="colOrigen" text="Origen" prefWidth="150" />
@@ -119,7 +120,7 @@
                         </content>
                     </ScrollPane>
                 </Tab>
-                <Tab text="Consultas">
+                <Tab text="Búsqueda e historial">
                     <VBox spacing="18" styleClass="tab-content">
                         <HBox spacing="10" styleClass="card">
                             <ComboBox fx:id="cmbFiltroAlgoritmo" maxWidth="Infinity" promptText="Algoritmo" HBox.hgrow="ALWAYS" />
@@ -127,7 +128,7 @@
                             <ComboBox fx:id="cmbFiltroPerfil" maxWidth="Infinity" promptText="Perfil" HBox.hgrow="ALWAYS" />
                             <Button text="Ver historial" onAction="#verHistorial" />
                         </HBox>
-                        <Label text="Resultados de las consultas HQL" styleClass="section-title" />
+                        <Label text="Ejercicios e intentos encontrados" styleClass="section-title" />
                         <TableView fx:id="tblResultados" VBox.vgrow="ALWAYS">
                             <columns>
                                 <TableColumn fx:id="colResultadoAlgoritmo" text="Algoritmo" prefWidth="190" />

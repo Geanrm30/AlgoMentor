@@ -16,7 +16,7 @@
                     <Button text="Crear perfil" onAction="#crearPerfil" />
                 </HBox>
                 <ComboBox fx:id="cmbEjercicio" promptText="Ejercicio guardado" maxWidth="Infinity" />
-                <Label fx:id="lblEnunciado" text="Selecciona un ejercicio de la base de datos." wrapText="true" />
+                <Label fx:id="lblEnunciado" text="Selecciona un ejercicio de la biblioteca." wrapText="true" />
             </VBox>
             <VBox spacing="10" styleClass="card">
                 <Label text="Tu respuesta" styleClass="section-title" />
@@ -32,7 +32,7 @@
                         <TextField fx:id="txtOrigen" promptText="Fila origen, si aplica" HBox.hgrow="ALWAYS" />
                         <TextField fx:id="txtFactor" promptText="Factor, si aplica" HBox.hgrow="ALWAYS" />
                     </HBox>
-                    <TextArea fx:id="txtMatrizEscrita" prefRowCount="4" promptText="Una fila por línea; celdas separadas por coma" accessibleText="Matriz resultante escrita por el estudiante" />
+                    <VBox fx:id="entradaMatrizEscrita" />
                 </VBox>
                 <HBox spacing="10">
                     <Button text="Verificar" onAction="#verificar" styleClass="primary-button" />
