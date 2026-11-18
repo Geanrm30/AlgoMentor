@@ -6,6 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class MovimientoCeldasTest {
 
+    @Test void lasEscriturasNoFingenIntercambiosNiAlAvanzarNiAlRetroceder() {
+        var escritura = ni.edu.uam.algomentor.engine.TipoOperacion.ESCRIBIR;
+        assertArrayEquals(new int[]{0, -1}, MovimientoCeldas.origenes(
+                new String[]{"1", "2"}, new String[]{"1", "1"}, escritura));
+        assertArrayEquals(new int[]{0, -1}, MovimientoCeldas.origenes(
+                new String[]{"1", "1"}, new String[]{"1", "2"}, escritura));
+        assertArrayEquals(new int[]{1, 0}, MovimientoCeldas.origenes(
+                new String[]{"2", "1"}, new String[]{"1", "2"},
+                ni.edu.uam.algomentor.engine.TipoOperacion.INTERCAMBIAR));
+    }
+
     @Test
     void sinCambiosCadaCeldaConservaSuPosicion() {
         String[] valores = {"5", "3", "1"};

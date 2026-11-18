@@ -1,10 +1,24 @@
 package ni.edu.uam.algomentor.util;
 
 import java.util.Arrays;
+import ni.edu.uam.algomentor.engine.TipoOperacion;
 
 public final class MovimientoCeldas {
 
     private MovimientoCeldas() {
+    }
+
+    /** Solo los intercambios desplazan celdas; las escrituras renuevan el contenido en su posición. */
+    public static int[] origenes(String[] anterior, String[] nuevo, TipoOperacion operacion) {
+        if (operacion == TipoOperacion.INTERCAMBIAR) return origenes(anterior, nuevo);
+        int[] origen = new int[nuevo.length];
+        Arrays.fill(origen, -1);
+        if (anterior != null && anterior.length == nuevo.length) {
+            for (int i = 0; i < nuevo.length; i++) {
+                if (anterior[i].equals(nuevo[i])) origen[i] = i;
+            }
+        }
+        return origen;
     }
 
     /**

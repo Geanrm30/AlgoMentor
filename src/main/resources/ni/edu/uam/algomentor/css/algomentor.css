@@ -546,6 +546,13 @@
     -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.65), 20, 0.25, 0, 0);
 }
 
+.valor-pivote {
+    -fx-background-color: #483169;
+    -fx-border-color: #c4a0ff;
+    -fx-border-width: 3;
+    -fx-text-fill: #ffffff;
+}
+
 .valor-cambiado {
     -fx-border-color: -ac-warn;
 }

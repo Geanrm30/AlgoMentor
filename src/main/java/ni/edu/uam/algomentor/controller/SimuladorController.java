@@ -16,12 +16,10 @@ import javafx.util.Duration;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import ni.edu.uam.algomentor.engine.BubbleSort;
+import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.Fraccion;
-import ni.edu.uam.algomentor.engine.Gauss;
-import ni.edu.uam.algomentor.engine.GaussJordan;
-import ni.edu.uam.algomentor.engine.InsertionSort;
+import ni.edu.uam.algomentor.engine.TipoOperacion;
 import ni.edu.uam.algomentor.engine.Paso;
 import ni.edu.uam.algomentor.engine.ResultadoEjecucion;
 import ni.edu.uam.algomentor.engine.ResultadoMatriz;
@@ -58,6 +56,7 @@ public class SimuladorController {
 
     private ResultadoEjecucion resultado;
     private int indice = -1;
+    private int indiceMostrado = -1;
     private boolean matricial;
     private String conclusion = "";
     private MediaPlayer reproductor;
@@ -69,7 +68,7 @@ public class SimuladorController {
     private void initialize() {
         matrizVisual = new EntradaMatrizVisual();
         entradaMatriz.getChildren().add(matrizVisual);
-        cmbAlgoritmo.setItems(FXCollections.observableArrayList("Bubble Sort", "Insertion Sort", "Gauss", "Gauss-Jordan"));
+        cmbAlgoritmo.setItems(FXCollections.observableArrayList(CatalogoAlgoritmos.nombres()));
         cmbAlgoritmo.setConverter(new StringConverter<>() {
             @Override public String toString(String valor) { return valor == null ? "" : TextoInterfaz.algoritmo(valor); }
             @Override public String fromString(String texto) { return texto; }
@@ -79,7 +78,7 @@ public class SimuladorController {
             if (actual == null) {
                 return;
             }
-            matricial = actual.startsWith("Gauss");
+            matricial = !CatalogoAlgoritmos.porNombre(actual).esOrdenamiento();
             txtArreglo.setVisible(!matricial);
             txtArreglo.setManaged(!matricial);
             entradaMatriz.setVisible(matricial);
@@ -94,18 +93,16 @@ public class SimuladorController {
     @FXML
     private void simular() {
         try {
-            String algoritmo = cmbAlgoritmo.getValue();
+            CatalogoAlgoritmos algoritmo = CatalogoAlgoritmos.porNombre(cmbAlgoritmo.getValue());
             if (matricial) {
                 Fraccion[][] entrada = matrizVisual.leerMatriz();
-                ResultadoMatriz matriz = "Gauss".equals(algoritmo)
-                        ? new Gauss().ejecutar(entrada) : new GaussJordan().ejecutar(entrada);
+                ResultadoMatriz matriz = algoritmo.crearMatricial().ejecutar(entrada);
                 resultado = matriz.ejecucion();
                 conclusion = "Sistema: " + TextoInterfaz.clasificacion(matriz.clasificacion())
                         + (matriz.solucion().isEmpty() ? "" : " · " + TextoInterfaz.solucion(matriz.solucion()));
             } else {
                 int[] entrada = EntradaAprendizaje.leerArreglo(txtArreglo.getText());
-                resultado = "Bubble Sort".equals(algoritmo)
-                        ? new BubbleSort().ejecutar(entrada) : new InsertionSort().ejecutar(entrada);
+                resultado = algoritmo.crearOrdenamiento().ejecutar(entrada);
                 conclusion = "Resultado: " + resultado.estadoFinal();
             }
             indice = -1;
@@ -142,13 +139,19 @@ public class SimuladorController {
             liberarAudio();
         }
         Paso paso = indice < 0 ? null : resultado.pasos().get(indice);
+        TipoOperacion movimiento = paso == null ? null : paso.tipo();
+        if (indiceMostrado >= 0 && indice == indiceMostrado - 1) {
+            movimiento = resultado.pasos().get(indiceMostrado).tipo();
+        }
         String estado = paso == null ? resultado.estadoInicial() : paso.estadoPosterior();
         if (matricial) {
             mostrarMatriz(FormatoDatos.leerEstadoMatriz(estado), paso == null ? List.of() : paso.indices());
         } else {
             mostrarArreglo(EntradaAprendizaje.leerArreglo(estado.substring(1, estado.length() - 1)),
-                    paso == null ? List.of() : paso.indices());
+                    paso == null ? List.of() : paso.indices(),
+                    paso == null ? -1 : paso.indicePivote(), movimiento);
         }
+        indiceMostrado = indice;
         lblPaso.setText(paso == null ? "Estado inicial" : "Paso " + paso.numero() + " de " + resultado.pasos().size() + " · " + TextoInterfaz.operacion(paso.tipo()));
         lblExplicacion.setText(paso == null ? "Pulsa Siguiente para recorrer los pasos." : paso.explicacion()
                 + (indice == resultado.pasos().size() - 1 ? "\n" + conclusion : ""));
@@ -222,20 +225,25 @@ public class SimuladorController {
         lblAudio.setText("La explicación escrita está disponible para cada paso. Puedes adjuntar un audio MP3 o WAV.");
     }
 
-    private void mostrarArreglo(int[] valores, List<Integer> destacados) {
+    private void mostrarArreglo(int[] valores, List<Integer> destacados, int pivote, TipoOperacion movimiento) {
         contenedorMatriz.getChildren().clear();
         double[] xPrevias = posicionesX(contenedorArreglo);
         contenedorArreglo.getChildren().clear();
         String[] textos = new String[valores.length];
         for (int i = 0; i < valores.length; i++) {
             textos[i] = Integer.toString(valores[i]);
-            contenedorArreglo.getChildren().add(celda(textos[i], destacados.contains(i)));
+            Label valor = celda(textos[i], destacados.contains(i));
+            if (i == pivote) {
+                valor.getStyleClass().add("valor-pivote");
+                valor.setAccessibleText("Pivote: " + textos[i]);
+            }
+            contenedorArreglo.getChildren().add(valor);
         }
-        animarArreglo(textos, destacados, xPrevias);
+        animarArreglo(textos, destacados, xPrevias, movimiento);
         celdasPrevias = textos;
     }
 
-    private void animarArreglo(String[] textos, List<Integer> destacados, double[] xPrevias) {
+    private void animarArreglo(String[] textos, List<Integer> destacados, double[] xPrevias, TipoOperacion movimiento) {
         List<Node> celdas = contenedorArreglo.getChildren();
         if (celdasPrevias == null || celdasPrevias.length != textos.length) {
             aparecerEscalonado(celdas);
@@ -243,7 +251,7 @@ public class SimuladorController {
         }
         contenedorArreglo.applyCss();
         contenedorArreglo.layout();
-        int[] origen = MovimientoCeldas.origenes(celdasPrevias, textos);
+        int[] origen = MovimientoCeldas.origenes(celdasPrevias, textos, movimiento);
         for (int i = 0; i < celdas.size(); i++) {
             Node celda = celdas.get(i);
             if (origen[i] == -1) {
@@ -314,6 +322,7 @@ public class SimuladorController {
         liberarAudio();
         resultado = null;
         indice = -1;
+        indiceMostrado = -1;
         celdasPrevias = null;
         contenedorArreglo.getChildren().clear();
         contenedorMatriz.getChildren().clear();
