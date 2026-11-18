@@ -12,7 +12,8 @@ class GeneradorEjerciciosTest {
                 String datos = new GeneradorEjercicios(42).datosPara(algoritmo.nombre(), dificultad);
                 if (algoritmo.esOrdenamiento()) {
                     int[] entrada = FormatoDatos.leerArreglo(datos);
-                    assertTrue(entrada.length <= 12);
+                    assertTrue(entrada.length <= FormatoDatos.MAX_ELEMENTOS_VISUALES);
+                    if (dificultad == 5) assertEquals(FormatoDatos.MAX_ELEMENTOS_VISUALES, entrada.length);
                     String respuesta = algoritmo.crearOrdenamiento().ejecutar(entrada).estadoFinal();
                     assertTrue(ni.edu.uam.algomentor.service.EvaluadorPractica.evaluar(algoritmo.nombre(), datos,
                             respuesta.substring(1, respuesta.length() - 1)).correcto());

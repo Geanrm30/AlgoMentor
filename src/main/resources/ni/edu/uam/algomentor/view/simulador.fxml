@@ -19,7 +19,7 @@
             <VBox spacing="12" styleClass="card">
                 <Label text="Estado del algoritmo" styleClass="section-title" />
                 <Label text="Cian: elementos activos · Violeta: pivote de Quick Sort. Las escrituras actualizan la celda en su posición." wrapText="true" styleClass="subtitle" />
-                <ScrollPane fitToHeight="true" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" maxHeight="110">
+                <ScrollPane fx:id="scrollArreglo" fitToHeight="true" fitToWidth="true" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" maxHeight="110">
                     <content><HBox fx:id="contenedorArreglo" alignment="BOTTOM_CENTER" spacing="8" /></content>
                 </ScrollPane>
                 <VBox fx:id="contenedorMatriz" alignment="CENTER" spacing="6" />

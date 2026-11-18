@@ -1,6 +1,7 @@
 package ni.edu.uam.algomentor.controller;
 
 import javafx.collections.FXCollections;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -46,6 +48,7 @@ public class SimuladorController {
     @FXML private VBox entradaMatriz;
     @FXML private Label lblFormato;
     @FXML private HBox contenedorArreglo;
+    @FXML private ScrollPane scrollArreglo;
     @FXML private VBox contenedorMatriz;
     @FXML private Label lblPaso;
     @FXML private Label lblExplicacion;
@@ -86,7 +89,7 @@ public class SimuladorController {
             entradaMatriz.setManaged(matricial);
             lblFormato.setText(matricial
                     ? "Completa los coeficientes y el término independiente b. Admite fracciones como 1/2."
-                    : "Hasta 12 enteros separados por coma.");
+                    : "Hasta " + FormatoDatos.MAX_ELEMENTOS_VISUALES + " enteros separados por coma.");
         });
         cmbAlgoritmo.getSelectionModel().selectFirst();
     }
@@ -254,7 +257,28 @@ public class SimuladorController {
             contenedorArreglo.getChildren().add(valor);
         }
         animarArreglo(textos, destacados, xPrevias, movimiento);
+        seguirElemento(destacados, pivote);
         celdasPrevias = textos;
+    }
+
+    private void seguirElemento(List<Integer> destacados, int pivote) {
+        int objetivo = destacados.isEmpty() ? pivote : destacados.get(destacados.size() - 1);
+        int pasoActual = indice;
+        Platform.runLater(() -> {
+            if (indice != pasoActual) return;
+            scrollArreglo.applyCss();
+            scrollArreglo.layout();
+            double ancho = contenedorArreglo.getWidth();
+            double visible = scrollArreglo.getViewportBounds().getWidth();
+            if (objetivo < 0 || objetivo >= contenedorArreglo.getChildren().size() || ancho <= visible) {
+                scrollArreglo.setHvalue(0);
+                return;
+            }
+            Node celda = contenedorArreglo.getChildren().get(objetivo);
+            double centro = celda.getBoundsInParent().getMinX() + celda.getBoundsInParent().getWidth() / 2;
+            double desplazamiento = Math.max(0, Math.min(ancho - visible, centro - visible / 2));
+            scrollArreglo.setHvalue(desplazamiento / (ancho - visible));
+        });
     }
 
     private void animarArreglo(String[] textos, List<Integer> destacados, double[] xPrevias, TipoOperacion movimiento) {

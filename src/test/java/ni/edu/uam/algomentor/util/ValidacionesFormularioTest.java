@@ -1,6 +1,7 @@
 package ni.edu.uam.algomentor.util;
 
 import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
+import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.model.Algoritmo;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +16,7 @@ class ValidacionesFormularioTest {
             assertThrows(IllegalArgumentException.class, () -> ValidacionesFormulario.validarEjercicio(
                     algoritmo, "MANUAL", 1, "abc"));
             assertThrows(IllegalArgumentException.class, () -> ValidacionesFormulario.validarEjercicio(
-                    algoritmo, "MANUAL", 1, "v1;ARREGLO;1,2,3,4,5,6,7,8,9,10,11,12,13"));
+                    algoritmo, "MANUAL", 1, "v1;ARREGLO;" + "1,".repeat(FormatoDatos.MAX_ELEMENTOS_VISUALES) + "1"));
         }
     }
 

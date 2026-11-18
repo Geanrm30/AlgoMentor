@@ -1,5 +1,6 @@
 package ni.edu.uam.algomentor.service;
 
+import ni.edu.uam.algomentor.engine.FormatoDatos;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +31,8 @@ class ComparadorOrdenamientosTest {
                 .stream().allMatch(m -> m.resultado().equals("[-2147483648, 2147483647]")));
         assertThrows(IllegalArgumentException.class, () -> ComparadorOrdenamientos.comparar(null));
         assertThrows(IllegalArgumentException.class, () -> ComparadorOrdenamientos.comparar(new int[0]));
-        assertThrows(IllegalArgumentException.class, () -> ComparadorOrdenamientos.comparar(new int[13]));
+        assertEquals(7, ComparadorOrdenamientos.comparar(new int[FormatoDatos.MAX_ELEMENTOS_VISUALES]).size());
+        assertThrows(IllegalArgumentException.class, () -> ComparadorOrdenamientos.comparar(new int[FormatoDatos.MAX_ELEMENTOS_VISUALES + 1]));
     }
 
     @Test

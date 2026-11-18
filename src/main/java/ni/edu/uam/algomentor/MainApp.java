@@ -10,16 +10,26 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.api.EjerciciosApiServer;
+import ni.edu.uam.algomentor.service.CatalogoPersistidoService;
 import ni.edu.uam.algomentor.util.HibernateUtil;
 import ni.edu.uam.algomentor.util.Tema;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainApp extends Application {
 
+    private static final Logger LOG = Logger.getLogger(MainApp.class.getName());
+
     @Override
     public void start(Stage stage) throws IOException {
+        try {
+            CatalogoPersistidoService.completarCatalogo();
+        } catch (RuntimeException e) {
+            LOG.log(Level.WARNING, "No se pudo sincronizar el catálogo de algoritmos", e);
+        }
         Parent experiencia = cargarVista("experiencia.fxml");
         Parent gestion = cargarVista("gestion-contenido.fxml");
         TabPane navegacion = new TabPane();

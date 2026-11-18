@@ -110,7 +110,8 @@ Ejecuta en la base `algomentor` el archivo `src/main/resources/ni/edu/uam/algome
 El script define las ocho tablas y sus relaciones, crea las cuatro habilidades iniciales
 (Signos, Fracciones, Aritmetica y Procedimiento) y registra los nueve algoritmos del catálogo.
 
-**Instalaciones existentes:** ejecuta en la base `algomentor` el script
+**Instalaciones existentes:** al abrir la aplicación se agregan los algoritmos faltantes a la base.
+También puedes ejecutar manualmente el script
 [`actualizar-nuevos-algoritmos.sql`](src/main/resources/ni/edu/uam/algomentor/db/actualizar-nuevos-algoritmos.sql).
 La migración es transaccional e idempotente (`ON CONFLICT (nombre) DO NOTHING`): agrega los cinco
 algoritmos nuevos sin eliminar ni modificar perfiles, ejercicios, intentos, progreso o algoritmos
@@ -147,7 +148,7 @@ Progreso, Compartir y Comprobar sistema) y **Biblioteca** (gestión de contenido
 
 ### 3.1 Simulador
 
-1. **Entrada.** Selecciona uno de los nueve algoritmos. Para ordenamiento introduce hasta 12 enteros
+1. **Entrada.** Selecciona uno de los nueve algoritmos. Para ordenamiento introduce hasta 20 enteros
    separados por comas; para Gauss y Gauss-Jordan completa una matriz ampliada. **Generar entrada**
    crea un ejemplo para el método seleccionado.
 2. **Recorrido.** Pulsa **Anterior** o **Siguiente** para recorrer las operaciones, sus estados y
@@ -515,7 +516,7 @@ actualizaciones hechas por otros servicios deben respetar la misma estrategia de
 ### Validación de entradas
 
 La aplicación controla y explica, con mensajes claros y sin cerrar la ventana, los datos no válidos:
-nombres de perfil vacíos o inválidos, arreglos con valores no enteros o con más de 12 elementos en la interfaz,
+nombres de perfil vacíos o inválidos, arreglos con valores no enteros o con más de 20 elementos en la interfaz,
 matrices con filas de distinto tamaño, operaciones de fila con índices fuera de rango, campos
 obligatorios de algoritmos y ejercicios, y operaciones sin perfil o ejercicio seleccionado.
 
@@ -640,9 +641,9 @@ La rama `main` debe compilar y ejecutarse después de cada integración.
 
 ## 11. Limitaciones y notas de uso
 
-- La interfaz y los ejercicios utilizables de ordenamiento admiten hasta 12 enteros; el formato de almacenamiento conserva el límite de 30 por compatibilidad.
+- La interfaz y los ejercicios utilizables de ordenamiento admiten hasta 20 enteros; el formato de almacenamiento conserva el límite de 30 por compatibilidad. En Simular, la fila se centra cuando cabe y se desplaza hasta el elemento activo durante los pasos.
 - Práctica reconoce los nueve algoritmos del catálogo. Los ejercicios deben usar los nombres registrados, como `Quick Sort` o `Gauss-Jordan`.
-- Ejecuta `schema.sql` en una instalación nueva o la migración `actualizar-nuevos-algoritmos.sql` en una existente. Las cuatro habilidades iniciales deben estar disponibles antes de registrar intentos.
+- Ejecuta `schema.sql` en una instalación nueva. En una existente, la aplicación completa automáticamente los algoritmos faltantes sin modificar los registros ya presentes; `actualizar-nuevos-algoritmos.sql` sigue disponible para una migración manual. Las cuatro habilidades iniciales deben estar disponibles antes de registrar intentos.
 - La API externa math.js requiere Internet y verifica únicamente sistemas cuadrados con solución única; la solución local sigue disponible ante fallos del servicio.
 - El intercambio es local y está limitado a 500 ejercicios y 1 MB por lote. Ambos equipos deben disponer de los algoritmos correspondientes.
 - Las trazas guardan instantáneas de los estados: las métricas educativas no representan una medición directa de tiempo ni memoria real de ejecución.

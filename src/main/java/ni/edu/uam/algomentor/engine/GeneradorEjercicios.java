@@ -30,7 +30,7 @@ public class GeneradorEjercicios {
         CatalogoAlgoritmos algoritmo = CatalogoAlgoritmos.porNombre(nombreAlgoritmo);
         if (algoritmo.esOrdenamiento()) {
             return FormatoDatos.serializarArreglo(arregloAleatorio(
-                    Math.min(12, 4 + dificultad * 2), -20 * dificultad, 20 * dificultad));
+                    Math.min(FormatoDatos.MAX_ELEMENTOS_VISUALES, 5 + dificultad * 3), -20 * dificultad, 20 * dificultad));
         }
         return FormatoDatos.serializarMatriz(sistemaAleatorio(Math.min(4, dificultad + 1), dificultad * 3));
     }

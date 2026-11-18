@@ -1,5 +1,6 @@
 package ni.edu.uam.algomentor.util;
 
+import ni.edu.uam.algomentor.engine.FormatoDatos;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,6 +11,10 @@ class EntradaAprendizajeTest {
     void leeArregloYRechazaElementosVacios() {
         assertArrayEquals(new int[]{4, -2, 7}, EntradaAprendizaje.leerArreglo("4, -2, 7"));
         assertThrows(IllegalArgumentException.class, () -> EntradaAprendizaje.leerArreglo("4,,7"));
+        assertEquals(FormatoDatos.MAX_ELEMENTOS_VISUALES,
+                EntradaAprendizaje.leerArreglo("1,".repeat(FormatoDatos.MAX_ELEMENTOS_VISUALES - 1) + "1").length);
+        assertThrows(IllegalArgumentException.class, () ->
+                EntradaAprendizaje.leerArreglo("1,".repeat(FormatoDatos.MAX_ELEMENTOS_VISUALES) + "1"));
     }
 
     @Test

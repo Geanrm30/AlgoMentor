@@ -12,8 +12,8 @@ public final class ComparadorOrdenamientos {
                           int escriturasCubeta, int conteos, int distribuciones, int pasos, String resultado) { }
 
     public static List<Metrica> comparar(int[] datos) {
-        if (datos == null || datos.length == 0 || datos.length > 12) {
-            throw new IllegalArgumentException("Usa entre 1 y 12 números.");
+        if (datos == null || datos.length == 0 || datos.length > FormatoDatos.MAX_ELEMENTOS_VISUALES) {
+            throw new IllegalArgumentException("Usa entre 1 y " + FormatoDatos.MAX_ELEMENTOS_VISUALES + " números.");
         }
         return CatalogoAlgoritmos.ordenamientos().stream()
                 .map(a -> metrica(a.crearOrdenamiento(), datos)).toList();

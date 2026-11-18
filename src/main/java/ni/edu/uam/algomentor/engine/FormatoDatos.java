@@ -9,6 +9,7 @@ public final class FormatoDatos {
 
     public static final String VERSION = "v1";
     public static final int MAX_ELEMENTOS = 30;
+    public static final int MAX_ELEMENTOS_VISUALES = 20;
     public static final int MAX_FILAS = 6;
     public static final int MAX_COLUMNAS = 7;
 
