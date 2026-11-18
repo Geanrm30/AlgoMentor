@@ -16,7 +16,9 @@ public final class ComandosTerminal {
         }
         String[] partes = comando.strip().split("\\s+", 3);
         if (partes[0].equalsIgnoreCase("ayuda") && partes.length == 1) {
-            return "Métodos: bubble (burbuja), insertion (inserción), gauss y jordan.\n"
+            return "Ordenamientos: " + CatalogoAlgoritmos.ordenamientos().stream()
+                    .map(CatalogoAlgoritmos::comando).collect(java.util.stream.Collectors.joining(", "))
+                    + ". Sistemas: gauss y jordan.\n"
                     + "Ejemplos:\nordenar bubble 4,2,1\nordenar insertion 4,2,1\n"
                     + "resolver gauss 1,1,3;1,-1,1\nresolver jordan 1,1,3;1,-1,1\nlimpiar";
         }
@@ -28,20 +30,13 @@ public final class ComandosTerminal {
         }
         if (partes[0].equalsIgnoreCase("ordenar")) {
             int[] datos = EntradaAprendizaje.leerArreglo(partes[2]);
-            ResultadoEjecucion resultado = switch (partes[1].toLowerCase()) {
-                case "bubble" -> new BubbleSort().ejecutar(datos);
-                case "insertion" -> new InsertionSort().ejecutar(datos);
-                default -> throw new IllegalArgumentException("Algoritmo de ordenamiento desconocido.");
-            };
+            ResultadoEjecucion resultado = CatalogoAlgoritmos.porComando(partes[1])
+                    .crearOrdenamiento().ejecutar(datos);
             return "Entrada: " + Arrays.toString(datos) + "\n" + describir(resultado);
         }
         if (partes[0].equalsIgnoreCase("resolver")) {
             Fraccion[][] datos = EntradaAprendizaje.leerMatriz(partes[2].replace(';', '\n'));
-            ResultadoMatriz resultado = switch (partes[1].toLowerCase()) {
-                case "gauss" -> new Gauss().ejecutar(datos);
-                case "jordan" -> new GaussJordan().ejecutar(datos);
-                default -> throw new IllegalArgumentException("Método matricial desconocido.");
-            };
+            ResultadoMatriz resultado = CatalogoAlgoritmos.porComando(partes[1]).crearMatricial().ejecutar(datos);
             return describir(resultado.ejecucion()) + "Sistema: " + TextoInterfaz.clasificacion(resultado.clasificacion())
                     + (resultado.solucion().isEmpty() ? "" : " · " + TextoInterfaz.solucion(resultado.solucion()));
         }

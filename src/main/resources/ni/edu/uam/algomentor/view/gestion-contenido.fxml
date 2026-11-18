@@ -104,6 +104,7 @@
                                 </GridPane>
                                 <HBox spacing="10" styleClass="actions">
                                     <Button text="Guardar" onAction="#guardarEjercicio" styleClass="primary-button" />
+                                    <Button text="Generar ejercicio" onAction="#generarEjercicio" />
                                     <Button text="Actualizar" onAction="#actualizarEjercicio" />
                                     <Button text="Eliminar" onAction="#eliminarEjercicio" />
                                     <Button text="Limpiar" onAction="#limpiarEjercicio" />

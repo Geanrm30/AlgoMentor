@@ -28,6 +28,9 @@ public class BubbleSort implements AlgoritmoOrdenamiento {
                 int izquierda = a[j];
                 int derecha = a[j + 1];
                 if (izquierda > derecha) {
+                    pasos.add(new Paso(pasos.size() + 1, TipoOperacion.COMPARAR,
+                            List.of(j, j + 1), antes, antes,
+                            izquierda + " > " + derecha + ": se necesita intercambiar los elementos."));
                     a[j] = derecha;
                     a[j + 1] = izquierda;
                     huboCambio = true;

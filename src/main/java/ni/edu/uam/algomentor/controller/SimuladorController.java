@@ -20,6 +20,7 @@ import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
+import ni.edu.uam.algomentor.engine.GeneradorEjercicios;
 import ni.edu.uam.algomentor.engine.Paso;
 import ni.edu.uam.algomentor.engine.ResultadoEjecucion;
 import ni.edu.uam.algomentor.engine.ResultadoMatriz;
@@ -88,6 +89,19 @@ public class SimuladorController {
                     : "Hasta 12 enteros separados por coma.");
         });
         cmbAlgoritmo.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    private void generarEntrada() {
+        try {
+            String datos = new GeneradorEjercicios().datosPara(cmbAlgoritmo.getValue(), 2);
+            limpiarResultado();
+            if (matricial) matrizVisual.cargar(FormatoDatos.leerMatriz(datos));
+            else txtArreglo.setText(java.util.Arrays.stream(FormatoDatos.leerArreglo(datos))
+                    .mapToObj(Integer::toString).collect(java.util.stream.Collectors.joining(", ")));
+        } catch (IllegalArgumentException e) {
+            mostrarAlerta(Alert.AlertType.WARNING, "No se pudo generar", e.getMessage());
+        }
     }
 
     @FXML

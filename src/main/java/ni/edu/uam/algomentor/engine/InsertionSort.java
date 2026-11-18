@@ -27,6 +27,9 @@ public class InsertionSort implements AlgoritmoOrdenamiento {
                 int izquierda = a[j - 1];
                 int derecha = a[j];
                 if (izquierda > derecha) {
+                    pasos.add(new Paso(pasos.size() + 1, TipoOperacion.COMPARAR,
+                            List.of(j - 1, j), antes, antes,
+                            izquierda + " > " + derecha + ": el elemento debe avanzar hacia la izquierda."));
                     a[j - 1] = derecha;
                     a[j] = izquierda;
                     pasos.add(new Paso(pasos.size() + 1, TipoOperacion.INTERCAMBIAR, List.of(j - 1, j),

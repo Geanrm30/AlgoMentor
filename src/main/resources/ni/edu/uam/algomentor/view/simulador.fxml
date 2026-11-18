@@ -11,7 +11,10 @@
                 <TextField fx:id="txtArreglo" promptText="Ej. 8, 3, 6, 1" accessibleText="Números enteros separados por coma" />
                 <VBox fx:id="entradaMatriz" />
                 <Label fx:id="lblFormato" wrapText="true" />
-                <Button text="Simular" onAction="#simular" styleClass="primary-button" />
+                <HBox spacing="10">
+                    <Button text="Simular" onAction="#simular" styleClass="primary-button" />
+                    <Button text="Generar entrada" onAction="#generarEntrada" />
+                </HBox>
             </VBox>
             <VBox spacing="12" styleClass="card">
                 <Label text="Estado del algoritmo" styleClass="section-title" />
