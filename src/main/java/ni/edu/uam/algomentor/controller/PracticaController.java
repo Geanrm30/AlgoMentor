@@ -11,9 +11,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.engine.ErrorOperacion;
+import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
 import ni.edu.uam.algomentor.engine.ResultadoVerificacion;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
-import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.dao.EjercicioDAO;
 import ni.edu.uam.algomentor.model.Ejercicio;
@@ -85,9 +85,7 @@ public class PracticaController {
             panelOrdenamiento.setManaged(!matriz);
             if (matriz) {
                 try {
-                    Fraccion[][] datos = actual.getDatos().startsWith(FormatoDatos.VERSION + ";MATRIZ;")
-                            ? FormatoDatos.leerMatriz(actual.getDatos())
-                            : EntradaAprendizaje.leerMatriz(actual.getDatos());
+                    Fraccion[][] datos = EntradaAprendizaje.leerMatrizGuardada(actual.getDatos());
                     matrizVisual.cargar(datos);
                 } catch (IllegalArgumentException e) {
                     matrizVisual.limpiar();
@@ -112,8 +110,7 @@ public class PracticaController {
         ejecutarEnSegundoPlano(() -> {
             List<Perfil> perfiles = new PerfilService().listarPerfiles();
             List<Ejercicio> ejercicios = new EjercicioDAO().listarConAlgoritmo().stream()
-                    .filter(e -> List.of("Bubble Sort", "Insertion Sort", "Gauss", "Gauss-Jordan")
-                            .contains(e.getAlgoritmo().getNombre()))
+                    .filter(e -> CatalogoAlgoritmos.admite(e.getAlgoritmo().getNombre()))
                     .toList();
             Platform.runLater(() -> {
                 cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));

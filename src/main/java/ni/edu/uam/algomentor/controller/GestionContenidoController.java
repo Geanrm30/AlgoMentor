@@ -24,6 +24,7 @@ import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Intento;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
+import ni.edu.uam.algomentor.engine.GeneradorEjercicios;
 import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
 import ni.edu.uam.algomentor.util.EntradaMatrizVisual;
@@ -139,9 +140,7 @@ public class GestionContenidoController {
                 txtDatosEjercicio.setText(e.getDatos());
                 if (e.getAlgoritmo().getNombre().startsWith("Gauss")) {
                     try {
-                        Fraccion[][] datos = e.getDatos().startsWith(FormatoDatos.VERSION + ";MATRIZ;")
-                                ? FormatoDatos.leerMatriz(e.getDatos())
-                                : EntradaAprendizaje.leerMatriz(e.getDatos());
+                        Fraccion[][] datos = EntradaAprendizaje.leerMatrizGuardada(e.getDatos());
                         matrizVisual.cargar(datos);
                     } catch (IllegalArgumentException error) {
                         matrizVisual.limpiar();
@@ -288,6 +287,22 @@ public class GestionContenidoController {
         e.setDificultad(dificultad);
         e.setDatos(datos.trim());
         return e;
+    }
+
+    @FXML private void generarEjercicio() {
+        try {
+            Algoritmo algoritmo = requerido(cmbAlgoritmoEjercicio.getValue(), "Seleccioná un algoritmo");
+            String datos = new GeneradorEjercicios().datosPara(algoritmo.getNombre(), spDificultad.getValue());
+            if (algoritmo.getNombre().startsWith("Gauss")) {
+                matrizVisual.cargar(FormatoDatos.leerMatriz(datos));
+            } else {
+                txtDatosEjercicio.setText(datos);
+            }
+            cmbOrigen.setValue("ALEATORIO");
+            lblEstado.setText("Ejercicio generado. Pulsa Guardar para añadirlo a la biblioteca.");
+        } catch (IllegalArgumentException e) {
+            mostrarAlerta(Alert.AlertType.WARNING, "No se pudo generar", e.getMessage());
+        }
     }
 
     @FXML private void buscarEjercicios() {

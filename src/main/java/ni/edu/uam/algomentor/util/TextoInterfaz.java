@@ -3,6 +3,7 @@ package ni.edu.uam.algomentor.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ni.edu.uam.algomentor.engine.ClasificacionSistema;
+import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
@@ -41,13 +42,7 @@ public final class TextoInterfaz {
     }
 
     public static String algoritmo(String valor) {
-        return switch (valor) {
-            case "Bubble Sort" -> "Ordenamiento burbuja";
-            case "Insertion Sort" -> "Ordenamiento por inserción";
-            case "Gauss" -> "Eliminación de Gauss";
-            case "Gauss-Jordan" -> "Eliminación de Gauss-Jordan";
-            default -> valor;
-        };
+        return CatalogoAlgoritmos.admite(valor) ? CatalogoAlgoritmos.porNombre(valor).etiqueta() : valor;
     }
 
     public static String modo(String valor) {
@@ -100,6 +95,16 @@ public final class TextoInterfaz {
         return switch (valor) {
             case COMPARAR -> "Comparar elementos";
             case INTERCAMBIAR -> "Intercambiar elementos";
+            case PIVOTE -> "Seleccionar pivote";
+            case PARTICIONAR -> "Particionar";
+            case DIVIDIR -> "Dividir subarreglo";
+            case MEZCLAR -> "Mezclar subarreglos";
+            case ESCRIBIR -> "Escribir elemento";
+            case ESCRIBIR_AUXILIAR -> "Escribir en cubeta auxiliar";
+            case CONTAR -> "Contar frecuencia";
+            case DISTRIBUIR -> "Distribuir elemento";
+            case PASADA -> "Procesar posición de dígito";
+            case ORDENAR_CUBETA -> "Ordenar cubeta";
             case FINALIZAR -> "Finalizar";
             case INTERCAMBIAR_FILAS -> "Intercambiar filas";
             case ESCALAR_FILA -> "Multiplicar una fila";

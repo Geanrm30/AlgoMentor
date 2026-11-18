@@ -6,6 +6,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EvaluadorPracticaTest {
 
+    @org.junit.jupiter.api.Test void evaluaLosSieteOrdenamientosConDatosSimplesYVersionados() {
+        for (var algoritmo : ni.edu.uam.algomentor.engine.CatalogoAlgoritmos.ordenamientos()) {
+            for (String datos : new String[]{"-3,0,2,-3", "v1;ARREGLO;-3,0,2,-3"}) {
+                assertTrue(EvaluadorPractica.evaluar(algoritmo.nombre(), datos, "-3,-3,0,2").correcto());
+                assertFalse(EvaluadorPractica.evaluar(algoritmo.nombre(), datos, "2,0,-3,-3").correcto());
+            }
+            assertTrue(EvaluadorPractica.evaluar(algoritmo.nombre(), "2147483647,-2147483648,0",
+                    "-2147483648,0,2147483647").correcto());
+        }
+    }
+
     @Test
     void evaluaOrdenamientoSinDependerDelFormatoVisual() {
         assertTrue(EvaluadorPractica.evaluar("Bubble Sort", "v1;ARREGLO;3,1,2", "1, 2, 3").correcto());

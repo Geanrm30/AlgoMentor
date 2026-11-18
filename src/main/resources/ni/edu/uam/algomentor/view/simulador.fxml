@@ -11,11 +11,17 @@
                 <TextField fx:id="txtArreglo" promptText="Ej. 8, 3, 6, 1" accessibleText="Números enteros separados por coma" />
                 <VBox fx:id="entradaMatriz" />
                 <Label fx:id="lblFormato" wrapText="true" />
-                <Button text="Simular" onAction="#simular" styleClass="primary-button" />
+                <HBox spacing="10">
+                    <Button text="Simular" onAction="#simular" styleClass="primary-button" />
+                    <Button text="Generar entrada" onAction="#generarEntrada" />
+                </HBox>
             </VBox>
             <VBox spacing="12" styleClass="card">
                 <Label text="Estado del algoritmo" styleClass="section-title" />
-                <HBox fx:id="contenedorArreglo" alignment="BOTTOM_CENTER" spacing="8" />
+                <Label text="Cian: elementos activos · Violeta: pivote de Quick Sort. Las escrituras actualizan la celda en su posición." wrapText="true" styleClass="subtitle" />
+                <ScrollPane fitToHeight="true" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" maxHeight="110">
+                    <content><HBox fx:id="contenedorArreglo" alignment="BOTTOM_CENTER" spacing="8" /></content>
+                </ScrollPane>
                 <VBox fx:id="contenedorMatriz" alignment="CENTER" spacing="6" />
                 <Label fx:id="lblPaso" text="Prepara una entrada para empezar." wrapText="true" />
                 <Label fx:id="lblExplicacion" wrapText="true" />

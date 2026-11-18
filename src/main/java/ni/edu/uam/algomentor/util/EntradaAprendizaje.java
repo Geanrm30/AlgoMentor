@@ -7,6 +7,18 @@ public final class EntradaAprendizaje {
 
     private EntradaAprendizaje() { }
 
+    public static int[] leerArregloGuardado(String texto) {
+        int[] datos = texto != null && texto.strip().startsWith(FormatoDatos.VERSION + ";")
+                ? FormatoDatos.leerArreglo(texto) : leerArreglo(texto);
+        if (datos.length > 12) throw new IllegalArgumentException("Para visualizar, usa como máximo 12 números.");
+        return datos;
+    }
+
+    public static Fraccion[][] leerMatrizGuardada(String texto) {
+        return texto != null && texto.strip().startsWith(FormatoDatos.VERSION + ";")
+                ? FormatoDatos.leerMatriz(texto) : leerMatriz(texto);
+    }
+
     public static int[] leerArreglo(String texto) {
         if (texto == null || texto.isBlank()) {
             throw new IllegalArgumentException("Ingresa al menos un número entero.");
