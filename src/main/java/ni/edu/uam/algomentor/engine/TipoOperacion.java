@@ -8,6 +8,7 @@ public enum TipoOperacion {
     DIVIDIR,
     MEZCLAR,
     ESCRIBIR,
+    ESCRIBIR_AUXILIAR,
     CONTAR,
     DISTRIBUIR,
     PASADA,

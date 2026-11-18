@@ -105,6 +105,7 @@ public final class TextoInterfaz {
             case DIVIDIR -> "Dividir subarreglo";
             case MEZCLAR -> "Mezclar subarreglos";
             case ESCRIBIR -> "Escribir elemento";
+            case ESCRIBIR_AUXILIAR -> "Escribir en cubeta auxiliar";
             case CONTAR -> "Contar frecuencia";
             case DISTRIBUIR -> "Distribuir elemento";
             case PASADA -> "Procesar posición de dígito";
