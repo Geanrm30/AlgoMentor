@@ -12,7 +12,13 @@ public record Paso(
         List<Integer> indices,
         String estadoAnterior,
         String estadoPosterior,
-        String explicacion) {
+        String explicacion,
+        int indicePivote) {
+
+    public Paso(int numero, TipoOperacion tipo, List<Integer> indices, String estadoAnterior,
+                String estadoPosterior, String explicacion) {
+        this(numero, tipo, indices, estadoAnterior, estadoPosterior, explicacion, -1);
+    }
 
     public Paso {
         indices = List.copyOf(indices);

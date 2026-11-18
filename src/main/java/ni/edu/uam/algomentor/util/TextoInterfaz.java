@@ -100,6 +100,15 @@ public final class TextoInterfaz {
         return switch (valor) {
             case COMPARAR -> "Comparar elementos";
             case INTERCAMBIAR -> "Intercambiar elementos";
+            case PIVOTE -> "Seleccionar pivote";
+            case PARTICIONAR -> "Particionar";
+            case DIVIDIR -> "Dividir subarreglo";
+            case MEZCLAR -> "Mezclar subarreglos";
+            case ESCRIBIR -> "Escribir elemento";
+            case CONTAR -> "Contar frecuencia";
+            case DISTRIBUIR -> "Distribuir elemento";
+            case PASADA -> "Procesar posición de dígito";
+            case ORDENAR_CUBETA -> "Ordenar cubeta";
             case FINALIZAR -> "Finalizar";
             case INTERCAMBIAR_FILAS -> "Intercambiar filas";
             case ESCALAR_FILA -> "Multiplicar una fila";
