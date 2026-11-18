@@ -304,7 +304,7 @@ Requiere Internet. Si la API falla, la solución local permanece visible. Los si
 
 | Pestaña | Función |
 |---|---|
-| Algoritmos | Consultar, actualizar y eliminar las fichas existentes. La interfaz no permite crear algoritmos nuevos. |
+| Algoritmos | Consultar y actualizar las fichas existentes. La interfaz no permite crear ni eliminar algoritmos. |
 | Ejercicios | Generar ejercicios por algoritmo y dificultad, revisar los datos y realizar operaciones CRUD. |
 | Consultas | Buscar ejercicios por algoritmo e historial de intentos por perfil mediante HQL. |
 

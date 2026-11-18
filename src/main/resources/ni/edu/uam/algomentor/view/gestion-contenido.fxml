@@ -58,7 +58,6 @@
                                 </GridPane>
                                 <HBox spacing="10" styleClass="actions">
                                     <Button text="Actualizar" onAction="#actualizarAlgoritmo" />
-                                    <Button text="Eliminar" onAction="#eliminarAlgoritmo" />
                                     <Button text="Limpiar" onAction="#limpiarAlgoritmo" />
                                 </HBox>
                                 <TableView fx:id="tblAlgoritmos" prefHeight="260" VBox.vgrow="ALWAYS">

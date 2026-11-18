@@ -193,17 +193,6 @@ public class GestionContenidoController {
         });
     }
 
-    @FXML private void eliminarAlgoritmo() {
-        ejecutar(() -> {
-            Algoritmo a = requerido(tblAlgoritmos.getSelectionModel().getSelectedItem(), "Seleccioná un algoritmo");
-            if (confirmarEliminacion(a.getNombre())) {
-                algoritmoDAO.eliminar(a.getId());
-                recargar();
-                limpiarAlgoritmo();
-            }
-        });
-    }
-
     @FXML private void limpiarAlgoritmo() {
         tblAlgoritmos.getSelectionModel().clearSelection();
         txtNombreAlgoritmo.clear();
