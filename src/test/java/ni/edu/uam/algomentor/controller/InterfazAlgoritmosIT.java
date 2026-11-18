@@ -84,6 +84,15 @@ class InterfazAlgoritmosIT {
         });
     }
 
+    @Test void practicaCargaConUnaSolaAccionDeVerificacion() throws Exception {
+        enJavaFx(() -> {
+            FXMLLoader vista = cargar("practica.fxml");
+            assertNotNull(control(vista, "btnVerificar"));
+            assertTrue(((Parent) vista.getRoot()).lookupAll(".button").stream().filter(Button.class::isInstance)
+                    .map(Button.class::cast).noneMatch(b -> "Guardar intento".equals(b.getText())));
+        });
+    }
+
     @Test void quickSortResaltaElPivoteYLoQuitaAlVolverAlInicio() throws Exception {
         enJavaFx(() -> {
             FXMLLoader vista = cargar("simulador.fxml");

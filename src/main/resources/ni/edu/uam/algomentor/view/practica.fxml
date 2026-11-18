@@ -35,8 +35,7 @@
                     <VBox fx:id="entradaMatrizEscrita" />
                 </VBox>
                 <HBox spacing="10">
-                    <Button text="Verificar" onAction="#verificar" styleClass="primary-button" />
-                    <Button fx:id="btnGuardar" text="Guardar intento" onAction="#guardarIntento" disable="true" />
+                    <Button fx:id="btnVerificar" text="Verificar" onAction="#verificar" styleClass="primary-button" />
                 </HBox>
                 <Label fx:id="lblResultado" wrapText="true" />
             </VBox>

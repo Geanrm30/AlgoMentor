@@ -49,11 +49,8 @@ public class PracticaController {
     @FXML private VBox entradaMatrizEscrita;
     @FXML private Label lblEnunciado;
     @FXML private Label lblResultado;
-    @FXML private Button btnGuardar;
+    @FXML private Button btnVerificar;
 
-    private EvaluadorPractica.Resultado evaluacion;
-    private String respuestaEvaluada;
-    private List<ErrorOperacion> errores = List.of();
     private long inicioNanos;
     private EntradaMatrizVisual matrizVisual;
 
@@ -61,7 +58,7 @@ public class PracticaController {
     private void initialize() {
         matrizVisual = new EntradaMatrizVisual();
         matrizVisual.fijarDimensiones(true);
-        matrizVisual.alCambiar(this::invalidarEvaluacion);
+        matrizVisual.alCambiar(this::limpiarResultado);
         entradaMatrizEscrita.getChildren().add(matrizVisual);
         cmbPerfil.setConverter(new StringConverter<>() {
             @Override public String toString(Perfil valor) { return valor == null ? "" : valor.getNombre(); }
@@ -76,7 +73,7 @@ public class PracticaController {
         });
         cmbOperacion.setItems(FXCollections.observableArrayList("Intercambiar filas", "Escalar fila", "Eliminar fila"));
         cmbEjercicio.valueProperty().addListener((obs, anterior, actual) -> {
-            invalidarEvaluacion();
+            limpiarResultado();
             inicioNanos = System.nanoTime();
             boolean matriz = actual != null && actual.getAlgoritmo().getNombre().startsWith("Gauss");
             panelMatriz.setVisible(matriz);
@@ -96,11 +93,11 @@ public class PracticaController {
                     : "Algoritmo: " + TextoInterfaz.algoritmo(actual.getAlgoritmo().getNombre())
                     + "\n" + TextoInterfaz.datos(actual));
         });
-        txtRespuesta.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
-        txtDestino.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
-        txtOrigen.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
-        txtFactor.textProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
-        cmbOperacion.valueProperty().addListener((obs, anterior, actual) -> invalidarEvaluacion());
+        txtRespuesta.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
+        txtDestino.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
+        txtOrigen.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
+        txtFactor.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
+        cmbOperacion.valueProperty().addListener((obs, anterior, actual) -> limpiarResultado());
         recargar();
     }
 
@@ -144,64 +141,59 @@ public class PracticaController {
 
     @FXML
     private void verificar() {
+        Perfil perfil = cmbPerfil.getValue();
         Ejercicio ejercicio = cmbEjercicio.getValue();
+        if (perfil == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Falta perfil", "Selecciona o crea un perfil antes de verificar.");
+            return;
+        }
         if (ejercicio == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Falta ejercicio", "Selecciona un ejercicio.");
             return;
         }
+        String respuesta = respuestaActual(ejercicio);
+        boolean correcto;
+        List<ErrorOperacion> errores = List.of();
+        String mensaje;
         try {
             if (esMatriz(ejercicio)) {
                 ResultadoVerificacion verificacion = new EvaluadorPasoMatriz().evaluar(ejercicio.getDatos(),
                         tipoOperacion(), txtDestino.getText(), txtOrigen.getText(), txtFactor.getText(),
                         matrizVisual.texto());
                 errores = verificacion.errores();
-                evaluacion = new EvaluadorPractica.Resultado(verificacion.correcto(), "");
-                Animaciones.mostrarResultado(lblResultado,
-                        verificacion.correcto() ? "Operación correcta." : describirErrores(errores),
-                        verificacion.correcto() ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
+                correcto = verificacion.correcto();
+                mensaje = correcto ? "Operación correcta." : describirErrores(errores);
             } else {
-                evaluacion = EvaluadorPractica.evaluar(ejercicio.getAlgoritmo().getNombre(),
+                EvaluadorPractica.Resultado evaluacion = EvaluadorPractica.evaluar(ejercicio.getAlgoritmo().getNombre(),
                         ejercicio.getDatos(), txtRespuesta.getText());
-                errores = List.of();
-                Animaciones.mostrarResultado(lblResultado, (evaluacion.correcto() ? "Correcto." : "Incorrecto.")
-                        + " Respuesta esperada: " + evaluacion.esperado(),
-                        evaluacion.correcto() ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
+                correcto = evaluacion.correcto();
+                mensaje = (correcto ? "Correcto." : "Incorrecto.")
+                        + " Respuesta esperada: " + evaluacion.esperado();
             }
-            respuestaEvaluada = respuestaActual(ejercicio);
-            btnGuardar.setDisable(false);
         } catch (IllegalArgumentException e) {
-            invalidarEvaluacion();
-            mostrarAlerta(Alert.AlertType.WARNING, "Revisa el ejercicio", e.getMessage());
+            correcto = false;
+            mensaje = "Respuesta incorrecta: " + e.getMessage();
         }
-    }
-
-    @FXML
-    private void guardarIntento() {
-        Perfil perfil = cmbPerfil.getValue();
-        Ejercicio ejercicio = cmbEjercicio.getValue();
-        if (perfil == null || ejercicio == null || evaluacion == null || !respuestaActual(ejercicio).equals(respuestaEvaluada)) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos incompletos", "Selecciona un perfil y verifica la respuesta.");
-            return;
-        }
-        boolean correcto = evaluacion.correcto();
-        String respuesta = respuestaEvaluada;
+        boolean resultado = correcto;
+        String mensajeResultado = mensaje;
         List<ErrorOperacion> erroresEvaluados = errores;
         int duracion = (int) Math.min(Integer.MAX_VALUE, Math.max(0, (System.nanoTime() - inicioNanos) / 1_000_000_000L));
-        btnGuardar.setDisable(true);
-        Animaciones.mostrarResultado(lblResultado, "Guardando intento…", Animaciones.Estado.NEUTRO);
+        btnVerificar.setDisable(true);
+        Animaciones.mostrarResultado(lblResultado, "Registrando verificación…", Animaciones.Estado.NEUTRO);
         ejecutarEnSegundoPlano(() -> {
-            new RegistroPracticaService().registrar(perfil.getId(), ejercicio.getId(), respuesta, correcto, duracion, erroresEvaluados);
-            Platform.runLater(() -> Animaciones.mostrarResultado(lblResultado,
-                    "Intento guardado. " + (correcto ? "Correcto." : "Incorrecto."), Animaciones.Estado.CORRECTO));
-        }, "No se pudo guardar el intento. Revisa la conexión y el esquema.",
-                () -> btnGuardar.setDisable(false));
+            new RegistroPracticaService().registrar(perfil.getId(), ejercicio.getId(), respuesta, resultado, duracion, erroresEvaluados);
+            Platform.runLater(() -> {
+                inicioNanos = System.nanoTime();
+                Animaciones.mostrarResultado(lblResultado, mensajeResultado + "\nIntento registrado.",
+                        resultado ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
+                btnVerificar.setDisable(false);
+            });
+        }, "No se pudo registrar el intento. Revisa la conexión y el esquema.",
+                () -> btnVerificar.setDisable(false));
     }
 
-    private void invalidarEvaluacion() {
-        evaluacion = null;
-        respuestaEvaluada = null;
-        errores = List.of();
-        btnGuardar.setDisable(true);
+    private void limpiarResultado() {
+        lblResultado.setText("");
     }
 
     private boolean esMatriz(Ejercicio ejercicio) {

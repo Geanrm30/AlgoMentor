@@ -187,7 +187,7 @@ Crea un perfil, actualiza la lista y selecciona un ejercicio guardado.
 - **Gauss y Gauss-Jordan:** selecciona una operación de filas (intercambiar, escalar o eliminar),
   indica las filas con números desde 1 y el factor cuando corresponda, y escribe la matriz resultante completa.
 
-Verifica y guarda el intento. Los errores matriciales identifican la fila y columna correspondientes;
+Cada pulsación de **Verificar** registra automáticamente un intento, correcto o incorrecto, para el perfil seleccionado. Las respuestas incompletas o mal escritas también cuentan como intentos incorrectos. Los errores matriciales identifican la fila y columna correspondientes;
 los errores se asocian a Signos, Fracciones, Aritmetica o Procedimiento. Los pasos correctos de práctica
 cuentan en Procedimiento. `RegistroPracticaService` conecta la evaluación con `IntentoService`.
 
@@ -617,7 +617,7 @@ los pasos. `Arrays.sort` sirve como referencia de prueba, no como implementació
 | Comparación | Introducir `8,3,6,1,5` y verificar las siete filas de resultados. |
 | Persistencia de algoritmos y ejercicios | Crear, consultar y actualizar registros desde Biblioteca; verificar restricciones de eliminación. |
 | Generación de ejercicios | Elegir el algoritmo y dificultad, generar y guardar el ejercicio. |
-| Práctica | Seleccionar un perfil y un ejercicio, evaluar una respuesta y guardar el intento. |
+| Práctica | Seleccionar un perfil y un ejercicio; cada verificación registra automáticamente el intento. |
 | Progreso | Consultar el perfil y verificar la habilidad y estadísticas correspondientes. |
 | Informe PDF | Pulsar **Exportar PDF** y abrir el archivo generado. |
 | Intercambio API | Exportar JSON e importar un paquete válido; verificar que los duplicados se omiten. |
