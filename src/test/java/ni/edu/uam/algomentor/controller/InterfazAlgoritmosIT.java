@@ -22,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class InterfazAlgoritmosIT {
     @BeforeAll static void iniciarJavaFx() throws Exception {
         FutureTask<Void> inicio = new FutureTask<>(() -> { Platform.setImplicitExit(false); return null; });
-        Platform.startup(inicio);
+        try { Platform.startup(inicio); }
+        catch (IllegalStateException e) { Platform.runLater(inicio); }
         inicio.get(15, TimeUnit.SECONDS);
     }
 

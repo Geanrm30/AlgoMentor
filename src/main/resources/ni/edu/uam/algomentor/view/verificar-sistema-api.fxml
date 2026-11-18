@@ -19,7 +19,9 @@
             <VBox spacing="10" styleClass="card">
                 <Label text="Resultados" styleClass="section-title" />
                 <Label fx:id="lblLocal" wrapText="true" />
+                <Label fx:id="lblTiempoLocal" wrapText="true" styleClass="subtitle" />
                 <Label fx:id="lblExterno" wrapText="true" />
+                <Label fx:id="lblTiempoExterno" wrapText="true" styleClass="subtitle" />
             </VBox>
         </VBox>
     </content>

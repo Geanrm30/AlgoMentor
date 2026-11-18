@@ -11,6 +11,8 @@ import ni.edu.uam.algomentor.model.Ejercicio;
 
 import java.util.Arrays;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
@@ -63,6 +65,13 @@ public final class TextoInterfaz {
                 .collect(Collectors.joining(" · "));
     }
 
+    public static String solucionDecimal(List<Fraccion> valores) {
+        return IntStream.range(0, valores.size())
+                .mapToObj(i -> "x" + (i + 1) + " = " + decimal(new BigDecimal(valores.get(i).numerador())
+                        .divide(new BigDecimal(valores.get(i).denominador()), 6, RoundingMode.HALF_UP)))
+                .collect(Collectors.joining(" · "));
+    }
+
     public static String solucionExterna(String respuesta) {
         try {
             JsonNode valores = new ObjectMapper().readTree(respuesta);
@@ -72,15 +81,20 @@ public final class TextoInterfaz {
             StringJoiner texto = new StringJoiner(" · ");
             for (int i = 0; i < valores.size(); i++) {
                 JsonNode fila = valores.get(i);
-                if (!fila.isArray() || fila.size() != 1 || !fila.get(0).isValueNode()) {
+                if (!fila.isArray() || fila.size() != 1 || !fila.get(0).isNumber()) {
                     return respuesta;
                 }
-                texto.add("x" + (i + 1) + " = " + fila.get(0).asText());
+                texto.add("x" + (i + 1) + " = " + decimal(new BigDecimal(fila.get(0).asText())));
             }
             return texto.toString();
         } catch (IOException e) {
             return respuesta;
         }
+    }
+
+    private static String decimal(BigDecimal valor) {
+        BigDecimal redondeado = valor.setScale(6, RoundingMode.HALF_UP).stripTrailingZeros();
+        return redondeado.signum() == 0 ? "0" : redondeado.toPlainString();
     }
 
     public static String clasificacion(ClasificacionSistema valor) {

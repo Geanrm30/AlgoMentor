@@ -292,7 +292,10 @@ independiente un sistema lineal de solución única.
 2. El motor de Gauss calcula la solución exacta con fracciones.
 3. `MathJsClient` envía los coeficientes y términos independientes por HTTPS a
    `https://api.mathjs.org/v4/` mediante una petición POST JSON.
-4. La aplicación muestra la solución local junto a la respuesta del servicio externo.
+4. La aplicación muestra ambas soluciones como decimales con hasta seis cifras y el tiempo de cada
+   operación por separado. AlgoMentor conserva el cálculo exacto con fracciones internamente.
+   El tiempo externo incluye la preparación de la petición y la comunicación por Internet,
+   por lo que no mide únicamente el cálculo de math.js.
 
 Requiere Internet. Si la API falla, la solución local permanece visible. Los sistemas sin solución
 única se clasifican localmente y no se envían a math.js.
