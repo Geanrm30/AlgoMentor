@@ -23,7 +23,7 @@
         <VBox spacing="5" styleClass="page-header">
             <Label text="AlgoMentor" styleClass="brand" />
             <Label text="Biblioteca de ejercicios" styleClass="page-title" />
-            <Label text="Crea algoritmos y ejercicios; consulta lo que has guardado y practicado" styleClass="subtitle" />
+            <Label text="Consulta los algoritmos disponibles, crea ejercicios y revisa tu historial" styleClass="subtitle" />
         </VBox>
     </top>
     <center>
@@ -57,7 +57,6 @@
                                     </VBox>
                                 </GridPane>
                                 <HBox spacing="10" styleClass="actions">
-                                    <Button text="Guardar" onAction="#guardarAlgoritmo" styleClass="primary-button" />
                                     <Button text="Actualizar" onAction="#actualizarAlgoritmo" />
                                     <Button text="Eliminar" onAction="#eliminarAlgoritmo" />
                                     <Button text="Limpiar" onAction="#limpiarAlgoritmo" />

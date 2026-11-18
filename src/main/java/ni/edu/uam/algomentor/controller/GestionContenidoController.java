@@ -182,15 +182,6 @@ public class GestionContenidoController {
         lblEstado.setText("Datos actualizados");
     }
 
-    @FXML private void guardarAlgoritmo() {
-        ejecutar(() -> {
-            Algoritmo a = leerAlgoritmo();
-            algoritmoDAO.guardar(a);
-            recargar();
-            limpiarAlgoritmo();
-        });
-    }
-
     @FXML private void actualizarAlgoritmo() {
         ejecutar(() -> {
             Algoritmo seleccionado = requerido(tblAlgoritmos.getSelectionModel().getSelectedItem(), "Seleccioná un algoritmo");
