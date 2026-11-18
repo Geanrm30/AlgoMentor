@@ -148,8 +148,8 @@ Progreso, Compartir y Comprobar sistema) y **Biblioteca** (gestión de contenido
 
 ### 3.1 Simulador
 
-1. **Entrada.** Selecciona uno de los nueve algoritmos. Para ordenamiento introduce hasta 20 enteros
-   separados por comas; para Gauss y Gauss-Jordan completa una matriz ampliada. **Generar entrada**
+1. **Entrada.** Selecciona uno de los nueve algoritmos. En Simular puedes introducir enteros
+   separados por comas sin un límite fijo de elementos; para Gauss y Gauss-Jordan completa una matriz ampliada. **Generar entrada**
    crea un ejemplo para el método seleccionado.
 2. **Recorrido.** Pulsa **Anterior** o **Siguiente** para recorrer las operaciones, sus estados y
    explicaciones en español. Se distinguen las comparaciones, los intercambios, las escrituras,
@@ -644,7 +644,7 @@ La rama `main` debe compilar y ejecutarse después de cada integración.
 
 ## 11. Limitaciones y notas de uso
 
-- La interfaz y los ejercicios utilizables de ordenamiento admiten hasta 20 enteros; el formato de almacenamiento conserva el límite de 30 por compatibilidad. En Simular, la fila se centra cuando cabe y se desplaza hasta el elemento activo durante los pasos.
+- Simular no impone un máximo fijo de enteros al introducir el arreglo manualmente. La fila se centra cuando cabe y se desplaza hasta el elemento activo durante los pasos. Biblioteca, Práctica y Comparar conservan su límite visual de 20, y el formato de almacenamiento mantiene el límite de 30 por compatibilidad. Los arreglos muy grandes requieren más tiempo y memoria porque se conserva el estado de cada paso.
 - Práctica reconoce los nueve algoritmos del catálogo. Los ejercicios deben usar los nombres registrados, como `Quick Sort` o `Gauss-Jordan`.
 - Ejecuta `schema.sql` en una instalación nueva. En una existente, la aplicación completa automáticamente los algoritmos faltantes sin modificar los registros ya presentes; `actualizar-nuevos-algoritmos.sql` sigue disponible para una migración manual. Las cuatro habilidades iniciales deben estar disponibles antes de registrar intentos.
 - La API externa math.js requiere Internet y verifica únicamente sistemas cuadrados con solución única; la solución local sigue disponible ante fallos del servicio.

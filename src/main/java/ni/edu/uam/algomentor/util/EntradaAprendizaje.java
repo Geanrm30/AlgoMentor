@@ -22,13 +22,18 @@ public final class EntradaAprendizaje {
     }
 
     public static int[] leerArreglo(String texto) {
+        int[] valores = leerArregloSinLimite(texto);
+        if (valores.length > FormatoDatos.MAX_ELEMENTOS_VISUALES) {
+            throw new IllegalArgumentException("Para visualizar, usa como máximo " + FormatoDatos.MAX_ELEMENTOS_VISUALES + " números.");
+        }
+        return valores;
+    }
+
+    public static int[] leerArregloSinLimite(String texto) {
         if (texto == null || texto.isBlank()) {
             throw new IllegalArgumentException("Ingresa al menos un número entero.");
         }
         String[] partes = texto.strip().split(",", -1);
-        if (partes.length > FormatoDatos.MAX_ELEMENTOS_VISUALES) {
-            throw new IllegalArgumentException("Para visualizar, usa como máximo " + FormatoDatos.MAX_ELEMENTOS_VISUALES + " números.");
-        }
         int[] valores = new int[partes.length];
         for (int i = 0; i < partes.length; i++) {
             try {

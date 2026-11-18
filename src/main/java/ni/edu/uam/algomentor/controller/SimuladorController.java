@@ -89,7 +89,7 @@ public class SimuladorController {
             entradaMatriz.setManaged(matricial);
             lblFormato.setText(matricial
                     ? "Completa los coeficientes y el término independiente b. Admite fracciones como 1/2."
-                    : "Hasta " + FormatoDatos.MAX_ELEMENTOS_VISUALES + " enteros separados por coma.");
+                    : "Escribe enteros separados por coma. Desplaza la fila para ver arreglos grandes.");
         });
         cmbAlgoritmo.getSelectionModel().selectFirst();
     }
@@ -118,7 +118,7 @@ public class SimuladorController {
                 conclusion = "Sistema: " + TextoInterfaz.clasificacion(matriz.clasificacion())
                         + (matriz.solucion().isEmpty() ? "" : " · " + TextoInterfaz.solucion(matriz.solucion()));
             } else {
-                int[] entrada = EntradaAprendizaje.leerArreglo(txtArreglo.getText());
+                int[] entrada = EntradaAprendizaje.leerArregloSinLimite(txtArreglo.getText());
                 resultado = algoritmo.crearOrdenamiento().ejecutar(entrada);
                 conclusion = "Resultado: " + resultado.estadoFinal();
             }
@@ -164,7 +164,7 @@ public class SimuladorController {
         if (matricial) {
             mostrarMatriz(FormatoDatos.leerEstadoMatriz(estado), paso == null ? List.of() : paso.indices());
         } else {
-            mostrarArreglo(EntradaAprendizaje.leerArreglo(estado.substring(1, estado.length() - 1)),
+            mostrarArreglo(EntradaAprendizaje.leerArregloSinLimite(estado.substring(1, estado.length() - 1)),
                     paso == null ? List.of() : paso.indices(),
                     paso == null ? -1 : paso.indicePivote(), movimiento);
         }

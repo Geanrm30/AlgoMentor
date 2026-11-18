@@ -15,6 +15,8 @@ class EntradaAprendizajeTest {
                 EntradaAprendizaje.leerArreglo("1,".repeat(FormatoDatos.MAX_ELEMENTOS_VISUALES - 1) + "1").length);
         assertThrows(IllegalArgumentException.class, () ->
                 EntradaAprendizaje.leerArreglo("1,".repeat(FormatoDatos.MAX_ELEMENTOS_VISUALES) + "1"));
+        assertEquals(100, EntradaAprendizaje.leerArregloSinLimite("1,".repeat(99) + "1").length);
+        assertThrows(IllegalArgumentException.class, () -> EntradaAprendizaje.leerArregloSinLimite("1,,2"));
     }
 
     @Test

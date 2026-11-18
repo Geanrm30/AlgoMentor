@@ -28,7 +28,7 @@ class SimuladorDesplazamientoIT {
     }
 
     @Test
-    void sigueLaCeldaActivaFueraDeLaVistaEnUnArregloDeVeinte() throws Exception {
+    void sigueLaCeldaActivaFueraDeLaVistaEnUnArregloDeTreintaYCinco() throws Exception {
         AtomicReference<ScrollPane> desplazamiento = new AtomicReference<>();
         FutureTask<Void> preparar = new FutureTask<>(() -> {
             FXMLLoader vista = new FXMLLoader(getClass().getResource("/ni/edu/uam/algomentor/view/simulador.fxml"));
@@ -36,7 +36,7 @@ class SimuladorDesplazamientoIT {
             new Scene(raiz, 760, 720);
             raiz.applyCss();
             raiz.layout();
-            int[] valores = new int[20];
+            int[] valores = new int[35];
             for (int i = 0; i < valores.length; i++) valores[i] = valores.length - i;
             ((TextField) vista.getNamespace().get("txtArreglo")).setText(
                     java.util.Arrays.stream(valores).mapToObj(Integer::toString)
@@ -44,7 +44,7 @@ class SimuladorDesplazamientoIT {
             ((Button) raiz.lookup(".primary-button")).fire();
             int paso = 0;
             var pasos = new BubbleSort().ejecutar(valores).pasos();
-            while (!pasos.get(paso).indices().contains(19)) paso++;
+            while (!pasos.get(paso).indices().contains(34)) paso++;
             Button siguiente = (Button) vista.getNamespace().get("btnSiguiente");
             for (int i = 0; i <= paso; i++) siguiente.fire();
             desplazamiento.set((ScrollPane) vista.getNamespace().get("scrollArreglo"));
@@ -53,7 +53,7 @@ class SimuladorDesplazamientoIT {
         Platform.runLater(preparar);
         preparar.get(15, TimeUnit.SECONDS);
         FutureTask<Void> verificar = new FutureTask<>(() -> {
-            assertTrue(desplazamiento.get().getHvalue() > 0, "La celda 20 debe entrar en la zona visible");
+            assertTrue(desplazamiento.get().getHvalue() > 0, "La celda 35 debe entrar en la zona visible");
             return null;
         });
         Platform.runLater(verificar);
