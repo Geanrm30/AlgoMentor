@@ -7,7 +7,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableCell;
@@ -16,10 +15,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.dao.EstadisticasDAO;
-import ni.edu.uam.algomentor.model.Perfil;
-import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.ReporteProgresoService;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.Tema;
@@ -38,9 +34,15 @@ public class ProgresoController {
     private static final double UMBRAL_ALTO = 70;
     private static final double UMBRAL_MEDIO = 40;
 
-    @FXML private ComboBox<Perfil> cmbPerfil;
+    @FXML private TableView<EstadisticasDAO.ResumenPerfil> tabla;
+    @FXML private TableColumn<EstadisticasDAO.ResumenPerfil, String> colPerfil;
+    @FXML private TableColumn<EstadisticasDAO.ResumenPerfil, String> colIntentos;
+    @FXML private TableColumn<EstadisticasDAO.ResumenPerfil, String> colCorrectos;
+    @FXML private TableColumn<EstadisticasDAO.ResumenPerfil, String> colIncorrectos;
+    @FXML private TableColumn<EstadisticasDAO.ResumenPerfil, String> colSinCalificar;
+    @FXML private TableColumn<EstadisticasDAO.ResumenPerfil, Double> colPorcentajeGeneral;
     @FXML private Label lblResumen;
-    @FXML private TableView<EstadisticasDAO.EstadisticaHabilidad> tabla;
+    @FXML private TableView<EstadisticasDAO.EstadisticaHabilidad> tablaHabilidades;
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colHabilidad;
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colAciertos;
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colErrores;
@@ -48,15 +50,21 @@ public class ProgresoController {
 
     @FXML
     private void initialize() {
-        cmbPerfil.setConverter(new StringConverter<>() {
-            @Override public String toString(Perfil valor) { return valor == null ? "" : valor.getNombre(); }
-            @Override public Perfil fromString(String texto) { return null; }
-        });
+        colPerfil.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().nombre()));
+        colIntentos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Long.toString(c.getValue().intentos().total())));
+        colCorrectos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Long.toString(c.getValue().intentos().correctos())));
+        colIncorrectos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Long.toString(c.getValue().intentos().incorrectos())));
+        colSinCalificar.setCellValueFactory(c -> new ReadOnlyStringWrapper(Long.toString(c.getValue().intentos().sinCalificar())));
+        colPorcentajeGeneral.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().intentos().porcentajeCorrectos()));
+        colPorcentajeGeneral.setCellFactory(columna -> new CeldaPorcentaje<>());
         colHabilidad.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().nombre()));
         colAciertos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().aciertos())));
         colErrores.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().errores())));
         colPorcentaje.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().porcentajeAciertos()));
-        colPorcentaje.setCellFactory(columna -> new CeldaPorcentaje());
+        colPorcentaje.setCellFactory(columna -> new CeldaPorcentaje<>());
+        tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        tablaHabilidades.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        tabla.getSelectionModel().selectedItemProperty().addListener((obs, anterior, actual) -> verProgreso(actual));
         cargarPerfiles();
     }
 
@@ -64,42 +72,46 @@ public class ProgresoController {
     private void cargarPerfiles() {
         lblResumen.setText("Cargando perfiles…");
         ejecutarEnSegundoPlano(() -> {
-            List<Perfil> perfiles = new PerfilService().listarPerfiles();
+            List<EstadisticasDAO.ResumenPerfil> perfiles = new EstadisticasDAO().listarResumenesPerfiles();
             Platform.runLater(() -> {
-                cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));
-                tabla.getItems().clear();
-                lblResumen.setText(perfiles.isEmpty() ? "Todavía no hay perfiles." : "Selecciona un perfil.");
+                Long seleccionado = tabla.getSelectionModel().getSelectedItem() == null
+                        ? null : tabla.getSelectionModel().getSelectedItem().id();
+                tabla.setItems(FXCollections.observableArrayList(perfiles));
+                tabla.getSelectionModel().clearSelection();
+                tablaHabilidades.getItems().clear();
+                lblResumen.setText(perfiles.isEmpty() ? "Todavía no hay perfiles."
+                        : "Selecciona un integrante para ver el detalle por habilidad o guardar su informe.");
+                if (seleccionado != null) perfiles.stream().filter(p -> p.id().equals(seleccionado))
+                        .findFirst().ifPresent(tabla.getSelectionModel()::select);
             });
         });
     }
 
-    @FXML
-    private void verProgreso() {
-        Perfil perfil = cmbPerfil.getValue();
+    private void verProgreso(EstadisticasDAO.ResumenPerfil perfil) {
         if (perfil == null) {
-            lblResumen.setText("Selecciona un perfil.");
             return;
         }
-        lblResumen.setText("Cargando progreso…");
+        tablaHabilidades.getItems().clear();
+        lblResumen.setText("Cargando habilidades de " + perfil.nombre() + "…");
         ejecutarEnSegundoPlano(() -> {
             EstadisticasDAO dao = new EstadisticasDAO();
-            var resumen = dao.obtenerResumenIntentos(perfil.getId());
-            var habilidades = dao.listarProgresoPorHabilidad(perfil.getId());
+            var habilidades = dao.listarProgresoPorHabilidad(perfil.id());
             Platform.runLater(() -> {
-                tabla.setItems(FXCollections.observableArrayList(habilidades));
-                lblResumen.setText("Intentos: " + resumen.total() + " · Correctos: " + resumen.correctos()
-                        + " · Incorrectos: " + resumen.incorrectos() + " · Sin calificar: " + resumen.sinCalificar()
-                        + (habilidades.isEmpty() ? "\nSin progreso por habilidad registrado." : ""));
+                if (tabla.getSelectionModel().getSelectedItem() == null
+                        || !tabla.getSelectionModel().getSelectedItem().id().equals(perfil.id())) return;
+                tablaHabilidades.setItems(FXCollections.observableArrayList(habilidades));
+                lblResumen.setText(habilidades.isEmpty() ? perfil.nombre() + " aún no tiene progreso por habilidad."
+                        : "Habilidades de " + perfil.nombre());
             });
         });
     }
 
     @FXML
     private void generarReporte() {
-        Perfil perfil = cmbPerfil.getValue();
+        EstadisticasDAO.ResumenPerfil perfil = tabla.getSelectionModel().getSelectedItem();
         if (perfil == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Perfil requerido",
-                    "Selecciona un perfil antes de generar el reporte.");
+                    "Selecciona un integrante de la tabla antes de generar el informe.");
             return;
         }
 
@@ -108,20 +120,20 @@ public class ProgresoController {
         selector.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Documento PDF", "*.pdf")
         );
-        String nombrePerfilArchivo = perfil.getNombre()
+        String nombrePerfilArchivo = perfil.nombre()
                 .replaceAll("[\\\\/:*?\"<>|]", "_");
         selector.setInitialFileName("progreso-" + nombrePerfilArchivo + ".pdf");
 
-        Window ventana = cmbPerfil.getScene() == null
+        Window ventana = tabla.getScene() == null
                 ? null
-                : cmbPerfil.getScene().getWindow();
+                : tabla.getScene().getWindow();
         java.io.File archivo = selector.showSaveDialog(ventana);
         if (archivo == null) {
             return;
         }
 
         lblResumen.setText("Generando informe PDF…");
-        Long perfilId = perfil.getId();
+        Long perfilId = perfil.id();
         Path destinoElegido = archivo.toPath();
         Path destino = destinoElegido.getFileName().toString()
                 .toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")
@@ -158,7 +170,7 @@ public class ProgresoController {
         alerta.showAndWait();
     }
 
-    private static final class CeldaPorcentaje extends TableCell<EstadisticasDAO.EstadisticaHabilidad, Double> {
+    private static final class CeldaPorcentaje<T> extends TableCell<T, Double> {
 
         private final ProgressBar barra = new ProgressBar(0);
         private final Label etiqueta = new Label();

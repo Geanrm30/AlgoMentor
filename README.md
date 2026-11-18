@@ -231,13 +231,14 @@ distribuciones y pasos educativos. Las métricas describen la traza del método,
 
 ### 3.4 Progreso e informe PDF
 
-Selecciona un perfil para consultar sus intentos y aciertos por habilidad. Cada habilidad muestra una
-barra animada: verde desde 70 %, ámbar desde 40 % y roja por debajo.
+La tabla muestra todos los perfiles con sus intentos, correctos, incorrectos, sin calificar y porcentaje
+de aciertos. Al seleccionar una fila aparece debajo el progreso de ese perfil por habilidad. Cada habilidad
+muestra una barra animada: verde desde 70 %, ámbar desde 40 % y roja por debajo.
 
 Para exportar el informe:
 
-1. Abre **Aprender > Progreso** y selecciona un perfil existente.
-2. Pulsa **Exportar PDF**, elige una ubicación y confirma el nombre del archivo.
+1. Abre **Aprender > Progreso** y selecciona un integrante de la tabla.
+2. Pulsa **Guardar informe**, elige una ubicación y confirma el nombre del archivo.
 3. El informe incluye la fecha de generación, el total de intentos, correctos, incorrectos y sin
    calificar, y los aciertos, errores y porcentaje por habilidad.
 

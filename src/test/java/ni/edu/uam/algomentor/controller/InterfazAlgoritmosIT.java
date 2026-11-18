@@ -73,6 +73,17 @@ class InterfazAlgoritmosIT {
         });
     }
 
+    @Test void progresoPresentaUnaTablaDeIntegrantesYConservaElDetallePorHabilidad() throws Exception {
+        enJavaFx(() -> {
+            FXMLLoader vista = cargar("progreso.fxml");
+            TableView<?> integrantes = control(vista, "tabla");
+            TableView<?> habilidades = control(vista, "tablaHabilidades");
+            assertEquals(6, integrantes.getColumns().size());
+            assertEquals("Integrante", integrantes.getColumns().getFirst().getText());
+            assertEquals(4, habilidades.getColumns().size());
+        });
+    }
+
     @Test void quickSortResaltaElPivoteYLoQuitaAlVolverAlInicio() throws Exception {
         enJavaFx(() -> {
             FXMLLoader vista = cargar("simulador.fxml");

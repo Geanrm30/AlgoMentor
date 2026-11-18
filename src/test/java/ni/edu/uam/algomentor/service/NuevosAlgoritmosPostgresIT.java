@@ -86,6 +86,28 @@ class NuevosAlgoritmosPostgresIT {
         }
     }
 
+    @Test void listaElResumenDeTodosLosPerfilesIncluidosLosSinIntentos() {
+        Perfil nuevo = new PerfilService().crearPerfil("IT_Resumen_" + UUID.randomUUID());
+        try {
+            EstadisticasDAO estadisticas = new EstadisticasDAO();
+            var perfiles = new PerfilService().listarPerfiles();
+            var resumenes = estadisticas.listarResumenesPerfiles();
+            assertEquals(perfiles.size(), resumenes.size());
+            for (var resumen : resumenes) {
+                assertEquals(estadisticas.obtenerResumenIntentos(resumen.id()), resumen.intentos());
+            }
+            var sinIntentos = resumenes.stream().filter(p -> p.id().equals(nuevo.getId()))
+                    .findFirst().orElseThrow();
+            assertEquals(0, sinIntentos.intentos().total());
+        } finally {
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                var tx = session.beginTransaction();
+                session.remove(session.get(Perfil.class, nuevo.getId()));
+                tx.commit();
+            }
+        }
+    }
+
     private void limpiar(SessionFactory factory, Long perfilId, String datos) {
         try (Session session = factory.openSession()) {
             var tx = session.beginTransaction();

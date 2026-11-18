@@ -3,15 +3,23 @@
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
-    <Label text="Progreso de aprendizaje" styleClass="section-title" />
-    <HBox spacing="10">
-        <ComboBox fx:id="cmbPerfil" promptText="Perfil" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="Progreso de aprendizaje" styleClass="section-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
         <Button text="Actualizar" onAction="#cargarPerfiles" />
-        <Button text="Ver progreso" onAction="#verProgreso" styleClass="primary-button" />
         <Button text="Guardar informe" onAction="#generarReporte" />
     </HBox>
-    <Label fx:id="lblResumen" text="Selecciona un perfil." wrapText="true" />
-    <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
+    <TableView fx:id="tabla" prefHeight="290" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colPerfil" text="Integrante" prefWidth="200" />
+            <TableColumn fx:id="colIntentos" text="Intentos" prefWidth="120" />
+            <TableColumn fx:id="colCorrectos" text="Correctos" prefWidth="130" />
+            <TableColumn fx:id="colIncorrectos" text="Incorrectos" prefWidth="130" />
+            <TableColumn fx:id="colSinCalificar" text="Sin calificar" prefWidth="140" />
+            <TableColumn fx:id="colPorcentajeGeneral" text="Acierto %" prefWidth="220" />
+        </columns>
+    </TableView>
+    <Label fx:id="lblResumen" text="Selecciona un integrante para ver sus habilidades." wrapText="true" />
+    <TableView fx:id="tablaHabilidades" prefHeight="210" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colHabilidad" text="Habilidad" prefWidth="200" />
             <TableColumn fx:id="colAciertos" text="Aciertos" prefWidth="130" />

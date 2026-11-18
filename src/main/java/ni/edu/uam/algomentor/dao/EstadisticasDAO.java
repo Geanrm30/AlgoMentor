@@ -100,6 +100,26 @@ public class EstadisticasDAO {
         }
     }
 
+    public record ResumenPerfil(Long id, String nombre, ResumenIntentos intentos) { }
+
+    public List<ResumenPerfil> listarResumenesPerfiles() {
+        try (Session session = factory.openSession()) {
+            List<Object[]> filas = session.createQuery("""
+                    SELECT p.id, p.nombre, COUNT(i),
+                           SUM(CASE WHEN i.correcto = true THEN 1 ELSE 0 END),
+                           SUM(CASE WHEN i.correcto = false THEN 1 ELSE 0 END)
+                    FROM Perfil p LEFT JOIN p.intentos i
+                    GROUP BY p.id, p.nombre
+                    ORDER BY p.nombre
+                    """, Object[].class).getResultList();
+            return filas.stream().map(fila -> new ResumenPerfil(
+                    (Long) fila[0], (String) fila[1],
+                    new ResumenIntentos(((Number) fila[2]).longValue(),
+                            ((Number) fila[3]).longValue(), ((Number) fila[4]).longValue())))
+                    .toList();
+        }
+    }
+
     // Validar el identificador antes de consultar Hibernate.
     public static void validarPerfilId(Long perfilId) {
         if (perfilId == null || perfilId <= 0) {
