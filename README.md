@@ -63,11 +63,11 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 
 ## Aprendizaje
 
-- **Simulador:** elige Bubble Sort, Insertion Sort, Gauss o Gauss-Jordan. Escribe enteros separados por comas, o una matriz ampliada con una ecuación por línea y celdas separadas por comas. Usa **Anterior** y **Siguiente** para recorrer los pasos.
+- **Simulador:** elige Bubble Sort, Insertion Sort, Quick Sort, Merge Sort, Counting Sort, Radix Sort, Bucket Sort, Gauss o Gauss-Jordan. Escribe hasta 12 enteros separados por comas, o completa una matriz ampliada. **Generar entrada** crea un ejemplo del método seleccionado. Usa **Anterior** y **Siguiente** para recorrer los pasos.
 - **Audio:** en un paso puedes cargar un MP3 o WAV local y reproducirlo. El texto del paso permanece visible. Los audios no se guardan en la base de datos ni se incluyen en el repositorio.
 - **Práctica:** crea un perfil y selecciona un ejercicio guardado. Para ordenamiento responde con el arreglo final. Para Gauss y Gauss-Jordan selecciona una operación de filas, indica las filas con números desde 1 y el factor cuando aplique, y escribe la matriz resultante completa. Verifica y luego guarda el intento. Los errores muestran fila y columna y se asocian a Signos, Fracciones, Aritmetica o Procedimiento; los pasos correctos cuentan en Procedimiento.
 - **Terminal:** escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema operativo.
-- **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
+- **Comparar:** usa la misma entrada para comparar los siete métodos de ordenamiento. La tabla distingue comparaciones, intercambios, escrituras del arreglo, escrituras dentro de cubetas, conteos, distribuciones y pasos educativos.
 - **Progreso:** selecciona un perfil para consultar sus intentos y aciertos por habilidad. Pulsa **Exportar PDF** para guardar un informe con el resumen de intentos y los resultados por habilidad. El informe se genera usando JasperReports y los datos consultados mediante Hibernate.
 - **Intercambio API:** exporta ejercicios a JSON e importa lotes compartidos por otros equipos mediante una API HTTP local. Los ejercicios se relacionan por nombre de algoritmo, sin compartir identificadores de la base de datos.
 - **Verificar sistema API:** consulta el servicio externo math.js para resolver un sistema lineal de solución única y muestra su respuesta junto con la solución exacta del motor de AlgoMentor.
@@ -126,6 +126,101 @@ El servidor escucha solo en la computadora local. Para compartir entre equipos, 
 archivo JSON exportado y el otro equipo lo importa desde su propia instalación.
 
 En Gestión de contenido, crea los ejercicios con el mismo nombre de algoritmo que aparece en el simulador. Los datos pueden ser simples (`8,3,6,1` o `2,1,5` seguido de otra fila) o usar el formato versionado `v1;ARREGLO;8,3,6,1` y `v1;MATRIZ;2x3;2,1,5|1,-1,1`. Ejecuta `schema.sql` antes de guardar intentos, pues crea las cuatro habilidades iniciales.
+
+## Ampliación: nueve algoritmos
+
+Los cinco ordenamientos nuevos aceptan negativos, cero, repetidos y los extremos de `int`
+(`-2147483648` y `2147483647`). No modifican el arreglo recibido. Los motores rechazan
+arreglos vacíos o nulos. La interfaz y los ejercicios utilizables admiten hasta 12 elementos;
+el formato de almacenamiento conserva su límite original de 30 para compatibilidad.
+
+| Método | Funcionamiento y pasos | Tiempo | Memoria auxiliar del método |
+| --- | --- | --- | --- |
+| Quick Sort | Pivote central, comparaciones y partición en menores, iguales y mayores; el pivote se marca en violeta | Promedio `O(n log n)`, peor `O(n²)` | `O(log n)` de intervalos pendientes |
+| Merge Sort | División en subarreglos, mezcla estable y escrituras en el arreglo | `O(n log n)` | `O(n)` |
+| Counting Sort | Frecuencias con índice `valor - mínimo` y reconstrucción | Denso `O(n + k)`; disperso `O(n log u)` | Denso `O(k)`; disperso `O(u)` |
+| Radix Sort | Diez pasadas decimales estables, conteo, distribución y copia de la salida | `O(d(n + b))`, aquí `d = 10`, `b = 10` | `O(n + b)` |
+| Bucket Sort | `n` cubetas uniformes, inserción estable dentro de cada cubeta y concatenación | Esperado `O(n)` con distribución uniforme; peor `O(n²)` | `O(n)` |
+
+`k` es el tamaño del rango de valores y `u` el número de valores distintos. Estas cotas
+describen el algoritmo sin las instantáneas educativas ni la copia defensiva de la entrada.
+Cada paso conserva estados anterior y posterior completos; por ello, la traza usa memoria
+adicional proporcional al número de pasos multiplicado por el tamaño del arreglo.
+
+Counting Sort usa como máximo 65 536 casillas de frecuencias densas. Para rangos mayores,
+incluido el rango completo de enteros, cuenta únicamente las claves presentes en un árbol
+ordenado. Esta variante dispersa realiza comparaciones reales que aparecen en los pasos
+y en el comparador; la variante densa no compara claves para ordenarlas. El rango se calcula
+con `long` para evitar desbordamientos.
+
+Radix Sort calcula la clave `(long) valor - Integer.MIN_VALUE`, entre 0 y 4 294 967 295.
+No niega los negativos ni invierte grupos, y mantiene la estabilidad en cada pasada mediante
+frecuencias acumuladas y distribución de derecha a izquierda. Bucket Sort también calcula
+sus intervalos con `long`, sin restas o multiplicaciones de rango en `int`.
+
+Las comparaciones del comparador son decisiones de orden entre valores o claves de la traza;
+no incluyen comprobaciones de índices ni la búsqueda inicial del rango. Un intercambio
+se cuenta por separado de las escrituras explícitas `ESCRIBIR`; no se suman sus asignaciones
+otra vez como escrituras. Las escrituras internas de cubetas, conteos y distribuciones tienen
+columnas propias. Los pasos de división, mezcla, selección de pivote y finalización cuentan
+como pasos educativos, no como comparaciones. Bubble e Insertion ahora separan la comparación
+del intercambio que esta provoca, conservando sus resultados y cantidades de comparaciones.
+
+### Actualizar una base de datos existente
+
+En pgAdmin, conectado a la base de AlgoMentor, ejecutar:
+
+`src/main/resources/ni/edu/uam/algomentor/db/actualizar-nuevos-algoritmos.sql`
+
+El script es transaccional e idempotente: inserta los cinco nombres con
+`ON CONFLICT (nombre) DO NOTHING`. No elimina ejercicios, perfiles, intentos, progreso
+ni modifica algoritmos existentes. Para una instalación nueva, `schema.sql` ya incluye los nueve.
+Los nombres persistidos e intercambiados son exactamente `Quick Sort`, `Merge Sort`,
+`Counting Sort`, `Radix Sort` y `Bucket Sort`.
+
+Después de aplicar el SQL, abrir **Biblioteca > Ejercicios**, seleccionar el algoritmo,
+elegir dificultad y pulsar **Generar ejercicio**. Revisar los datos y pulsar **Guardar**.
+En **Práctica**, pulsar **Actualizar**, seleccionar perfil y ejercicio y responder con el
+arreglo ordenado. La evaluación y el guardado usan los mismos servicios de aprendizaje,
+habilidades y transacciones existentes. La API mantiene su JSON versión 1 y relaciona
+ejercicios por nombre; el equipo receptor también debe haber aplicado el SQL. Los límites
+de importación existentes siguen siendo 500 ejercicios y 1 MB por lote.
+
+La terminal incorpora `ordenar quick`, `ordenar merge`, `ordenar counting`, `ordenar radix`
+y `ordenar bucket`. Por ejemplo:
+
+```text
+ordenar quick 4,-2,0,4,-7
+ordenar radix 2147483647,-2147483648,0
+```
+
+### Verificación de la ampliación
+
+Pruebas unitarias, sin PostgreSQL:
+
+```powershell
+.\mvnw.cmd clean test
+```
+
+Prueba real de carga FXML y controles JavaFX (requiere escritorio):
+
+```powershell
+.\mvnw.cmd "-Dtest=InterfazAlgoritmosIT" test
+```
+
+Pruebas de persistencia con PostgreSQL real, conexión configurada y esquema actualizado:
+
+```powershell
+.\mvnw.cmd "-Dtest=PersistenciaAprendizajeIT,NuevosAlgoritmosPostgresIT" test
+```
+
+La prueba nueva de PostgreSQL comprueba la migración dos veces dentro de una transacción
+revertida, importación y deduplicación de ejercicios, recuperación con Hibernate, exportación,
+evaluación e intentos correctos e incorrectos con estadísticas. Sus perfiles y ejercicios
+temporales usan UUID y se eliminan al terminar. Las clases `*IT` no se ejecutan automáticamente
+con `mvn test`. No se utilizan bases alternativas ni persistencia simulada.
+
+El informe de implementación y archivos está en [docs/AMPLIACION_ALGORITMOS.md](docs/AMPLIACION_ALGORITMOS.md).
 
 ## Trabajo en equipo
 
