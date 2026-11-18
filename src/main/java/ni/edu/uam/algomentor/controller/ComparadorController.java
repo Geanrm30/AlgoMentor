@@ -10,7 +10,6 @@ import javafx.scene.control.TextField;
 import ni.edu.uam.algomentor.service.ComparadorOrdenamientos;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
 import ni.edu.uam.algomentor.util.Tema;
-import ni.edu.uam.algomentor.util.TextoInterfaz;
 
 public class ComparadorController {
 
@@ -28,7 +27,7 @@ public class ComparadorController {
 
     @FXML
     private void initialize() {
-        colAlgoritmo.setCellValueFactory(c -> new ReadOnlyStringWrapper(TextoInterfaz.algoritmo(c.getValue().algoritmo())));
+        colAlgoritmo.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().algoritmo()));
         colComparaciones.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().comparaciones())));
         colIntercambios.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().intercambios())));
         colEscrituras.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().escrituras())));

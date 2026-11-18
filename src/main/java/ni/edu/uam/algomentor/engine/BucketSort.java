@@ -19,7 +19,7 @@ public class BucketSort implements AlgoritmoOrdenamiento {
             minimo = Math.min(minimo, valor);
             maximo = Math.max(maximo, valor);
         }
-        int cantidad = Math.max(1, (int) Math.sqrt(datos.length));
+        int cantidad = datos.length;
         long rango = (long) maximo - minimo + 1;
         List<List<Elemento>> cubetas = new ArrayList<>();
         for (int i = 0; i < cantidad; i++) cubetas.add(new ArrayList<>());

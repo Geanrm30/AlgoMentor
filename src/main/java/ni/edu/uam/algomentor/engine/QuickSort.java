@@ -16,10 +16,22 @@ public class QuickSort implements AlgoritmoOrdenamiento {
             int[] rango = pendientes.pop();
             if (rango[0] >= rango[1]) continue;
             int[] iguales = particionar(traza, rango[0], rango[1]);
-            pendientes.push(new int[]{iguales[1] + 1, rango[1]});
-            pendientes.push(new int[]{rango[0], iguales[0] - 1});
+            int[] izquierda = {rango[0], iguales[0] - 1};
+            int[] derecha = {iguales[1] + 1, rango[1]};
+            // Se procesa primero el menor intervalo para acotar la pila a O(log n).
+            if (izquierda[1] - izquierda[0] < derecha[1] - derecha[0]) {
+                apilar(pendientes, derecha);
+                apilar(pendientes, izquierda);
+            } else {
+                apilar(pendientes, izquierda);
+                apilar(pendientes, derecha);
+            }
         }
         return traza.terminar();
+    }
+
+    private void apilar(ArrayDeque<int[]> pendientes, int[] rango) {
+        if (rango[0] < rango[1]) pendientes.push(rango);
     }
 
     private int[] particionar(TrazaOrdenamiento traza, int inicio, int fin) {

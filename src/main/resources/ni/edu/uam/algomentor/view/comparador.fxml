@@ -4,22 +4,22 @@
 
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ComparadorController">
     <Label text="Comparar ordenamientos" styleClass="section-title" />
-    <Label text="Compara los siete ordenamientos con los mismos números. Las escrituras del arreglo, escrituras dentro de cubetas, conteos y distribuciones se muestran por separado; un intercambio no se cuenta como comparación." wrapText="true" />
+    <Label text="Compara los siete métodos: comparaciones, intercambios, escrituras, conteos y distribuciones." wrapText="true" minHeight="-Infinity" />
     <HBox spacing="10">
         <TextField fx:id="txtDatos" promptText="Ej. 5, 1, 4, 2" accessibleText="Números enteros separados por coma" HBox.hgrow="ALWAYS" />
         <Button text="Comparar" onAction="#comparar" styleClass="primary-button" />
     </HBox>
     <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colAlgoritmo" text="Algoritmo" prefWidth="170" />
-            <TableColumn fx:id="colComparaciones" text="Comparaciones" prefWidth="110" />
-            <TableColumn fx:id="colIntercambios" text="Intercambios" prefWidth="100" />
-            <TableColumn fx:id="colEscrituras" text="Escrituras" prefWidth="90" />
-            <TableColumn fx:id="colEscriturasCubeta" text="Escr. cubeta" prefWidth="100" />
+            <TableColumn fx:id="colAlgoritmo" text="Algoritmo" prefWidth="140" />
+            <TableColumn fx:id="colComparaciones" text="Comparaciones" prefWidth="125" />
+            <TableColumn fx:id="colIntercambios" text="Intercambios" prefWidth="115" />
+            <TableColumn fx:id="colEscrituras" text="Escrituras" prefWidth="100" />
+            <TableColumn fx:id="colEscriturasCubeta" text="Escr. cubeta" prefWidth="110" />
             <TableColumn fx:id="colConteos" text="Conteos" prefWidth="80" />
-            <TableColumn fx:id="colDistribuciones" text="Distribuciones" prefWidth="110" />
+            <TableColumn fx:id="colDistribuciones" text="Distribuciones" prefWidth="125" />
             <TableColumn fx:id="colPasos" text="Pasos" prefWidth="70" />
-            <TableColumn fx:id="colResultado" text="Resultado" prefWidth="220" />
+            <TableColumn fx:id="colResultado" text="Resultado" prefWidth="170" />
         </columns>
     </TableView>
 </VBox>

@@ -52,6 +52,9 @@ abstract class ContratoOrdenamiento {
             assertFalse(paso.explicacion().isBlank());
             assertTrue(paso.indices().stream().allMatch(indice -> indice >= 0 && indice < datos.length));
             assertTrue(paso.indicePivote() >= -1 && paso.indicePivote() < datos.length);
+            if (paso.tipo() == TipoOperacion.ESCRIBIR || paso.tipo() == TipoOperacion.INTERCAMBIAR) {
+                verificarMutacion(paso);
+            }
             if (paso.tipo() != TipoOperacion.ESCRIBIR && paso.tipo() != TipoOperacion.INTERCAMBIAR) {
                 assertEquals(paso.estadoAnterior(), paso.estadoPosterior());
             }
@@ -59,5 +62,27 @@ abstract class ContratoOrdenamiento {
         }
         assertEquals(r.estadoFinal(), anterior);
         assertEquals(TipoOperacion.FINALIZAR, r.pasos().getLast().tipo());
+    }
+
+    private void verificarMutacion(Paso paso) {
+        int[] antes = leerEstado(paso.estadoAnterior());
+        int[] despues = leerEstado(paso.estadoPosterior());
+        assertEquals(antes.length, despues.length);
+        for (int i = 0; i < antes.length; i++) {
+            if (!paso.indices().contains(i)) assertEquals(antes[i], despues[i]);
+        }
+        if (paso.tipo() == TipoOperacion.ESCRIBIR) assertEquals(1, paso.indices().size());
+        else {
+            assertEquals(2, paso.indices().size());
+            int a = paso.indices().get(0);
+            int b = paso.indices().get(1);
+            assertEquals(antes[a], despues[b]);
+            assertEquals(antes[b], despues[a]);
+        }
+    }
+
+    private int[] leerEstado(String estado) {
+        return Arrays.stream(estado.substring(1, estado.length() - 1).split(","))
+                .map(String::strip).mapToInt(Integer::parseInt).toArray();
     }
 }

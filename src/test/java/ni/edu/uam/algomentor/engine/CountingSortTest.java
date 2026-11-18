@@ -20,4 +20,15 @@ class CountingSortTest extends ContratoOrdenamiento {
         assertTrue(r.pasos().stream().anyMatch(p -> p.tipo() == TipoOperacion.COMPARAR));
         assertTrue(r.pasos().size() < 100);
     }
+
+    @Test void respetaElLimiteDeMemoriaInclusoJuntoAMinValue() {
+        var denso = algoritmo().ejecutar(new int[]{Integer.MIN_VALUE + CountingSort.MAX_RANGO_DENSO - 1,
+                Integer.MIN_VALUE});
+        var disperso = algoritmo().ejecutar(new int[]{Integer.MIN_VALUE + CountingSort.MAX_RANGO_DENSO,
+                Integer.MIN_VALUE});
+        assertTrue(denso.pasos().stream().noneMatch(p -> p.tipo() == TipoOperacion.COMPARAR));
+        assertTrue(disperso.pasos().stream().anyMatch(p -> p.tipo() == TipoOperacion.COMPARAR));
+        assertEquals("[-2147483648, -2147418113]", denso.estadoFinal());
+        assertEquals("[-2147483648, -2147418112]", disperso.estadoFinal());
+    }
 }
