@@ -57,6 +57,13 @@ class GaussTest {
     }
 
     @Test
+    void clasificaComoIncompatibleElSistemaDeLaCaptura() {
+        ResultadoMatriz resultado = gauss.ejecutar(m("1,2,3,1|2,3,4,6|3,2,1,4"));
+        assertEquals(ClasificacionSistema.SIN_SOLUCION, resultado.clasificacion());
+        assertTrue(resultado.ejecucion().pasos().getLast().explicacion().contains("0 ="));
+    }
+
+    @Test
     void detectaSistemaConInfinitasSoluciones() {
         ResultadoMatriz r = gauss.ejecutar(m("1,1,2|2,2,4"));
         assertEquals(ClasificacionSistema.INFINITAS, r.clasificacion());

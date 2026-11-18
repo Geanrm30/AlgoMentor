@@ -45,4 +45,26 @@ class VerificarSistemaVistaIT {
         Platform.runLater(prueba);
         prueba.get(15, TimeUnit.SECONDS);
     }
+
+    @Test
+    void explicaPorQueElSistemaDeLaCapturaNoTieneSolucion() throws Exception {
+        FutureTask<Void> prueba = new FutureTask<>(() -> {
+            FXMLLoader vista = new FXMLLoader(getClass().getResource("/ni/edu/uam/algomentor/view/verificar-sistema-api.fxml"));
+            vista.load();
+            VBox entrada = (VBox) vista.getNamespace().get("entradaMatriz");
+            ((EntradaMatrizVisual) entrada.getChildren().getFirst()).cargar(new Fraccion[][]{
+                    {Fraccion.de(1), Fraccion.de(2), Fraccion.de(3), Fraccion.de(1)},
+                    {Fraccion.de(2), Fraccion.de(3), Fraccion.de(4), Fraccion.de(6)},
+                    {Fraccion.de(3), Fraccion.de(2), Fraccion.de(1), Fraccion.de(4)}
+            });
+            ((Button) vista.getNamespace().get("btnConsultar")).fire();
+            String local = ((Label) vista.getNamespace().get("lblLocal")).getText();
+            assertTrue(local.contains("Sin solución"));
+            assertTrue(local.contains("0 ="));
+            assertTrue(((Label) vista.getNamespace().get("lblTiempoExterno")).getText().contains("no aplica"));
+            return null;
+        });
+        Platform.runLater(prueba);
+        prueba.get(15, TimeUnit.SECONDS);
+    }
 }

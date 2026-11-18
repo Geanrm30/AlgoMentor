@@ -66,6 +66,7 @@ public class VerificarSistemaApiController {
         lblLocal.setText("Solución de AlgoMentor: " + TextoInterfaz.clasificacion(resultado.clasificacion())
                 + (resultado.solucion().isEmpty() ? "" : " · " + TextoInterfaz.solucionDecimal(resultado.solucion())));
         if (resultado.clasificacion() != ClasificacionSistema.UNICA) {
+            lblLocal.setText(lblLocal.getText() + " · " + resultado.ejecucion().pasos().getLast().explicacion());
             lblExterno.setText("La comparación externa solo está disponible para sistemas con una solución.");
             lblTiempoExterno.setText("Tiempo externo: no aplica.");
             lblEstadoConsulta.setText("Resultado listo. Revísalo abajo.");
