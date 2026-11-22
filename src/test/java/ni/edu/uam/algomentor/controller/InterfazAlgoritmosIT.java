@@ -4,14 +4,19 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
+import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.ComparadorOrdenamientos;
+import ni.edu.uam.algomentor.util.SesionUsuario;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.FutureTask;
@@ -25,6 +30,17 @@ class InterfazAlgoritmosIT {
         try { Platform.startup(inicio); }
         catch (IllegalStateException e) { Platform.runLater(inicio); }
         inicio.get(15, TimeUnit.SECONDS);
+    }
+
+    @BeforeEach void iniciarSesionDePrueba() {
+        Perfil perfil = new Perfil();
+        perfil.setId(1L);
+        perfil.setNombre("prueba");
+        SesionUsuario.iniciar(perfil);
+    }
+
+    @AfterEach void cerrarSesionDePrueba() {
+        SesionUsuario.cerrar();
     }
 
     @Test void simulaSieteOrdenamientosYRetrocedeHastaElEstadoInicial() throws Exception {
@@ -73,14 +89,24 @@ class InterfazAlgoritmosIT {
         });
     }
 
-    @Test void progresoPresentaUnaTablaDeIntegrantesYConservaElDetallePorHabilidad() throws Exception {
+    @Test void progresoPresentaElGraficoYLaTablaDeHabilidadesDelPerfilActivo() throws Exception {
         enJavaFx(() -> {
             FXMLLoader vista = cargar("progreso.fxml");
-            TableView<?> integrantes = control(vista, "tabla");
-            TableView<?> habilidades = control(vista, "tablaHabilidades");
-            assertEquals(6, integrantes.getColumns().size());
-            assertEquals("Integrante", integrantes.getColumns().getFirst().getText());
+            BarChart<?, ?> grafico = control(vista, "graficoHabilidades");
+            TableView<?> habilidades = control(vista, "tabla");
+            assertNotNull(grafico);
             assertEquals(4, habilidades.getColumns().size());
+            assertEquals("Habilidad", habilidades.getColumns().getFirst().getText());
+            assertEquals("Perfil: prueba", ((Label) control(vista, "lblPerfilActual")).getText());
+            BarChart<?, ?> errores = control(vista, "graficoErrores");
+            TableView<?> rendimiento = control(vista, "tablaRendimiento");
+            TableView<?> historial = control(vista, "tablaHistorial");
+            assertNotNull(errores);
+            assertNotNull(control(vista, "graficoAlgoritmos"));
+            assertNotNull(control(vista, "graficoEvolucion"));
+            assertNotNull(control(vista, "graficoResultados"));
+            assertEquals(5, rendimiento.getColumns().size());
+            assertEquals(5, historial.getColumns().size());
         });
     }
 

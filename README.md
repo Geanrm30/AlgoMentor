@@ -110,8 +110,9 @@ Ejecuta en la base `algomentor` el archivo `src/main/resources/ni/edu/uam/algome
 El script define las tablas y sus relaciones, incluyendo `cuenta`, crea las cuatro habilidades
 iniciales (Signos, Fracciones, Aritmetica y Procedimiento) y registra los nueve algoritmos del catálogo.
 
-**Bases existentes:** ejecuta `src/main/resources/ni/edu/uam/algomentor/db/actualizar-cuentas.sql`
-para crear la tabla de cuentas sin recrear ni borrar datos. Un perfil antiguo se puede reclamar
+**Bases existentes:** al abrir la aplicación se crea la tabla de cuentas si falta, sin recrear ni
+borrar datos (también puedes ejecutar manualmente
+`src/main/resources/ni/edu/uam/algomentor/db/actualizar-cuentas.sql`). Un perfil antiguo se puede reclamar
 al registrarse con el mismo nombre de usuario (sin distinguir mayúsculas); se conserva su
 progreso y ese perfil solo puede quedar vinculado a una cuenta.
 
@@ -133,9 +134,8 @@ Abre la carpeta en IntelliJ IDEA como proyecto Maven con JDK 21, o desde una ter
 La aplicación inicia en la pantalla de acceso. Crea una cuenta con un usuario de 3 a 40
 caracteres y una contraseña de 8 a 128 caracteres, o inicia sesión. Cada cuenta queda
 vinculada a un perfil; al registrar el nombre de un perfil previo se conserva su progreso.
-Las contraseñas se almacenan con PBKDF2 y no en texto plano. Usa **Cerrar sesión** en la
-barra superior para salir. La gestión de contenido permite crear, consultar, actualizar y
-eliminar algoritmos y ejercicios. La pestaña **Resumen** muestra los totales y listados de
+Las contraseñas se almacenan con PBKDF2 y no en texto plano. Usa **Archivo > Cerrar sesión** para salir. La gestión de contenido permite crear, consultar, actualizar y
+eliminar algoritmos y ejercicios. La sección **Inicio > Resumen general** incluye gráficos de ejercicios por algoritmo (circular) y por dificultad (barras) y muestra los totales y listados de
 algoritmos, ejercicios y perfiles, además del total de intentos.
 Si la conexión a PostgreSQL falla, la aplicación muestra el problema en la barra inferior y registra
 el detalle técnico en consola.
@@ -155,12 +155,40 @@ el detalle técnico en consola.
 
 ## 3. Módulos de la aplicación
 
-Tras iniciar sesión, la ventana principal muestra **Resumen**, **Aprender** (Simular, Práctica,
-Comandos, Comparar, Progreso, Compartir y Comprobar sistema) y **Biblioteca** (gestión de contenido).
+Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a cada sección:
+
+| Menú | Opciones |
+|---|---|
+| **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF), Cerrar sesión y Salir. |
+| **Inicio** | Resumen general y Mi progreso. |
+| **Aprender** | Simular, Práctica y Comandos. |
+| **Herramientas** | Comparar algoritmos, Comprobar sistema (math.js) y Biblioteca de contenido. |
+| **Ver** | Tema claro u oscuro. |
+| **Ayuda** | Acerca de AlgoMentor. |
+
+Atajos de teclado (en macOS, `Cmd` en lugar de `Ctrl`):
+
+| Atajo | Acción | Atajo | Acción |
+|---|---|---|---|
+| `Ctrl+0` | Resumen general | `Ctrl+5` | Comparar algoritmos |
+| `Ctrl+1` | Simular | `Ctrl+6` | Comprobar sistema |
+| `Ctrl+2` | Práctica | `Ctrl+7` | Biblioteca de contenido |
+| `Ctrl+3` | Mi progreso | `Ctrl+E` | Exportar informe PDF |
+| `Ctrl+4` | Comandos | `Ctrl+Shift+E` / `Ctrl+I` | Exportar / importar ejercicios |
+| `Ctrl+T` | Tema claro u oscuro | `Ctrl+Shift+L` / `Ctrl+Q` | Cerrar sesión / salir |
+| `F11` | Pantalla completa | | |
+
+Las secciones con datos (Resumen, Progreso, Práctica y Biblioteca) se cargan de nuevo cada vez que se
+abren, para mostrar los cambios recientes. Simular, Comandos, Comparar y Comprobar sistema conservan
+lo que estabas haciendo.
+
+**Actualización automática:** Resumen y Progreso consultan la base de datos cada 10 segundos y cuando la
+ventana recupera el foco, por ejemplo después de importar ejercicios con Postman. Solo redibujan si los
+datos cambiaron, así que no pierden la selección ni parpadean; **Actualizar** sigue disponible para forzarlo.
 
 ### 3.1 Simulador
 
-La aplicación inicia con el tema oscuro; usa **Tema claro** en la barra superior para alternar su apariencia.
+La aplicación inicia con el tema oscuro; usa **Ver > Tema claro** para alternar su apariencia; la elección se recuerda al cerrar y volver a abrir la aplicación, y también se aplica en la pantalla de inicio de sesión. La ventana se abre maximizada; **Ver > Pantalla completa** (`F11`) la lleva a pantalla completa real.
 
 1. **Entrada.** Selecciona uno de los nueve algoritmos. En Simular puedes introducir enteros
    separados por comas sin un límite fijo de elementos; para Gauss y Gauss-Jordan completa una matriz ampliada. **Generar entrada**
@@ -248,13 +276,24 @@ distribuciones y pasos educativos. Las métricas describen la traza del método,
 
 ### 3.4 Progreso e informe PDF
 
-Muestra el progreso del perfil autenticado, no un ranking global: incluye intentos, correctos,
-incorrectos, sin calificar y aciertos por habilidad. El gráfico compara aciertos y errores; la tabla
-de detalle incluye una barra animada por habilidad: verde desde 70 %, ámbar desde 40 % y roja por debajo.
+Muestra el progreso del perfil autenticado, no un ranking global. Arriba hay seis tarjetas: intentos,
+correctos, incorrectos, porcentaje de acierto (solo sobre los intentos calificados), racha de aciertos
+seguidos y tiempo promedio por intento. Debajo, siete pestañas:
+
+- **Gráfico:** gráfico de barras que compara aciertos y errores por habilidad.
+- **Detalle:** una barra animada por habilidad: verde desde 70 %, ámbar desde 40 % y roja por debajo.
+- **Por algoritmo:** gráfico de barras apiladas (correctos e incorrectos) y la tabla con intentos y porcentaje de acierto de cada algoritmo.
+- **Errores:** gráfico de los errores detectados por tipo (signo, fracción, aritmético y operación inválida).
+- **Evolución:** gráfico de líneas con el acierto acumulado a lo largo de los últimos intentos calificados.
+- **Resultados:** gráfico circular con la proporción de intentos correctos, incorrectos y sin calificar.
+- **Historial:** los 20 intentos más recientes con fecha, algoritmo, modo, resultado y duración.
+
+La racha cuenta los aciertos consecutivos más recientes; ignora las simulaciones, que no se califican,
+y se reinicia con el primer error. Los datos se obtienen con consultas HQL agrupadas y parametrizadas.
 
 Para revisar o exportar el informe:
 
-1. Abre **Aprender > Progreso** después de iniciar sesión.
+1. Abre **Inicio > Mi progreso** después de iniciar sesión (o **Archivo > Exportar informe de progreso**).
 2. Pulsa **Vista previa** para abrir el visor de JasperReports, o **Exportar** para guardar el PDF.
 3. El informe presenta tarjetas de resumen, la fecha de generación, resultados por habilidad y
    numeración de páginas.
@@ -265,7 +304,7 @@ no necesita consultar una API externa.
 
 <!-- Pendiente: capturas reales de Progreso y del PDF de JasperReports con PostgreSQL configurado. -->
 
-### 3.5 Intercambio API
+### 3.5 Exportar e importar ejercicios (API local)
 
 La API HTTP local escucha en `127.0.0.1:8765`. JavaFX la consume para exportar e importar ejercicios
 JSON portables, sin depender de Internet ni compartir los identificadores internos de PostgreSQL.
@@ -294,10 +333,10 @@ Ejemplo de paquete JSON (versión 1):
 
 La importación acepta hasta 500 ejercicios y 1 MB por lote, con `Content-Type: application/json`.
 Se procesa en una sola transacción: si algún dato es inválido, no se guarda el lote. Los ejercicios
-idénticos se omiten. Para compartir entre equipos se envía el archivo exportado y se importa desde
-la instalación receptora; el servidor no se expone a la red.
+idénticos se omiten. Para pasar ejercicios a otro equipo se envía el archivo exportado (**Archivo > Exportar ejercicios**) y se importa desde
+la instalación receptora (**Archivo > Importar ejercicios**); el servidor no se expone a la red.
 
-<!-- Pendiente: captura real de Compartir con PostgreSQL configurado. -->
+<!-- Pendiente: captura real de Exportar e importar ejercicios con PostgreSQL configurado. -->
 
 ### 3.6 Verificar sistema API
 
@@ -669,7 +708,8 @@ La rama `main` debe compilar y ejecutarse después de cada integración.
 - El intercambio es local y está limitado a 500 ejercicios y 1 MB por lote. Ambos equipos deben disponer de los algoritmos correspondientes.
 - Las trazas guardan instantáneas de los estados: las métricas educativas no representan una medición directa de tiempo ni memoria real de ejecución.
 - Los audios del simulador son archivos locales y no se guardan en la base de datos.
-- Hibernate valida el esquema al iniciar (`hbm2ddl.auto=validate`); no lo crea ni lo migra automáticamente.
+- Hibernate valida el esquema al iniciar (`hbm2ddl.auto=validate`); no lo crea ni lo migra. La única excepción es la tabla `cuenta`, que la aplicación crea si falta antes de validar.
+- El inicio de sesión protege el acceso desde la aplicación, no la base de datos: quien abra PostgreSQL directamente puede ver los datos. Las contraseñas se guardan con PBKDF2-HMAC-SHA256 y sal, nunca en texto plano. Tras 5 intentos fallidos seguidos con un usuario, ese usuario queda bloqueado 30 segundos; el contador se guarda en memoria y se reinicia al cerrar la aplicación.
 - La carpeta `target/` se genera al compilar y no forma parte del repositorio.
 - La última verificación documentada no incluye la ejecución de las pruebas contra PostgreSQL real.
 

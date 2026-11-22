@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ResumenController">
@@ -30,6 +31,21 @@
     </HBox>
     <TabPane VBox.vgrow="ALWAYS" styleClass="content-tabs">
         <tabs>
+            <Tab text="Gráficos" closable="false">
+                <content>
+                    <HBox spacing="16">
+                        <PieChart fx:id="graficoEjerciciosAlgoritmo" title="Ejercicios por algoritmo" animated="false" labelsVisible="false" legendVisible="true" legendSide="BOTTOM" HBox.hgrow="ALWAYS" />
+                        <BarChart fx:id="graficoEjerciciosDificultad" title="Ejercicios por dificultad" animated="false" legendVisible="false" HBox.hgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis fx:id="axisDificultad" label="Dificultad" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="axisCantidadEjercicios" label="Ejercicios" forceZeroInRange="true" />
+                            </yAxis>
+                        </BarChart>
+                    </HBox>
+                </content>
+            </Tab>
             <Tab text="Algoritmos" closable="false">
                 <content>
                     <TableView fx:id="tablaAlgoritmos">

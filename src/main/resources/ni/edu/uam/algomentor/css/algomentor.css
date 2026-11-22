@@ -804,3 +804,102 @@
 .app-root.light-theme .chart-horizontal-grid-lines {
     -fx-stroke: #d1d5db;
 }
+
+/* ---------- Barra de menú principal ---------- */
+
+.app-menubar {
+    -fx-padding: 4 16;
+    -fx-background-color: -ac-surface;
+    -fx-border-color: transparent transparent -ac-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-menubar .menu-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.app-menubar .menu-bar .menu .label {
+    -fx-text-fill: -ac-text;
+    -fx-font-weight: bold;
+}
+
+.sesion-activa {
+    -fx-text-fill: -ac-muted;
+}
+
+.app-contenido {
+    -fx-background-color: transparent;
+}
+
+.app-root.light-theme .app-menubar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #d1d5db transparent;
+}
+
+.app-root.light-theme .app-menubar .menu-bar .menu .label {
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .sesion-activa {
+    -fx-text-fill: #4b5563;
+}
+
+.app-root.light-theme .context-menu {
+    -fx-background-color: #ffffff;
+}
+
+.app-root.light-theme .context-menu .menu-item .label {
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .context-menu .menu-item:focused {
+    -fx-background-color: #bae6fd;
+}
+
+.app-root.light-theme .context-menu .menu-item:focused .label {
+    -fx-text-fill: #0c4a6e;
+}
+
+/* ---------- Gráficos adicionales ---------- */
+
+.grafico-errores .chart-bar.default-color0 {
+    -fx-bar-fill: #f97316;
+}
+
+.pie-resultados .default-color0.chart-pie {
+    -fx-pie-color: #22c55e;
+}
+
+.pie-resultados .default-color1.chart-pie {
+    -fx-pie-color: #f97316;
+}
+
+.pie-resultados .default-color2.chart-pie {
+    -fx-pie-color: #9ca3af;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #22d3ee;
+    -fx-stroke-width: 2.5px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #22d3ee, #0b1020;
+}
+
+.app-root.light-theme .default-color0.chart-line-symbol {
+    -fx-background-color: #0284c7, #ffffff;
+}
+
+.app-root.light-theme .default-color0.chart-series-line {
+    -fx-stroke: #0284c7;
+}
+
+/* ---------- Inicio de sesión con tema claro ---------- */
+
+.app-root.light-theme .login-card,
+.app-root.light-theme .login-card .content-tabs .tab-content-area,
+.app-root.light-theme .login-card .content-tabs .tab-content {
+    -fx-background-color: #ffffff;
+}

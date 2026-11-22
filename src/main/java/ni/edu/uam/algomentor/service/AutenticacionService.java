@@ -8,6 +8,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.Objects;
@@ -23,25 +24,45 @@ public class AutenticacionService {
     private static final Pattern FORMATO_USUARIO =
             Pattern.compile("[\\p{L}\\p{N}._-]{3,40}");
 
+    private static final int MAXIMO_FALLOS = 5;
+    private static final Duration DURACION_BLOQUEO = Duration.ofSeconds(30);
+    /** Compartido: el controlador crea un servicio nuevo en cada intento. */
+    private static final LimitadorIntentos LIMITADOR_GLOBAL =
+            new LimitadorIntentos(MAXIMO_FALLOS, DURACION_BLOQUEO);
+
     private final CuentaDAO cuentaDAO;
+    private final LimitadorIntentos limitador;
 
     public AutenticacionService() {
         this(new CuentaDAO());
     }
 
     public AutenticacionService(CuentaDAO cuentaDAO) {
+        this(cuentaDAO, LIMITADOR_GLOBAL);
+    }
+
+    AutenticacionService(CuentaDAO cuentaDAO, LimitadorIntentos limitador) {
         this.cuentaDAO = Objects.requireNonNull(cuentaDAO);
+        this.limitador = Objects.requireNonNull(limitador);
     }
 
     public Optional<Perfil> iniciarSesion(String usuario, char[] contrasena) {
         String usuarioNormalizado = validarUsuario(usuario);
         validarContrasena(contrasena);
+        long espera = limitador.segundosRestantes(usuarioNormalizado);
+        if (espera > 0) {
+            throw new IllegalArgumentException(
+                    "Demasiados intentos fallidos. Espera " + espera + " segundos e inténtalo de nuevo."
+            );
+        }
         Optional<Cuenta> cuenta = cuentaDAO.buscarPorUsuario(usuarioNormalizado);
 
         if (cuenta.isEmpty()
                 || !verificarContrasena(contrasena, cuenta.get().getContrasenaHash())) {
+            limitador.registrarFallo(usuarioNormalizado);
             return Optional.empty();
         }
+        limitador.registrarExito(usuarioNormalizado);
         return Optional.of(cuenta.get().getPerfil());
     }
 
