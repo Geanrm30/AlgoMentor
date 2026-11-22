@@ -63,6 +63,7 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 
 ## Aprendizaje
 
+- La aplicación inicia con el tema oscuro. Usa el botón **Tema claro** de la barra superior para alternar entre ambos temas.
 - **Simulador:** elige Bubble Sort, Insertion Sort, Gauss o Gauss-Jordan. Escribe enteros separados por comas, o una matriz ampliada con una ecuación por línea y celdas separadas por comas. Usa **Anterior** y **Siguiente** para recorrer los pasos.
 - **Audio:** en un paso puedes cargar un MP3 o WAV local y reproducirlo. El texto del paso permanece visible. Los audios no se guardan en la base de datos ni se incluyen en el repositorio.
 - **Práctica:** crea un perfil y selecciona un ejercicio guardado. Para ordenamiento responde con el arreglo final. Para Gauss y Gauss-Jordan selecciona una operación de filas, indica las filas con números desde 1 y el factor cuando aplique, y escribe la matriz resultante completa. Verifica y luego guarda el intento. Los errores muestran fila y columna y se asocian a Signos, Fracciones, Aritmetica o Procedimiento; los pasos correctos cuentan en Procedimiento.
