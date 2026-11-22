@@ -107,8 +107,13 @@ desde la raíz del proyecto, archivo incluido en `.gitignore`.
 ### 4. Crear el esquema
 
 Ejecuta en la base `algomentor` el archivo `src/main/resources/ni/edu/uam/algomentor/db/schema.sql`.
-El script define las ocho tablas y sus relaciones, crea las cuatro habilidades iniciales
-(Signos, Fracciones, Aritmetica y Procedimiento) y registra los nueve algoritmos del catálogo.
+El script define las tablas y sus relaciones, incluyendo `cuenta`, crea las cuatro habilidades
+iniciales (Signos, Fracciones, Aritmetica y Procedimiento) y registra los nueve algoritmos del catálogo.
+
+**Bases existentes:** ejecuta `src/main/resources/ni/edu/uam/algomentor/db/actualizar-cuentas.sql`
+para crear la tabla de cuentas sin recrear ni borrar datos. Un perfil antiguo se puede reclamar
+al registrarse con el mismo nombre de usuario (sin distinguir mayúsculas); se conserva su
+progreso y ese perfil solo puede quedar vinculado a una cuenta.
 
 **Instalaciones existentes:** al abrir la aplicación se agregan los algoritmos faltantes a la base.
 También puedes ejecutar manualmente el script
@@ -125,6 +130,13 @@ Abre la carpeta en IntelliJ IDEA como proyecto Maven con JDK 21, o desde una ter
 .\mvnw.cmd javafx:run
 ```
 
+La aplicación inicia en la pantalla de acceso. Crea una cuenta con un usuario de 3 a 40
+caracteres y una contraseña de 8 a 128 caracteres, o inicia sesión. Cada cuenta queda
+vinculada a un perfil; al registrar el nombre de un perfil previo se conserva su progreso.
+Las contraseñas se almacenan con PBKDF2 y no en texto plano. Usa **Cerrar sesión** en la
+barra superior para salir. La gestión de contenido permite crear, consultar, actualizar y
+eliminar algoritmos y ejercicios. La pestaña **Resumen** muestra los totales y listados de
+algoritmos, ejercicios y perfiles, además del total de intentos.
 Si la conexión a PostgreSQL falla, la aplicación muestra el problema en la barra inferior y registra
 el detalle técnico en consola.
 
@@ -133,7 +145,7 @@ el detalle técnico en consola.
 | Librería | Uso |
 |---|---|
 | JavaFX 21 | Interfaz gráfica (FXML, CSS, animaciones). |
-| Hibernate ORM 6.6 | Mapeo de las ocho entidades y consultas HQL. |
+| Hibernate ORM 6.6 | Mapeo de las entidades y consultas HQL. |
 | PostgreSQL JDBC 42.7 | Controlador de la base de datos. |
 | JasperReports 7 | Compilación de la plantilla JRXML y exportación a PDF. |
 | Jackson 2.18 | Procesamiento JSON para el intercambio de ejercicios y la comunicación con math.js. |
@@ -143,10 +155,12 @@ el detalle técnico en consola.
 
 ## 3. Módulos de la aplicación
 
-La ventana principal tiene dos pestañas: **Aprender** (Simular, Práctica, Comandos, Comparar,
-Progreso, Compartir y Comprobar sistema) y **Biblioteca** (gestión de contenido).
+Tras iniciar sesión, la ventana principal muestra **Resumen**, **Aprender** (Simular, Práctica,
+Comandos, Comparar, Progreso, Compartir y Comprobar sistema) y **Biblioteca** (gestión de contenido).
 
 ### 3.1 Simulador
+
+La aplicación inicia con el tema oscuro; usa **Tema claro** en la barra superior para alternar su apariencia.
 
 1. **Entrada.** Selecciona uno de los nueve algoritmos. En Simular puedes introducir enteros
    separados por comas sin un límite fijo de elementos; para Gauss y Gauss-Jordan completa una matriz ampliada. **Generar entrada**
@@ -181,13 +195,16 @@ una solución única, infinitas soluciones o ninguna solución.
 
 ### 3.2 Práctica
 
-Crea un perfil, actualiza la lista y selecciona un ejercicio guardado.
+Inicia sesión con tu cuenta y selecciona un ejercicio guardado. La práctica usa el perfil asociado
+a la sesión; no permite elegir perfiles ajenos.
 
 - **Ordenamiento:** responde con el arreglo final para cualquiera de los siete métodos.
 - **Gauss y Gauss-Jordan:** selecciona una operación de filas (intercambiar, escalar o eliminar),
   indica las filas con números desde 1 y el factor cuando corresponda, y escribe la matriz resultante completa.
 
-Cada pulsación de **Verificar** registra automáticamente un intento, correcto o incorrecto, para el perfil seleccionado. Las respuestas incompletas o mal escritas también cuentan como intentos incorrectos. Los errores matriciales identifican la fila y columna correspondientes;
+Cada pulsación de **Verificar** registra automáticamente un intento, correcto o incorrecto, para
+el perfil autenticado. Las respuestas incompletas o mal escritas también cuentan como intentos
+incorrectos. Los errores matriciales identifican la fila y columna correspondientes;
 los errores se asocian a Signos, Fracciones, Aritmetica o Procedimiento. Los pasos correctos de práctica
 cuentan en Procedimiento. `RegistroPracticaService` conecta la evaluación con `IntentoService`.
 
@@ -231,21 +248,20 @@ distribuciones y pasos educativos. Las métricas describen la traza del método,
 
 ### 3.4 Progreso e informe PDF
 
-La tabla muestra todos los perfiles con sus intentos, correctos, incorrectos, sin calificar y porcentaje
-de aciertos. Al seleccionar una fila aparece debajo el progreso de ese perfil por habilidad. Cada habilidad
-muestra una barra animada: verde desde 70 %, ámbar desde 40 % y roja por debajo.
+Muestra el progreso del perfil autenticado, no un ranking global: incluye intentos, correctos,
+incorrectos, sin calificar y aciertos por habilidad. El gráfico compara aciertos y errores; la tabla
+de detalle incluye una barra animada por habilidad: verde desde 70 %, ámbar desde 40 % y roja por debajo.
 
-Para exportar el informe:
+Para revisar o exportar el informe:
 
-1. Abre **Aprender > Progreso** y selecciona un integrante de la tabla.
-2. Pulsa **Guardar informe**, elige una ubicación y confirma el nombre del archivo.
-3. El informe incluye la fecha de generación, el total de intentos, correctos, incorrectos y sin
-   calificar, y los aciertos, errores y porcentaje por habilidad.
+1. Abre **Aprender > Progreso** después de iniciar sesión.
+2. Pulsa **Vista previa** para abrir el visor de JasperReports, o **Exportar** para guardar el PDF.
+3. El informe presenta tarjetas de resumen, la fecha de generación, resultados por habilidad y
+   numeración de páginas.
 
-Si no hay progreso por habilidad, el PDF incluye el resumen de intentos y un mensaje que lo indica.
-Si no existen perfiles o la base no está disponible, no se puede generar el informe. JasperReports
-compila la plantilla JRXML al generar el archivo y obtiene los datos de `EstadisticasDAO` mediante HQL;
-no necesita consultar ninguna API externa.
+Si aún no hay progreso por habilidad, el PDF muestra el resumen de intentos y un mensaje que lo indica.
+JasperReports compila la plantilla JRXML al generar el informe y obtiene los datos mediante HQL;
+no necesita consultar una API externa.
 
 <!-- Pendiente: capturas reales de Progreso y del PDF de JasperReports con PostgreSQL configurado. -->
 
@@ -365,7 +381,7 @@ src/main/java/ni/edu/uam/algomentor/
 ├── service/                         Evaluación, registro de intentos, progreso,
 │                                    comparador, terminal e informes PDF
 ├── dao/                             CRUD genérico, acceso a datos y consultas HQL
-├── model/                           Ocho entidades persistentes
+├── model/                           Entidades persistentes del aprendizaje y cuentas
 ├── api/                             Intercambio JSON por HTTP y cliente math.js
 └── util/                            Hibernate, validaciones, tema y animaciones
 
@@ -402,8 +418,9 @@ datos. El catálogo centraliza la selección de algoritmos y la traza define las
 consume el simulador. Los servicios coordinan la lógica de negocio y la persistencia; los DAO
 encapsulan el acceso a datos y Hibernate mapea las entidades a PostgreSQL.
 
-Las ocho entidades son `Perfil`, `Algoritmo`, `Ejercicio`, `Intento`, `PasoIntento`, `ErrorDetectado`,
-`Habilidad` y `ProgresoHabilidad`. JasperReports utiliza las estadísticas de aprendizaje para producir
+Las entidades del aprendizaje son `Perfil`, `Algoritmo`, `Ejercicio`, `Intento`, `PasoIntento`,
+`ErrorDetectado`, `Habilidad` y `ProgresoHabilidad`; `Cuenta` guarda las credenciales protegidas
+y se vincula a un perfil. JasperReports utiliza las estadísticas de aprendizaje para producir
 el PDF; las API ofrecen funciones complementarias sin sustituir el motor local.
 
 ---
@@ -484,7 +501,7 @@ comparaciones reales de claves; la variante densa no inventa comparaciones de or
 
 AlgoMentor utiliza Hibernate ORM y PostgreSQL para almacenar el historial de aprendizaje. El sistema permite:
 
-- Registrar perfiles de estudiantes.
+- Registrar cuentas vinculadas a perfiles de estudiantes.
 - Guardar intentos y sus pasos.
 - Asociar errores detectados con habilidades.
 - Actualizar aciertos y errores por habilidad.
@@ -617,9 +634,9 @@ los pasos. `Arrays.sort` sirve como referencia de prueba, no como implementació
 | Comparación | Introducir `8,3,6,1,5` y verificar las siete filas de resultados. |
 | Persistencia de algoritmos y ejercicios | Crear, consultar y actualizar registros desde Biblioteca; verificar restricciones de eliminación. |
 | Generación de ejercicios | Elegir el algoritmo y dificultad, generar y guardar el ejercicio. |
-| Práctica | Seleccionar un perfil y un ejercicio; cada verificación registra automáticamente el intento. |
-| Progreso | Consultar el perfil y verificar la habilidad y estadísticas correspondientes. |
-| Informe PDF | Pulsar **Exportar PDF** y abrir el archivo generado. |
+| Práctica | Iniciar sesión, elegir un ejercicio y verificar que cada intento se registra en el perfil propio. |
+| Progreso | Consultar gráfico y detalle de habilidades del perfil autenticado. |
+| Informe PDF | Abrir **Vista previa** o usar **Exportar** y revisar el PDF generado. |
 | Intercambio API | Exportar JSON e importar un paquete válido; verificar que los duplicados se omiten. |
 | Verificación externa | Resolver las filas `2,1,5` y `1,-1,1` y comparar la respuesta de math.js con Gauss. |
 

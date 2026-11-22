@@ -610,3 +610,197 @@
     -fx-text-fill: -ac-text;
     -fx-background-radius: 8;
 }
+
+.chart {
+    -fx-padding: 12;
+}
+
+.chart-title, .axis-label, .axis .tick-label, .chart-legend-item {
+    -fx-text-fill: #d1d5db;
+}
+
+.chart-plot-background, .chart-legend {
+    -fx-background-color: #1f2937;
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #374151;
+}
+
+.chart-bar.default-color0 {
+    -fx-bar-fill: #22c55e;
+}
+
+.chart-bar.default-color1 {
+    -fx-bar-fill: #f97316;
+}
+
+.app-toolbar {
+    -fx-alignment: center-right;
+    -fx-padding: 8 18;
+    -fx-background-color: #1f2937;
+}
+
+.login-root {
+    -fx-padding: 28;
+    -fx-background-color: #111827;
+}
+
+.login-card {
+    -fx-padding: 28;
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 14;
+}
+
+.login-card .content-tabs .tab-content-area,
+.login-card .content-tabs .tab-content {
+    -fx-background-color: #1f2937;
+}
+
+.login-card .text-field {
+    -fx-max-width: Infinity;
+}
+
+.summary-card {
+    -fx-padding: 16;
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 10;
+    -fx-min-width: 120;
+}
+
+.summary-label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+}
+
+.summary-value {
+    -fx-text-fill: #38bdf8;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+}
+
+.app-root.light-theme, .app-root.light-theme .content-tabs,
+.app-root.light-theme .content-tabs .tab-content-area,
+.app-root.light-theme .scroll-pane,
+.app-root.light-theme .scroll-pane > .viewport,
+.app-root.light-theme .tab-content {
+    -fx-background-color: #f3f4f6;
+}
+
+.app-root.light-theme .app-toolbar,
+.app-root.light-theme .page-header {
+    -fx-background-color: #ffffff;
+}
+
+.app-root.light-theme .label,
+.app-root.light-theme .subtitle {
+    -fx-text-fill: #374151;
+}
+
+.app-root.light-theme .brand {
+    -fx-text-fill: #0284c7;
+}
+
+.app-root.light-theme .page-title,
+.app-root.light-theme .section-title,
+.app-root.light-theme .summary-label {
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .summary-value {
+    -fx-text-fill: #0284c7;
+}
+
+.app-root.light-theme .content-tabs .tab-header-area .tab-header-background {
+    -fx-background-color: #e5e7eb;
+}
+
+.app-root.light-theme .content-tabs .tab {
+    -fx-background-color: #d1d5db;
+}
+
+.app-root.light-theme .content-tabs .tab .tab-label {
+    -fx-text-fill: #1f2937;
+}
+
+.app-root.light-theme .content-tabs .tab:selected .tab-label {
+    -fx-text-fill: #ffffff;
+}
+
+.app-root.light-theme .card,
+.app-root.light-theme .summary-card,
+.app-root.light-theme .table-view,
+.app-root.light-theme .chart-plot-background,
+.app-root.light-theme .chart-legend {
+    -fx-background-color: #ffffff;
+}
+
+.app-root.light-theme .text-field,
+.app-root.light-theme .text-area,
+.app-root.light-theme .combo-box,
+.app-root.light-theme .spinner,
+.app-root.light-theme .text-area .content,
+.app-root.light-theme .combo-box .list-cell,
+.app-root.light-theme .spinner .text-field {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .button {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .button.primary-button {
+    -fx-background-color: #0284c7;
+    -fx-text-fill: #ffffff;
+}
+
+.app-root.light-theme .table-view {
+    -fx-border-color: #d1d5db;
+}
+
+.app-root.light-theme .table-view .column-header-background,
+.app-root.light-theme .table-view .column-header {
+    -fx-background-color: #e5e7eb;
+}
+
+.app-root.light-theme .table-view .column-header .label,
+.app-root.light-theme .table-cell {
+    -fx-text-fill: #1f2937;
+}
+
+.app-root.light-theme .table-row-cell {
+    -fx-background-color: #ffffff;
+}
+
+.app-root.light-theme .table-row-cell:odd {
+    -fx-background-color: #f9fafb;
+}
+
+.app-root.light-theme .table-row-cell:selected {
+    -fx-background-color: #bae6fd;
+}
+
+.app-root.light-theme .status-bar,
+.app-root.light-theme .valor-arreglo {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .valor-activo {
+    -fx-background-color: #0284c7;
+    -fx-text-fill: #ffffff;
+}
+
+.app-root.light-theme .chart-title,
+.app-root.light-theme .axis-label,
+.app-root.light-theme .axis .tick-label,
+.app-root.light-theme .chart-legend-item {
+    -fx-text-fill: #374151;
+}
+
+.app-root.light-theme .chart-vertical-grid-lines,
+.app-root.light-theme .chart-horizontal-grid-lines {
+    -fx-stroke: #d1d5db;
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ResumenController">
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Resumen general" styleClass="section-title" />
+            <Label text="Vista rápida del contenido y la actividad de AlgoMentor." wrapText="true" />
+        </VBox>
+        <Button fx:id="btnActualizar" text="Actualizar" onAction="#cargarResumen" />
+    </HBox>
+    <HBox spacing="12">
+        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <Label text="Algoritmos" styleClass="summary-label" />
+            <Label fx:id="lblCantidadAlgoritmos" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <Label text="Ejercicios" styleClass="summary-label" />
+            <Label fx:id="lblCantidadEjercicios" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <Label text="Perfiles" styleClass="summary-label" />
+            <Label fx:id="lblCantidadPerfiles" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <Label text="Intentos" styleClass="summary-label" />
+            <Label fx:id="lblCantidadIntentos" text="—" styleClass="summary-value" />
+        </VBox>
+    </HBox>
+    <TabPane VBox.vgrow="ALWAYS" styleClass="content-tabs">
+        <tabs>
+            <Tab text="Algoritmos" closable="false">
+                <content>
+                    <TableView fx:id="tablaAlgoritmos">
+                        <columns>
+                            <TableColumn fx:id="colAlgoritmoId" text="ID" prefWidth="70" />
+                            <TableColumn fx:id="colAlgoritmoNombre" text="Nombre" prefWidth="240" />
+                            <TableColumn fx:id="colAlgoritmoCategoria" text="Categoría" prefWidth="180" />
+                            <TableColumn fx:id="colAlgoritmoComplejidad" text="Complejidad" prefWidth="150" />
+                        </columns>
+                    </TableView>
+                </content>
+            </Tab>
+            <Tab text="Ejercicios" closable="false">
+                <content>
+                    <TableView fx:id="tablaEjercicios">
+                        <columns>
+                            <TableColumn fx:id="colEjercicioId" text="ID" prefWidth="65" />
+                            <TableColumn fx:id="colEjercicioAlgoritmo" text="Algoritmo" prefWidth="190" />
+                            <TableColumn fx:id="colEjercicioDificultad" text="Dificultad" prefWidth="100" />
+                            <TableColumn fx:id="colEjercicioOrigen" text="Origen" prefWidth="130" />
+                            <TableColumn fx:id="colEjercicioDatos" text="Datos" prefWidth="390" />
+                        </columns>
+                    </TableView>
+                </content>
+            </Tab>
+            <Tab text="Perfiles" closable="false">
+                <content>
+                    <TableView fx:id="tablaPerfiles">
+                        <columns>
+                            <TableColumn fx:id="colPerfilId" text="ID" prefWidth="90" />
+                            <TableColumn fx:id="colPerfilNombre" text="Nombre" prefWidth="300" />
+                            <TableColumn fx:id="colPerfilCreacion" text="Fecha de creación" prefWidth="190" />
+                        </columns>
+                    </TableView>
+                </content>
+            </Tab>
+        </tabs>
+    </TabPane>
+    <Label fx:id="lblEstado" text="Listo" wrapText="true" />
+</VBox>

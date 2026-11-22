@@ -71,9 +71,15 @@ public class ReporteProgresoService {
 
     public Path generarReporte(Long perfilId, Path destino)
             throws JRException, IOException {
-        EstadisticasDAO.validarPerfilId(perfilId);
         Objects.requireNonNull(destino, "El destino del reporte es obligatorio.");
 
+        JasperPrint reporte = prepararReporte(perfilId);
+        byte[] pdf = JasperExportManager.exportReportToPdf(reporte);
+        return Files.write(destino, pdf);
+    }
+
+    public JasperPrint prepararReporte(Long perfilId) throws JRException, IOException {
+        EstadisticasDAO.validarPerfilId(perfilId);
         Perfil perfil = perfilService.buscarPorId(perfilId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No existe un perfil con el ID indicado."
@@ -108,13 +114,11 @@ public class ReporteProgresoService {
         parametros.put("intentosIncorrectos", resumen.incorrectos());
         parametros.put("intentosSinCalificar", resumen.sinCalificar());
 
-        JasperPrint reporte = JasperFillManager.fillReport(
+        return JasperFillManager.fillReport(
                 plantillaCompilada,
                 parametros,
                 new JRMapCollectionDataSource(filas)
         );
-        byte[] pdf = JasperExportManager.exportReportToPdf(reporte);
-        return Files.write(destino, pdf);
     }
 
     private static ProveedorEstadisticas crearProveedorEstadisticas(

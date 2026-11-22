@@ -8,12 +8,8 @@
             <VBox spacing="10" styleClass="card">
                 <Label text="Perfil y ejercicio" styleClass="section-title" />
                 <HBox spacing="10">
-                    <ComboBox fx:id="cmbPerfil" promptText="Perfil" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                    <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
                     <Button text="Actualizar" onAction="#recargar" />
-                </HBox>
-                <HBox spacing="10">
-                    <TextField fx:id="txtNuevoPerfil" promptText="Nombre del nuevo perfil" HBox.hgrow="ALWAYS" />
-                    <Button text="Crear perfil" onAction="#crearPerfil" />
                 </HBox>
                 <ComboBox fx:id="cmbEjercicio" promptText="Ejercicio guardado" maxWidth="Infinity" />
                 <Label fx:id="lblEnunciado" text="Selecciona un ejercicio de la biblioteca." wrapText="true" />

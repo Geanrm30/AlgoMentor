@@ -37,6 +37,19 @@ class ReporteProgresoServiceTest {
     }
 
     @Test
+    void preparaReporteParaVistaPreviaSinCrearArchivo() throws Exception {
+        ReporteProgresoService servicio = crearServicio(List.of(
+                new EstadisticasDAO.EstadisticaHabilidad(
+                        1L, "Fracciones", 3, 1
+                )
+        ));
+
+        var reporte = servicio.prepararReporte(1L);
+
+        assertEquals(1, reporte.getPages().size());
+    }
+
+    @Test
     void generaPdfAunqueElPerfilNoTengaProgresoPorHabilidad() throws Exception {
         ReporteProgresoService servicio = crearServicio(List.of());
         Path destino = directorioTemporal.resolve("sin-progreso.pdf");

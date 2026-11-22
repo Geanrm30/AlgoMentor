@@ -1,30 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="Progreso de aprendizaje" styleClass="section-title" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-        <Button text="Actualizar" onAction="#cargarPerfiles" />
-        <Button text="Guardar informe" onAction="#generarReporte" />
+    <Label text="Progreso de aprendizaje" styleClass="section-title" />
+    <HBox spacing="10">
+        <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+        <Button text="Actualizar" onAction="#verProgreso" styleClass="primary-button" />
+        <Button fx:id="btnVistaPrevia" text="Vista previa" onAction="#previsualizarReporte" />
+        <Button text="Exportar" onAction="#generarReporte" />
     </HBox>
-    <TableView fx:id="tabla" prefHeight="290" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colPerfil" text="Integrante" prefWidth="200" />
-            <TableColumn fx:id="colIntentos" text="Intentos" prefWidth="120" />
-            <TableColumn fx:id="colCorrectos" text="Correctos" prefWidth="130" />
-            <TableColumn fx:id="colIncorrectos" text="Incorrectos" prefWidth="130" />
-            <TableColumn fx:id="colSinCalificar" text="Sin calificar" prefWidth="140" />
-            <TableColumn fx:id="colPorcentajeGeneral" text="Acierto %" prefWidth="220" />
-        </columns>
-    </TableView>
-    <Label fx:id="lblResumen" text="Selecciona un integrante para ver sus habilidades." wrapText="true" />
-    <TableView fx:id="tablaHabilidades" prefHeight="210" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colHabilidad" text="Habilidad" prefWidth="200" />
-            <TableColumn fx:id="colAciertos" text="Aciertos" prefWidth="130" />
-            <TableColumn fx:id="colErrores" text="Errores" prefWidth="130" />
-            <TableColumn fx:id="colPorcentaje" text="Acierto %" prefWidth="240" />
-        </columns>
-    </TableView>
+    <Label fx:id="lblResumen" text="Cargando progreso…" wrapText="true" />
+    <TabPane VBox.vgrow="ALWAYS" styleClass="content-tabs">
+        <tabs>
+            <Tab text="Gráfico" closable="false">
+                <content>
+                    <BarChart fx:id="graficoHabilidades" animated="false" legendVisible="true">
+                        <xAxis>
+                            <CategoryAxis fx:id="axisHabilidad" label="Habilidad" tickLabelRotation="-25" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="axisCantidad" label="Evaluaciones" forceZeroInRange="true" />
+                        </yAxis>
+                    </BarChart>
+                </content>
+            </Tab>
+            <Tab text="Detalle" closable="false">
+                <content>
+                    <TableView fx:id="tabla">
+                        <columns>
+                            <TableColumn fx:id="colHabilidad" text="Habilidad" prefWidth="200" />
+                            <TableColumn fx:id="colAciertos" text="Aciertos" prefWidth="130" />
+                            <TableColumn fx:id="colErrores" text="Errores" prefWidth="130" />
+                            <TableColumn fx:id="colPorcentaje" text="Acierto %" prefWidth="240" />
+                        </columns>
+                    </TableView>
+                </content>
+            </Tab>
+        </tabs>
+    </TabPane>
 </VBox>

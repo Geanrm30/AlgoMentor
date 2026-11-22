@@ -10,21 +10,21 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
-import ni.edu.uam.algomentor.engine.ErrorOperacion;
+import ni.edu.uam.algomentor.dao.EjercicioDAO;
 import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
+import ni.edu.uam.algomentor.engine.ErrorOperacion;
+import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.engine.ResultadoVerificacion;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
-import ni.edu.uam.algomentor.engine.Fraccion;
-import ni.edu.uam.algomentor.dao.EjercicioDAO;
 import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Perfil;
-import ni.edu.uam.algomentor.service.EvaluadorPractica;
 import ni.edu.uam.algomentor.service.EvaluadorPasoMatriz;
-import ni.edu.uam.algomentor.service.PerfilService;
+import ni.edu.uam.algomentor.service.EvaluadorPractica;
 import ni.edu.uam.algomentor.service.RegistroPracticaService;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
 import ni.edu.uam.algomentor.util.EntradaMatrizVisual;
+import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.Tema;
 import ni.edu.uam.algomentor.util.TextoInterfaz;
 
@@ -36,10 +36,9 @@ public class PracticaController {
 
     private static final Logger LOG = Logger.getLogger(PracticaController.class.getName());
 
-    @FXML private ComboBox<Perfil> cmbPerfil;
     @FXML private ComboBox<Ejercicio> cmbEjercicio;
-    @FXML private TextField txtNuevoPerfil;
     @FXML private TextField txtRespuesta;
+    @FXML private Label lblPerfilActual;
     @FXML private VBox panelOrdenamiento;
     @FXML private VBox panelMatriz;
     @FXML private ComboBox<String> cmbOperacion;
@@ -56,22 +55,25 @@ public class PracticaController {
 
     @FXML
     private void initialize() {
+        lblPerfilActual.setText("Sesión: " + SesionUsuario.obtenerPerfil().getNombre());
         matrizVisual = new EntradaMatrizVisual();
         matrizVisual.fijarDimensiones(true);
         matrizVisual.alCambiar(this::limpiarResultado);
         entradaMatrizEscrita.getChildren().add(matrizVisual);
-        cmbPerfil.setConverter(new StringConverter<>() {
-            @Override public String toString(Perfil valor) { return valor == null ? "" : valor.getNombre(); }
-            @Override public Perfil fromString(String texto) { return null; }
-        });
         cmbEjercicio.setConverter(new StringConverter<>() {
-            @Override public String toString(Ejercicio valor) {
+            @Override
+            public String toString(Ejercicio valor) {
                 return valor == null ? "" : "#" + valor.getId() + " · "
                         + TextoInterfaz.algoritmo(valor.getAlgoritmo().getNombre());
             }
-            @Override public Ejercicio fromString(String texto) { return null; }
+
+            @Override
+            public Ejercicio fromString(String texto) {
+                return null;
+            }
         });
-        cmbOperacion.setItems(FXCollections.observableArrayList("Intercambiar filas", "Escalar fila", "Eliminar fila"));
+        cmbOperacion.setItems(FXCollections.observableArrayList(
+                "Intercambiar filas", "Escalar fila", "Eliminar fila"));
         cmbEjercicio.valueProperty().addListener((obs, anterior, actual) -> {
             limpiarResultado();
             inicioNanos = System.nanoTime();
@@ -86,8 +88,12 @@ public class PracticaController {
                     matrizVisual.cargar(datos);
                 } catch (IllegalArgumentException e) {
                     matrizVisual.limpiar();
-                    lblResultado.setText("El ejercicio tiene una matriz inválida: " + e.getMessage());
+                    Animaciones.mostrarResultado(lblResultado,
+                            "El ejercicio tiene una matriz inválida: " + e.getMessage(),
+                            Animaciones.Estado.ERROR);
                 }
+            } else {
+                matrizVisual.limpiar();
             }
             lblEnunciado.setText(actual == null ? "Selecciona un ejercicio de la biblioteca."
                     : "Algoritmo: " + TextoInterfaz.algoritmo(actual.getAlgoritmo().getNombre())
@@ -103,69 +109,45 @@ public class PracticaController {
 
     @FXML
     private void recargar() {
-        Animaciones.mostrarResultado(lblResultado, "Cargando perfiles y ejercicios…", Animaciones.Estado.NEUTRO);
+        Animaciones.mostrarResultado(lblResultado, "Cargando ejercicios…", Animaciones.Estado.NEUTRO);
         ejecutarEnSegundoPlano(() -> {
-            List<Perfil> perfiles = new PerfilService().listarPerfiles();
             List<Ejercicio> ejercicios = new EjercicioDAO().listarConAlgoritmo().stream()
                     .filter(e -> CatalogoAlgoritmos.admite(e.getAlgoritmo().getNombre()))
                     .toList();
             Platform.runLater(() -> {
-                cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));
                 cmbEjercicio.setItems(FXCollections.observableArrayList(ejercicios));
                 Animaciones.mostrarResultado(lblResultado, ejercicios.isEmpty()
                         ? "No hay ejercicios para practicar. Crea uno en Biblioteca > Ejercicios."
-                        : "Selecciona un perfil y un ejercicio.", Animaciones.Estado.NEUTRO);
+                        : "Selecciona un ejercicio.", Animaciones.Estado.NEUTRO);
             });
         }, "No se pudieron cargar los datos. Revisa la conexión con la biblioteca e inténtalo de nuevo.");
     }
 
     @FXML
-    private void crearPerfil() {
-        String nombre = txtNuevoPerfil.getText();
-        try {
-            PerfilService.validarNombre(nombre);
-        } catch (IllegalArgumentException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Nombre inválido", e.getMessage());
-            return;
-        }
-        ejecutarEnSegundoPlano(() -> {
-            Perfil perfil = new PerfilService().crearPerfil(nombre);
-            Platform.runLater(() -> {
-                cmbPerfil.getItems().add(perfil);
-                cmbPerfil.setValue(perfil);
-                txtNuevoPerfil.clear();
-                Animaciones.mostrarResultado(lblResultado, "Perfil creado.", Animaciones.Estado.CORRECTO);
-            });
-        }, "No se pudo crear el perfil. Es posible que ya exista o que la biblioteca no esté disponible.");
-    }
-
-    @FXML
     private void verificar() {
-        Perfil perfil = cmbPerfil.getValue();
+        Perfil perfil = SesionUsuario.obtenerPerfil();
         Ejercicio ejercicio = cmbEjercicio.getValue();
-        if (perfil == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Falta perfil", "Selecciona o crea un perfil antes de verificar.");
-            return;
-        }
         if (ejercicio == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Falta ejercicio", "Selecciona un ejercicio.");
             return;
         }
+
         String respuesta = respuestaActual(ejercicio);
         boolean correcto;
         List<ErrorOperacion> errores = List.of();
         String mensaje;
         try {
             if (esMatriz(ejercicio)) {
-                ResultadoVerificacion verificacion = new EvaluadorPasoMatriz().evaluar(ejercicio.getDatos(),
-                        tipoOperacion(), txtDestino.getText(), txtOrigen.getText(), txtFactor.getText(),
-                        matrizVisual.texto());
+                ResultadoVerificacion verificacion = new EvaluadorPasoMatriz().evaluar(
+                        ejercicio.getDatos(), tipoOperacion(), txtDestino.getText(),
+                        txtOrigen.getText(), txtFactor.getText(), matrizVisual.texto());
                 errores = verificacion.errores();
                 correcto = verificacion.correcto();
                 mensaje = correcto ? "Operación correcta." : describirErrores(errores);
             } else {
-                EvaluadorPractica.Resultado evaluacion = EvaluadorPractica.evaluar(ejercicio.getAlgoritmo().getNombre(),
-                        ejercicio.getDatos(), txtRespuesta.getText());
+                EvaluadorPractica.Resultado evaluacion = EvaluadorPractica.evaluar(
+                        ejercicio.getAlgoritmo().getNombre(), ejercicio.getDatos(),
+                        txtRespuesta.getText());
                 correcto = evaluacion.correcto();
                 mensaje = (correcto ? "Correcto." : "Incorrecto.")
                         + " Respuesta esperada: " + evaluacion.esperado();
@@ -174,17 +156,22 @@ public class PracticaController {
             correcto = false;
             mensaje = "Respuesta incorrecta: " + e.getMessage();
         }
+
         boolean resultado = correcto;
         String mensajeResultado = mensaje;
         List<ErrorOperacion> erroresEvaluados = errores;
-        int duracion = (int) Math.min(Integer.MAX_VALUE, Math.max(0, (System.nanoTime() - inicioNanos) / 1_000_000_000L));
+        int duracion = (int) Math.min(Integer.MAX_VALUE,
+                Math.max(0, (System.nanoTime() - inicioNanos) / 1_000_000_000L));
         btnVerificar.setDisable(true);
-        Animaciones.mostrarResultado(lblResultado, "Registrando verificación…", Animaciones.Estado.NEUTRO);
+        Animaciones.mostrarResultado(lblResultado, "Registrando verificación…",
+                Animaciones.Estado.NEUTRO);
         ejecutarEnSegundoPlano(() -> {
-            new RegistroPracticaService().registrar(perfil.getId(), ejercicio.getId(), respuesta, resultado, duracion, erroresEvaluados);
+            new RegistroPracticaService().registrar(perfil.getId(), ejercicio.getId(),
+                    respuesta, resultado, duracion, erroresEvaluados);
             Platform.runLater(() -> {
                 inicioNanos = System.nanoTime();
-                Animaciones.mostrarResultado(lblResultado, mensajeResultado + "\nIntento registrado.",
+                Animaciones.mostrarResultado(lblResultado,
+                        mensajeResultado + "\nIntento registrado.",
                         resultado ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
                 btnVerificar.setDisable(false);
             });
@@ -211,8 +198,8 @@ public class PracticaController {
 
     private String respuestaActual(Ejercicio ejercicio) {
         return esMatriz(ejercicio)
-                ? String.join(" | ", String.valueOf(cmbOperacion.getValue()), txtDestino.getText(),
-                        txtOrigen.getText(), txtFactor.getText(), matrizVisual.texto())
+                ? String.join(" | ", String.valueOf(cmbOperacion.getValue()),
+                txtDestino.getText(), txtOrigen.getText(), txtFactor.getText(), matrizVisual.texto())
                 : txtRespuesta.getText();
     }
 
