@@ -165,6 +165,26 @@
     -fx-background-color: #1f2937;
 }
 
+.login-root {
+    -fx-padding: 28;
+    -fx-background-color: #111827;
+}
+
+.login-card {
+    -fx-padding: 28;
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 14;
+}
+
+.login-card .content-tabs .tab-content-area,
+.login-card .content-tabs .tab-content {
+    -fx-background-color: #1f2937;
+}
+
+.login-card .text-field {
+    -fx-max-width: Infinity;
+}
+
 .app-root.light-theme, .app-root.light-theme .content-tabs,
 .app-root.light-theme .content-tabs .tab-content-area,
 .app-root.light-theme .scroll-pane,

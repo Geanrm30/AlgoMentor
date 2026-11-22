@@ -44,6 +44,7 @@ public final class HibernateUtil {
         cfg.setProperty("hibernate.show_sql", "false");
 
         cfg.addAnnotatedClass(Perfil.class);
+        cfg.addAnnotatedClass(Cuenta.class);
         cfg.addAnnotatedClass(Algoritmo.class);
         cfg.addAnnotatedClass(Habilidad.class);
         cfg.addAnnotatedClass(Ejercicio.class);

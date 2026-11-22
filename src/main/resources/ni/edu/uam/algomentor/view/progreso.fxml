@@ -6,8 +6,7 @@
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
     <Label text="Progreso de aprendizaje" styleClass="section-title" />
     <HBox spacing="10">
-        <ComboBox fx:id="cmbPerfil" promptText="Perfil" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
-        <Button text="Actualizar" onAction="#cargarPerfiles" />
+        <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
         <Button text="Ver progreso" onAction="#verProgreso" styleClass="primary-button" />
         <Button fx:id="btnVistaPrevia" text="Vista previa" onAction="#previsualizarReporte" />
         <Button text="Exportar" onAction="#generarReporte" />

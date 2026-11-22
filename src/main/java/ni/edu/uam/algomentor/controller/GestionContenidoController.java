@@ -15,13 +15,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.dao.AlgoritmoDAO;
-import ni.edu.uam.algomentor.dao.BaseDAO;
 import ni.edu.uam.algomentor.dao.EjercicioDAO;
 import ni.edu.uam.algomentor.dao.IntentoDAO;
 import ni.edu.uam.algomentor.model.Algoritmo;
 import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Intento;
 import ni.edu.uam.algomentor.model.Perfil;
+import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.ValidacionesFormulario;
 
 import java.util.List;
@@ -61,7 +61,6 @@ public class GestionContenidoController {
     private AlgoritmoDAO algoritmoDAO;
     private EjercicioDAO ejercicioDAO;
     private IntentoDAO intentoDAO;
-    private BaseDAO<Perfil> perfilDAO;
 
     @FXML
     private void initialize() {
@@ -78,6 +77,9 @@ public class GestionContenidoController {
             @Override public String toString(Perfil p) { return p == null ? "" : p.getNombre(); }
             @Override public Perfil fromString(String text) { return null; }
         });
+        cmbFiltroPerfil.setDisable(true);
+        cmbFiltroPerfil.setItems(FXCollections.observableArrayList(SesionUsuario.obtenerPerfil()));
+        cmbFiltroPerfil.setValue(SesionUsuario.obtenerPerfil());
 
         colNombreAlgoritmo.setCellValueFactory(c -> value(c.getValue().getNombre()));
         colCategoria.setCellValueFactory(c -> value(c.getValue().getCategoria()));
@@ -114,7 +116,6 @@ public class GestionContenidoController {
             algoritmoDAO = new AlgoritmoDAO();
             ejercicioDAO = new EjercicioDAO();
             intentoDAO = new IntentoDAO();
-            perfilDAO = new BaseDAO<>(Perfil.class);
             recargar();
         } catch (RuntimeException e) {
             LOG.log(Level.SEVERE, "No se pudo iniciar la persistencia", e);
@@ -139,7 +140,8 @@ public class GestionContenidoController {
         cmbAlgoritmoEjercicio.setItems(FXCollections.observableArrayList(algoritmos));
         cmbFiltroAlgoritmo.setItems(FXCollections.observableArrayList(algoritmos));
         tblEjercicios.setItems(FXCollections.observableArrayList(ejercicioDAO.listarConAlgoritmo()));
-        cmbFiltroPerfil.setItems(FXCollections.observableArrayList(perfilDAO.listar()));
+        cmbFiltroPerfil.setItems(FXCollections.observableArrayList(SesionUsuario.obtenerPerfil()));
+        cmbFiltroPerfil.setValue(SesionUsuario.obtenerPerfil());
         lblEstado.setText("Datos actualizados");
     }
 

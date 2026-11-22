@@ -19,8 +19,8 @@ import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.EvaluadorPractica;
 import ni.edu.uam.algomentor.service.EvaluadorPasoMatriz;
-import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.RegistroPracticaService;
+import ni.edu.uam.algomentor.util.SesionUsuario;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -30,10 +30,9 @@ public class PracticaController {
 
     private static final Logger LOG = Logger.getLogger(PracticaController.class.getName());
 
-    @FXML private ComboBox<Perfil> cmbPerfil;
     @FXML private ComboBox<Ejercicio> cmbEjercicio;
-    @FXML private TextField txtNuevoPerfil;
     @FXML private TextField txtRespuesta;
+    @FXML private Label lblPerfilActual;
     @FXML private VBox panelOrdenamiento;
     @FXML private VBox panelMatriz;
     @FXML private ComboBox<String> cmbOperacion;
@@ -52,10 +51,7 @@ public class PracticaController {
 
     @FXML
     private void initialize() {
-        cmbPerfil.setConverter(new StringConverter<>() {
-            @Override public String toString(Perfil valor) { return valor == null ? "" : valor.getNombre(); }
-            @Override public Perfil fromString(String texto) { return null; }
-        });
+        lblPerfilActual.setText("Sesión: " + SesionUsuario.obtenerPerfil().getNombre());
         cmbEjercicio.setConverter(new StringConverter<>() {
             @Override public String toString(Ejercicio valor) {
                 return valor == null ? "" : "#" + valor.getId() + " · " + valor.getAlgoritmo().getNombre();
@@ -85,41 +81,19 @@ public class PracticaController {
 
     @FXML
     private void recargar() {
-        lblResultado.setText("Cargando perfiles y ejercicios…");
+        lblResultado.setText("Cargando ejercicios…");
         ejecutarEnSegundoPlano(() -> {
-            List<Perfil> perfiles = new PerfilService().listarPerfiles();
             List<Ejercicio> ejercicios = new EjercicioDAO().listarConAlgoritmo().stream()
                     .filter(e -> List.of("Bubble Sort", "Insertion Sort", "Gauss", "Gauss-Jordan")
                             .contains(e.getAlgoritmo().getNombre()))
                     .toList();
             Platform.runLater(() -> {
-                cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));
                 cmbEjercicio.setItems(FXCollections.observableArrayList(ejercicios));
                 lblResultado.setText(ejercicios.isEmpty()
                         ? "No hay ejercicios compatibles. Crea uno en Gestión de contenido."
-                        : "Selecciona un perfil y un ejercicio.");
+                        : "Selecciona un ejercicio.");
             });
         }, "No se pudieron cargar los datos. Revisa PostgreSQL y vuelve a intentar.");
-    }
-
-    @FXML
-    private void crearPerfil() {
-        String nombre = txtNuevoPerfil.getText();
-        try {
-            PerfilService.validarNombre(nombre);
-        } catch (IllegalArgumentException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Nombre inválido", e.getMessage());
-            return;
-        }
-        ejecutarEnSegundoPlano(() -> {
-            Perfil perfil = new PerfilService().crearPerfil(nombre);
-            Platform.runLater(() -> {
-                cmbPerfil.getItems().add(perfil);
-                cmbPerfil.setValue(perfil);
-                txtNuevoPerfil.clear();
-                lblResultado.setText("Perfil creado.");
-            });
-        }, "No se pudo crear el perfil. Puede que ya exista o que PostgreSQL no esté disponible.");
     }
 
     @FXML
@@ -154,10 +128,10 @@ public class PracticaController {
 
     @FXML
     private void guardarIntento() {
-        Perfil perfil = cmbPerfil.getValue();
+        Perfil perfil = SesionUsuario.obtenerPerfil();
         Ejercicio ejercicio = cmbEjercicio.getValue();
-        if (perfil == null || ejercicio == null || evaluacion == null || !respuestaActual(ejercicio).equals(respuestaEvaluada)) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos incompletos", "Selecciona un perfil y verifica la respuesta.");
+        if (ejercicio == null || evaluacion == null || !respuestaActual(ejercicio).equals(respuestaEvaluada)) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Datos incompletos", "Selecciona un ejercicio y verifica la respuesta.");
             return;
         }
         boolean correcto = evaluacion.correcto();

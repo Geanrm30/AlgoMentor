@@ -10,19 +10,17 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import javafx.util.StringConverter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.model.Perfil;
-import ni.edu.uam.algomentor.service.PerfilService;
 import ni.edu.uam.algomentor.service.ReporteProgresoService;
+import ni.edu.uam.algomentor.util.SesionUsuario;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,8 +35,8 @@ public class ProgresoController {
 
     private static final Logger LOG = Logger.getLogger(ProgresoController.class.getName());
 
-    @FXML private ComboBox<Perfil> cmbPerfil;
     @FXML private Label lblResumen;
+    @FXML private Label lblPerfilActual;
     @FXML private Button btnVistaPrevia;
     @FXML private BarChart<String, Number> graficoHabilidades;
     @FXML private CategoryAxis axisHabilidad;
@@ -51,10 +49,7 @@ public class ProgresoController {
 
     @FXML
     private void initialize() {
-        cmbPerfil.setConverter(new StringConverter<>() {
-            @Override public String toString(Perfil valor) { return valor == null ? "" : valor.getNombre(); }
-            @Override public Perfil fromString(String texto) { return null; }
-        });
+        lblPerfilActual.setText("Perfil: " + SesionUsuario.obtenerPerfil().getNombre());
         colHabilidad.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().nombre()));
         colAciertos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().aciertos())));
         colErrores.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().errores())));
@@ -62,30 +57,12 @@ public class ProgresoController {
         axisCantidad.setForceZeroInRange(true);
         graficoHabilidades.setCategoryGap(24);
         graficoHabilidades.setBarGap(6);
-        cargarPerfiles();
-    }
-
-    @FXML
-    private void cargarPerfiles() {
-        lblResumen.setText("Cargando perfiles…");
-        ejecutarEnSegundoPlano(() -> {
-            List<Perfil> perfiles = new PerfilService().listarPerfiles();
-            Platform.runLater(() -> {
-                cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));
-                tabla.getItems().clear();
-                actualizarGrafico(List.of());
-                lblResumen.setText(perfiles.isEmpty() ? "Todavía no hay perfiles." : "Selecciona un perfil.");
-            });
-        });
+        verProgreso();
     }
 
     @FXML
     private void verProgreso() {
-        Perfil perfil = cmbPerfil.getValue();
-        if (perfil == null) {
-            lblResumen.setText("Selecciona un perfil.");
-            return;
-        }
+        Perfil perfil = SesionUsuario.obtenerPerfil();
         lblResumen.setText("Cargando progreso…");
         ejecutarEnSegundoPlano(() -> {
             EstadisticasDAO dao = new EstadisticasDAO();
@@ -120,12 +97,7 @@ public class ProgresoController {
 
     @FXML
     private void generarReporte() {
-        Perfil perfil = cmbPerfil.getValue();
-        if (perfil == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Perfil requerido",
-                    "Selecciona un perfil antes de generar el reporte.");
-            return;
-        }
+        Perfil perfil = SesionUsuario.obtenerPerfil();
 
         FileChooser selector = new FileChooser();
         selector.setTitle("Guardar informe de progreso");
@@ -136,9 +108,7 @@ public class ProgresoController {
                 .replaceAll("[\\\\/:*?\"<>|]", "_");
         selector.setInitialFileName("progreso-" + nombrePerfilArchivo + ".pdf");
 
-        Window ventana = cmbPerfil.getScene() == null
-                ? null
-                : cmbPerfil.getScene().getWindow();
+        Window ventana = tabla.getScene() == null ? null : tabla.getScene().getWindow();
         java.io.File archivo = selector.showSaveDialog(ventana);
         if (archivo == null) {
             return;
@@ -175,12 +145,7 @@ public class ProgresoController {
 
     @FXML
     private void previsualizarReporte() {
-        Perfil perfil = cmbPerfil.getValue();
-        if (perfil == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Perfil requerido",
-                    "Selecciona un perfil antes de previsualizar el reporte.");
-            return;
-        }
+        Perfil perfil = SesionUsuario.obtenerPerfil();
 
         Long perfilId = perfil.getId();
         String nombrePerfil = perfil.getNombre();
@@ -226,10 +191,13 @@ public class ProgresoController {
                 accion.run();
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, "No se pudo consultar el progreso", e);
-                Platform.runLater(() -> lblResumen.setText("No se pudo consultar el progreso. Revisa PostgreSQL y el esquema."));
+                Platform.runLater(() -> lblResumen.setText(
+                        "No se pudo consultar el progreso. Revisa PostgreSQL y el esquema."
+                ));
             }
         }, "algomentor-progreso");
         hilo.setDaemon(true);
         hilo.start();
     }
+
 }
