@@ -6,7 +6,7 @@
               leftMargin="40"
               rightMargin="40"
               topMargin="36"
-              bottomMargin="36"
+              bottomMargin="32"
               whenNoDataType="AllSectionsNoDetail">
     <parameter name="perfilNombre" class="java.lang.String"/>
     <parameter name="fechaGeneracion" class="java.lang.String"/>
@@ -18,60 +18,134 @@
     <field name="aciertos" class="java.lang.Integer"/>
     <field name="errores" class="java.lang.Integer"/>
     <field name="porcentajeAciertos" class="java.lang.Double"/>
-    <title height="150">
-        <element kind="textField" x="0" y="0" width="515" height="32" fontSize="20.0" bold="true">
+    <title height="184">
+        <element kind="rectangle" x="0" y="0" width="515" height="58"
+                 mode="Opaque" backcolor="#0F172A" forecolor="#0F172A"/>
+        <element kind="textField" x="18" y="10" width="479" height="27"
+                 fontSize="20.0" bold="true" forecolor="#FFFFFF" vTextAlign="Middle">
             <expression><![CDATA["AlgoMentor | Informe de progreso"]]></expression>
         </element>
-        <element kind="textField" x="0" y="42" width="515" height="20">
-            <expression><![CDATA["Perfil: " + $P{perfilNombre}]]></expression>
+        <element kind="textField" x="19" y="38" width="479" height="15"
+                 fontSize="9.0" forecolor="#BAE6FD" vTextAlign="Middle">
+            <expression><![CDATA["RESUMEN DE APRENDIZAJE"]]></expression>
         </element>
-        <element kind="textField" x="0" y="64" width="515" height="20">
-            <expression><![CDATA["Generado: " + $P{fechaGeneracion}]]></expression>
+        <element kind="textField" x="0" y="68" width="330" height="20"
+                 fontSize="12.0" bold="true" forecolor="#0F172A" vTextAlign="Middle">
+            <expression><![CDATA[$P{perfilNombre}]]></expression>
         </element>
-        <element kind="textField" x="0" y="92" width="515" height="20">
-            <expression><![CDATA["Intentos: " + $P{totalIntentos}
-                    + " | Correctos: " + $P{intentosCorrectos}
-                    + " | Incorrectos: " + $P{intentosIncorrectos}
-                    + " | Sin calificar: " + $P{intentosSinCalificar}]]></expression>
+        <element kind="textField" x="330" y="68" width="185" height="20"
+                 fontSize="9.0" forecolor="#475569" hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA["Generado el " + $P{fechaGeneracion}]]></expression>
         </element>
-        <element kind="textField" x="0" y="125" width="515" height="20" fontSize="13.0" bold="true">
+        <element kind="rectangle" x="0" y="96" width="123" height="48"
+                 mode="Opaque" backcolor="#F1F5F9" forecolor="#F1F5F9"/>
+        <element kind="rectangle" x="131" y="96" width="123" height="48"
+                 mode="Opaque" backcolor="#ECFDF5" forecolor="#ECFDF5"/>
+        <element kind="rectangle" x="262" y="96" width="123" height="48"
+                 mode="Opaque" backcolor="#FFF7ED" forecolor="#FFF7ED"/>
+        <element kind="rectangle" x="393" y="96" width="122" height="48"
+                 mode="Opaque" backcolor="#F8FAFC" forecolor="#F8FAFC"/>
+        <element kind="textField" x="10" y="101" width="103" height="14"
+                 fontSize="8.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["INTENTOS"]]></expression>
+        </element>
+        <element kind="textField" x="10" y="116" width="103" height="23"
+                 fontSize="17.0" bold="true" forecolor="#0F172A" vTextAlign="Middle">
+            <expression><![CDATA[$P{totalIntentos}]]></expression>
+        </element>
+        <element kind="textField" x="141" y="101" width="103" height="14"
+                 fontSize="8.0" forecolor="#166534" vTextAlign="Middle">
+            <expression><![CDATA["CORRECTOS"]]></expression>
+        </element>
+        <element kind="textField" x="141" y="116" width="103" height="23"
+                 fontSize="17.0" bold="true" forecolor="#166534" vTextAlign="Middle">
+            <expression><![CDATA[$P{intentosCorrectos}]]></expression>
+        </element>
+        <element kind="textField" x="272" y="101" width="103" height="14"
+                 fontSize="8.0" forecolor="#9A3412" vTextAlign="Middle">
+            <expression><![CDATA["INCORRECTOS"]]></expression>
+        </element>
+        <element kind="textField" x="272" y="116" width="103" height="23"
+                 fontSize="17.0" bold="true" forecolor="#9A3412" vTextAlign="Middle">
+            <expression><![CDATA[$P{intentosIncorrectos}]]></expression>
+        </element>
+        <element kind="textField" x="403" y="101" width="103" height="14"
+                 fontSize="8.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["SIN CALIFICAR"]]></expression>
+        </element>
+        <element kind="textField" x="403" y="116" width="103" height="23"
+                 fontSize="17.0" bold="true" forecolor="#0F172A" vTextAlign="Middle">
+            <expression><![CDATA[$P{intentosSinCalificar}]]></expression>
+        </element>
+        <element kind="textField" x="0" y="160" width="515" height="20"
+                 fontSize="13.0" bold="true" forecolor="#0F172A" vTextAlign="Middle">
             <expression><![CDATA["Resultados por habilidad"]]></expression>
         </element>
     </title>
-    <columnHeader height="26">
-        <element kind="textField" x="0" y="0" width="235" height="26" bold="true" vTextAlign="Middle">
-            <expression><![CDATA["Habilidad"]]></expression>
+    <columnHeader height="30">
+        <element kind="rectangle" x="0" y="0" width="515" height="30"
+                 mode="Opaque" backcolor="#1E3A5F" forecolor="#1E3A5F"/>
+        <element kind="textField" x="12" y="0" width="223" height="30"
+                 fontSize="9.0" bold="true" forecolor="#FFFFFF" vTextAlign="Middle">
+            <expression><![CDATA["HABILIDAD"]]></expression>
         </element>
-        <element kind="textField" x="235" y="0" width="90" height="26" bold="true" hTextAlign="Center" vTextAlign="Middle">
-            <expression><![CDATA["Aciertos"]]></expression>
+        <element kind="textField" x="235" y="0" width="90" height="30"
+                 fontSize="9.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["ACIERTOS"]]></expression>
         </element>
-        <element kind="textField" x="325" y="0" width="90" height="26" bold="true" hTextAlign="Center" vTextAlign="Middle">
-            <expression><![CDATA["Errores"]]></expression>
+        <element kind="textField" x="325" y="0" width="90" height="30"
+                 fontSize="9.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["ERRORES"]]></expression>
         </element>
-        <element kind="textField" x="415" y="0" width="100" height="26" bold="true" hTextAlign="Center" vTextAlign="Middle">
-            <expression><![CDATA["Acierto %"]]></expression>
+        <element kind="textField" x="415" y="0" width="100" height="30"
+                 fontSize="9.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["ACIERTOS %"]]></expression>
         </element>
     </columnHeader>
     <detail>
-        <band height="24">
-            <element kind="textField" x="0" y="0" width="235" height="24" vTextAlign="Middle">
+        <band height="30">
+            <element kind="rectangle" x="0" y="0" width="515" height="30"
+                     mode="Opaque" backcolor="#F8FAFC" forecolor="#F8FAFC"/>
+            <element kind="line" x="0" y="29" width="515" height="0"
+                     forecolor="#E2E8F0"/>
+            <element kind="textField" x="12" y="0" width="223" height="30"
+                     fontSize="10.0" forecolor="#1E293B" vTextAlign="Middle">
                 <expression><![CDATA[$F{nombre}]]></expression>
             </element>
-            <element kind="textField" x="235" y="0" width="90" height="24" hTextAlign="Center" vTextAlign="Middle">
+            <element kind="textField" x="235" y="0" width="90" height="30"
+                     fontSize="10.0" forecolor="#166534" hTextAlign="Center" vTextAlign="Middle">
                 <expression><![CDATA[$F{aciertos}]]></expression>
             </element>
-            <element kind="textField" x="325" y="0" width="90" height="24" hTextAlign="Center" vTextAlign="Middle">
+            <element kind="textField" x="325" y="0" width="90" height="30"
+                     fontSize="10.0" forecolor="#9A3412" hTextAlign="Center" vTextAlign="Middle">
                 <expression><![CDATA[$F{errores}]]></expression>
             </element>
-            <element kind="textField" x="415" y="0" width="100" height="24" pattern="#,##0.0'%'"
+            <element kind="textField" x="415" y="0" width="100" height="30"
+                     fontSize="10.0" bold="true" forecolor="#1E3A5F"
+                     pattern="#,##0.0'%'"
                      hTextAlign="Center" vTextAlign="Middle">
                 <expression><![CDATA[$F{porcentajeAciertos}]]></expression>
             </element>
         </band>
     </detail>
-    <noData height="28">
-        <element kind="textField" x="0" y="0" width="515" height="24" vTextAlign="Middle">
-            <expression><![CDATA["No hay progreso por habilidad registrado para este perfil."]]></expression>
+    <pageFooter height="22">
+        <element kind="line" x="0" y="0" width="515" height="0"
+                 forecolor="#CBD5E1"/>
+        <element kind="textField" x="0" y="4" width="400" height="16"
+                 fontSize="8.0" forecolor="#64748B" vTextAlign="Middle">
+            <expression><![CDATA["AlgoMentor · Progreso de aprendizaje"]]></expression>
+        </element>
+        <element kind="textField" x="400" y="4" width="115" height="16"
+                 fontSize="8.0" forecolor="#64748B" hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+    </pageFooter>
+    <noData height="52">
+        <element kind="rectangle" x="0" y="0" width="515" height="44"
+                 mode="Opaque" backcolor="#F1F5F9" forecolor="#F1F5F9"/>
+        <element kind="textField" x="14" y="8" width="487" height="28"
+                 fontSize="10.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["Aún no hay resultados por habilidad para este perfil. Guarda intentos de práctica para ver el detalle aquí."]]></expression>
         </element>
     </noData>
 </jasperReport>

@@ -81,7 +81,7 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 1. Configura PostgreSQL, ejecuta `schema.sql` e inicia la aplicación.
 2. Inicia sesión y abre **Aprender > Progreso**.
 3. Pulsa **Vista previa** para revisar el informe, o **Exportar** para guardarlo como PDF en la ubicación elegida.
-4. El informe incluye la fecha de generación, total de intentos, correctos, incorrectos y sin calificar, además de aciertos, errores y porcentaje por habilidad.
+4. El informe incluye una portada resumida con tarjetas de intentos, fecha de generación, detalle de aciertos y errores por habilidad y numeración de páginas.
 
 Si tu cuenta no tiene progreso por habilidad, se genera el PDF con el resumen de intentos y un mensaje indicando que no hay datos de habilidades. Si la base de datos no está disponible, no se puede generar el informe. Para probar JasperReports sin PostgreSQL:
 
