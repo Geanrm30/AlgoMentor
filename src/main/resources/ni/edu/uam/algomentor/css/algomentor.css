@@ -185,6 +185,24 @@
     -fx-max-width: Infinity;
 }
 
+.summary-card {
+    -fx-padding: 16;
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 10;
+    -fx-min-width: 120;
+}
+
+.summary-label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+}
+
+.summary-value {
+    -fx-text-fill: #38bdf8;
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+}
+
 .app-root.light-theme, .app-root.light-theme .content-tabs,
 .app-root.light-theme .content-tabs .tab-content-area,
 .app-root.light-theme .scroll-pane,
@@ -208,8 +226,13 @@
 }
 
 .app-root.light-theme .page-title,
-.app-root.light-theme .section-title {
+.app-root.light-theme .section-title,
+.app-root.light-theme .summary-label {
     -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .summary-value {
+    -fx-text-fill: #0284c7;
 }
 
 .app-root.light-theme .content-tabs .tab-header-area .tab-header-background {
@@ -229,6 +252,7 @@
 }
 
 .app-root.light-theme .card,
+.app-root.light-theme .summary-card,
 .app-root.light-theme .table-view,
 .app-root.light-theme .chart-plot-background,
 .app-root.light-theme .chart-legend {

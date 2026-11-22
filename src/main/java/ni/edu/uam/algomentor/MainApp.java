@@ -64,10 +64,12 @@ public class MainApp extends Application {
             SesionUsuario.iniciar(perfil);
             Parent experiencia = cargarVista("experiencia.fxml");
             Parent gestion = cargarVista("gestion-contenido.fxml");
+            Parent resumen = cargarVista("resumen.fxml");
             TabPane navegacion = new TabPane();
             navegacion.getStyleClass().add("content-tabs");
             navegacion.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
             navegacion.getTabs().addAll(
+                    new Tab("Resumen", resumen),
                     new Tab("Aprender", experiencia),
                     new Tab("Gestión de contenido", gestion)
             );

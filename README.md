@@ -53,7 +53,8 @@ caracteres y una contraseña de 8 a 128 caracteres, o inicia sesión. Cada cuent
 vinculada a un perfil; al registrar el nombre de un perfil previo se conserva su progreso.
 Las contraseñas se almacenan con PBKDF2 y no en texto plano. Usa **Cerrar sesión** en la
 barra superior para salir. La gestión de contenido permite crear, consultar, actualizar y
-eliminar algoritmos y ejercicios.
+eliminar algoritmos y ejercicios. La pestaña **Resumen** muestra los totales y listados de
+algoritmos, ejercicios y perfiles, además del total de intentos.
 
 ### 6. Verificar la persistencia
 
