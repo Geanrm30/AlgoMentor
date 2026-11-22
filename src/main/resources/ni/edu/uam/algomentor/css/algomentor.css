@@ -134,3 +134,27 @@
 .valor-activo {
     -fx-background-color: #0284c7;
 }
+
+.chart {
+    -fx-padding: 12;
+}
+
+.chart-title, .axis-label, .axis .tick-label, .chart-legend-item {
+    -fx-text-fill: #d1d5db;
+}
+
+.chart-plot-background, .chart-legend {
+    -fx-background-color: #1f2937;
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #374151;
+}
+
+.chart-bar.default-color0 {
+    -fx-bar-fill: #22c55e;
+}
+
+.chart-bar.default-color1 {
+    -fx-bar-fill: #f97316;
+}

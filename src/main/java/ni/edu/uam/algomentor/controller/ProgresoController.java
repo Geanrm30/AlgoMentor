@@ -4,6 +4,10 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -31,6 +35,9 @@ public class ProgresoController {
 
     @FXML private ComboBox<Perfil> cmbPerfil;
     @FXML private Label lblResumen;
+    @FXML private BarChart<String, Number> graficoHabilidades;
+    @FXML private CategoryAxis axisHabilidad;
+    @FXML private NumberAxis axisCantidad;
     @FXML private TableView<EstadisticasDAO.EstadisticaHabilidad> tabla;
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colHabilidad;
     @FXML private TableColumn<EstadisticasDAO.EstadisticaHabilidad, String> colAciertos;
@@ -47,6 +54,9 @@ public class ProgresoController {
         colAciertos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().aciertos())));
         colErrores.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().errores())));
         colPorcentaje.setCellValueFactory(c -> new ReadOnlyStringWrapper(String.format("%.1f%%", c.getValue().porcentajeAciertos())));
+        axisCantidad.setForceZeroInRange(true);
+        graficoHabilidades.setCategoryGap(24);
+        graficoHabilidades.setBarGap(6);
         cargarPerfiles();
     }
 
@@ -58,6 +68,7 @@ public class ProgresoController {
             Platform.runLater(() -> {
                 cmbPerfil.setItems(FXCollections.observableArrayList(perfiles));
                 tabla.getItems().clear();
+                actualizarGrafico(List.of());
                 lblResumen.setText(perfiles.isEmpty() ? "Todavía no hay perfiles." : "Selecciona un perfil.");
             });
         });
@@ -77,11 +88,29 @@ public class ProgresoController {
             var habilidades = dao.listarProgresoPorHabilidad(perfil.getId());
             Platform.runLater(() -> {
                 tabla.setItems(FXCollections.observableArrayList(habilidades));
+                actualizarGrafico(habilidades);
                 lblResumen.setText("Intentos: " + resumen.total() + " · Correctos: " + resumen.correctos()
                         + " · Incorrectos: " + resumen.incorrectos() + " · Sin calificar: " + resumen.sinCalificar()
                         + (habilidades.isEmpty() ? "\nSin progreso por habilidad registrado." : ""));
             });
         });
+    }
+
+    private void actualizarGrafico(List<EstadisticasDAO.EstadisticaHabilidad> habilidades) {
+        XYChart.Series<String, Number> aciertos = new XYChart.Series<>();
+        aciertos.setName("Aciertos");
+        XYChart.Series<String, Number> errores = new XYChart.Series<>();
+        errores.setName("Errores");
+
+        for (EstadisticasDAO.EstadisticaHabilidad habilidad : habilidades) {
+            aciertos.getData().add(new XYChart.Data<>(habilidad.nombre(), habilidad.aciertos()));
+            errores.getData().add(new XYChart.Data<>(habilidad.nombre(), habilidad.errores()));
+        }
+
+        graficoHabilidades.setTitle(habilidades.isEmpty()
+                ? "Sin resultados por habilidad"
+                : "Aciertos y errores por habilidad");
+        graficoHabilidades.setData(FXCollections.observableArrayList(aciertos, errores));
     }
 
     @FXML

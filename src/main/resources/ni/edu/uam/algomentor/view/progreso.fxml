@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
@@ -11,12 +12,32 @@
         <Button text="Exportar PDF" onAction="#generarReporte" />
     </HBox>
     <Label fx:id="lblResumen" text="Selecciona un perfil." wrapText="true" />
-    <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colHabilidad" text="Habilidad" prefWidth="200" />
-            <TableColumn fx:id="colAciertos" text="Aciertos" prefWidth="130" />
-            <TableColumn fx:id="colErrores" text="Errores" prefWidth="130" />
-            <TableColumn fx:id="colPorcentaje" text="Acierto %" prefWidth="140" />
-        </columns>
-    </TableView>
+    <TabPane VBox.vgrow="ALWAYS">
+        <tabs>
+            <Tab text="Gráfico" closable="false">
+                <content>
+                    <BarChart fx:id="graficoHabilidades" animated="false" legendVisible="true">
+                        <xAxis>
+                            <CategoryAxis fx:id="axisHabilidad" label="Habilidad" tickLabelRotation="-25" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="axisCantidad" label="Evaluaciones" forceZeroInRange="true" />
+                        </yAxis>
+                    </BarChart>
+                </content>
+            </Tab>
+            <Tab text="Detalle" closable="false">
+                <content>
+                    <TableView fx:id="tabla">
+                        <columns>
+                            <TableColumn fx:id="colHabilidad" text="Habilidad" prefWidth="200" />
+                            <TableColumn fx:id="colAciertos" text="Aciertos" prefWidth="130" />
+                            <TableColumn fx:id="colErrores" text="Errores" prefWidth="130" />
+                            <TableColumn fx:id="colPorcentaje" text="Acierto %" prefWidth="140" />
+                        </columns>
+                    </TableView>
+                </content>
+            </Tab>
+        </tabs>
+    </TabPane>
 </VBox>
