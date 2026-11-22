@@ -68,14 +68,14 @@ algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejerc
 - **Práctica:** crea un perfil y selecciona un ejercicio guardado. Para ordenamiento responde con el arreglo final. Para Gauss y Gauss-Jordan selecciona una operación de filas, indica las filas con números desde 1 y el factor cuando aplique, y escribe la matriz resultante completa. Verifica y luego guarda el intento. Los errores muestran fila y columna y se asocian a Signos, Fracciones, Aritmetica o Procedimiento; los pasos correctos cuentan en Procedimiento.
 - **Terminal:** escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema operativo.
 - **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
-- **Progreso:** selecciona un perfil para consultar sus intentos y aciertos por habilidad. Pulsa **Exportar PDF** para guardar un informe con el resumen de intentos y los resultados por habilidad. El informe se genera usando JasperReports y los datos consultados mediante Hibernate.
+- **Progreso:** selecciona un perfil para consultar sus intentos y aciertos por habilidad. Pulsa **Exportar** para guardar un informe PDF con el resumen de intentos y los resultados por habilidad. El informe se genera usando JasperReports y los datos consultados mediante Hibernate.
 - **Repaso API:** carga preguntas de opción múltiple de computación desde Open Trivia DB, permite seleccionar una respuesta y muestra el resultado. Esta función no guarda respuestas en PostgreSQL.
 
 ### Informe PDF de progreso
 
 1. Configura PostgreSQL, ejecuta `schema.sql` e inicia la aplicación.
 2. Abre **Aprender > Progreso** y selecciona un perfil existente.
-3. Pulsa **Exportar PDF**, elige una ubicación y confirma el nombre del archivo.
+3. Pulsa **Exportar**, elige una ubicación y confirma el nombre del archivo PDF.
 4. El informe incluye la fecha de generación, total de intentos, correctos, incorrectos y sin calificar, además de aciertos, errores y porcentaje por habilidad.
 
 Si el perfil no tiene progreso por habilidad, se genera el PDF con el resumen de intentos y un mensaje indicando que no hay datos de habilidades. Si no existen perfiles o la base de datos no está disponible, no se puede generar el informe. Para probar JasperReports sin PostgreSQL:
