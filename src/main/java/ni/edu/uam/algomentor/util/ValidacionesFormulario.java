@@ -1,6 +1,8 @@
 package ni.edu.uam.algomentor.util;
 
 import java.util.Set;
+import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
+import ni.edu.uam.algomentor.model.Algoritmo;
 
 public final class ValidacionesFormulario {
 
@@ -13,19 +15,19 @@ public final class ValidacionesFormulario {
     public static void validarAlgoritmo(String nombre, String categoria, String complejidad,
                                         String descripcion) {
         validarTextoObligatorio(nombre, 80, "El nombre del algoritmo");
-        if (!CATEGORIAS.contains(categoria)) {
+        if (categoria == null || !CATEGORIAS.contains(categoria)) {
             throw new IllegalArgumentException("Seleccioná una categoría válida");
         }
         validarTextoOpcional(complejidad, 30, "La complejidad");
         validarTextoOpcional(descripcion, 500, "La descripción");
     }
 
-    public static void validarEjercicio(Object algoritmo, String origen, Integer dificultad,
+    public static void validarEjercicio(Algoritmo algoritmo, String origen, Integer dificultad,
                                         String datos) {
         if (algoritmo == null) {
             throw new IllegalArgumentException("Seleccioná un algoritmo");
         }
-        if (!ORIGENES.contains(origen)) {
+        if (origen == null || !ORIGENES.contains(origen)) {
             throw new IllegalArgumentException("Seleccioná un origen válido");
         }
         if (dificultad == null || dificultad < 1 || dificultad > 5) {
@@ -33,6 +35,14 @@ public final class ValidacionesFormulario {
         }
         if (datos == null || datos.isBlank()) {
             throw new IllegalArgumentException("Ingresá los datos del ejercicio");
+        }
+        if (datos.length() > 10_000) throw new IllegalArgumentException("Los datos superan 10000 caracteres.");
+        if (CatalogoAlgoritmos.admite(algoritmo.getNombre())) {
+            if (CatalogoAlgoritmos.porNombre(algoritmo.getNombre()).esOrdenamiento()) {
+                EntradaAprendizaje.leerArregloGuardado(datos);
+            } else {
+                EntradaAprendizaje.leerMatrizGuardada(datos);
+            }
         }
     }
 

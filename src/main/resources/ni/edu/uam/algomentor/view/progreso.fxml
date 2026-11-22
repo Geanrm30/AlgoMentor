@@ -7,12 +7,12 @@
     <Label text="Progreso de aprendizaje" styleClass="section-title" />
     <HBox spacing="10">
         <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
-        <Button text="Ver progreso" onAction="#verProgreso" styleClass="primary-button" />
+        <Button text="Actualizar" onAction="#verProgreso" styleClass="primary-button" />
         <Button fx:id="btnVistaPrevia" text="Vista previa" onAction="#previsualizarReporte" />
         <Button text="Exportar" onAction="#generarReporte" />
     </HBox>
-    <Label fx:id="lblResumen" text="Selecciona un perfil." wrapText="true" />
-    <TabPane VBox.vgrow="ALWAYS">
+    <Label fx:id="lblResumen" text="Cargando progreso…" wrapText="true" />
+    <TabPane VBox.vgrow="ALWAYS" styleClass="content-tabs">
         <tabs>
             <Tab text="Gráfico" closable="false">
                 <content>
@@ -33,7 +33,7 @@
                             <TableColumn fx:id="colHabilidad" text="Habilidad" prefWidth="200" />
                             <TableColumn fx:id="colAciertos" text="Aciertos" prefWidth="130" />
                             <TableColumn fx:id="colErrores" text="Errores" prefWidth="130" />
-                            <TableColumn fx:id="colPorcentaje" text="Acierto %" prefWidth="140" />
+                            <TableColumn fx:id="colPorcentaje" text="Acierto %" prefWidth="240" />
                         </columns>
                     </TableView>
                 </content>

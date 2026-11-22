@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fx:id="scrollVista" fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ni.edu.uam.algomentor.controller.VerificarSistemaApiController">
+    <content>
+        <VBox spacing="18" styleClass="tab-content">
+            <VBox spacing="12" styleClass="card">
+                <Label text="Comprobar un sistema lineal" styleClass="section-title" />
+                <Label text="Elige igual número de ecuaciones e incógnitas y completa la matriz ampliada."
+                       wrapText="true" />
+                <VBox fx:id="entradaMatriz" />
+                <Button fx:id="btnConsultar" text="Resolver y comparar" onAction="#consultar"
+                        styleClass="primary-button" />
+                <Label fx:id="lblEstadoConsulta" wrapText="true" />
+            </VBox>
+            <VBox spacing="10" styleClass="card">
+                <Label text="Resultados" styleClass="section-title" />
+                <Label fx:id="lblLocal" wrapText="true" />
+                <Label fx:id="lblTiempoLocal" wrapText="true" styleClass="subtitle" />
+                <Label fx:id="lblExterno" wrapText="true" />
+                <Label fx:id="lblTiempoExterno" wrapText="true" styleClass="subtitle" />
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

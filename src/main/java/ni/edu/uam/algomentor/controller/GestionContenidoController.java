@@ -13,6 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.dao.AlgoritmoDAO;
 import ni.edu.uam.algomentor.dao.EjercicioDAO;
@@ -22,6 +23,13 @@ import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Intento;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.util.SesionUsuario;
+import ni.edu.uam.algomentor.engine.FormatoDatos;
+import ni.edu.uam.algomentor.engine.GeneradorEjercicios;
+import ni.edu.uam.algomentor.engine.Fraccion;
+import ni.edu.uam.algomentor.util.EntradaAprendizaje;
+import ni.edu.uam.algomentor.util.EntradaMatrizVisual;
+import ni.edu.uam.algomentor.util.Tema;
+import ni.edu.uam.algomentor.util.TextoInterfaz;
 import ni.edu.uam.algomentor.util.ValidacionesFormulario;
 
 import java.util.List;
@@ -45,6 +53,8 @@ public class GestionContenidoController {
     @FXML private ComboBox<String> cmbOrigen;
     @FXML private Spinner<Integer> spDificultad;
     @FXML private TextArea txtDatosEjercicio;
+    @FXML private VBox entradaTextoEjercicio;
+    @FXML private VBox entradaMatrizEjercicio;
     @FXML private TableView<Ejercicio> tblEjercicios;
     @FXML private TableColumn<Ejercicio, String> colAlgoritmoEjercicio;
     @FXML private TableColumn<Ejercicio, String> colDatos;
@@ -61,14 +71,34 @@ public class GestionContenidoController {
     private AlgoritmoDAO algoritmoDAO;
     private EjercicioDAO ejercicioDAO;
     private IntentoDAO intentoDAO;
+    private EntradaMatrizVisual matrizVisual;
 
     @FXML
     private void initialize() {
+        matrizVisual = new EntradaMatrizVisual();
+        entradaMatrizEjercicio.getChildren().add(matrizVisual);
+        entradaMatrizEjercicio.setVisible(false);
+        entradaMatrizEjercicio.setManaged(false);
+        cmbAlgoritmoEjercicio.valueProperty().addListener((obs, anterior, actual) -> {
+            boolean matricial = actual != null && actual.getNombre().startsWith("Gauss");
+            entradaTextoEjercicio.setVisible(!matricial);
+            entradaTextoEjercicio.setManaged(!matricial);
+            entradaMatrizEjercicio.setVisible(matricial);
+            entradaMatrizEjercicio.setManaged(matricial);
+        });
         cmbCategoria.setItems(FXCollections.observableArrayList("ORDENAMIENTO", "MATEMATICO"));
         cmbOrigen.setItems(FXCollections.observableArrayList("ALEATORIO", "MANUAL", "PERSONALIZADO"));
+        cmbCategoria.setConverter(new StringConverter<>() {
+            @Override public String toString(String valor) { return valor == null ? "" : TextoInterfaz.categoria(valor); }
+            @Override public String fromString(String texto) { return texto; }
+        });
+        cmbOrigen.setConverter(new StringConverter<>() {
+            @Override public String toString(String valor) { return valor == null ? "" : TextoInterfaz.origen(valor); }
+            @Override public String fromString(String texto) { return texto; }
+        });
         spDificultad.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 1));
         StringConverter<Algoritmo> algoritmoConverter = new StringConverter<>() {
-            @Override public String toString(Algoritmo a) { return a == null ? "" : a.getNombre(); }
+            @Override public String toString(Algoritmo a) { return a == null ? "" : TextoInterfaz.algoritmo(a.getNombre()); }
             @Override public Algoritmo fromString(String text) { return null; }
         };
         cmbAlgoritmoEjercicio.setConverter(algoritmoConverter);
@@ -81,14 +111,14 @@ public class GestionContenidoController {
         cmbFiltroPerfil.setItems(FXCollections.observableArrayList(SesionUsuario.obtenerPerfil()));
         cmbFiltroPerfil.setValue(SesionUsuario.obtenerPerfil());
 
-        colNombreAlgoritmo.setCellValueFactory(c -> value(c.getValue().getNombre()));
-        colCategoria.setCellValueFactory(c -> value(c.getValue().getCategoria()));
+        colNombreAlgoritmo.setCellValueFactory(c -> value(TextoInterfaz.algoritmo(c.getValue().getNombre())));
+        colCategoria.setCellValueFactory(c -> value(TextoInterfaz.categoria(c.getValue().getCategoria())));
         colComplejidad.setCellValueFactory(c -> value(c.getValue().getComplejidad()));
         colDescripcion.setCellValueFactory(c -> value(c.getValue().getDescripcion()));
-        colAlgoritmoEjercicio.setCellValueFactory(c -> value(c.getValue().getAlgoritmo().getNombre()));
-        colDatos.setCellValueFactory(c -> value(c.getValue().getDatos()));
+        colAlgoritmoEjercicio.setCellValueFactory(c -> value(TextoInterfaz.algoritmo(c.getValue().getAlgoritmo().getNombre())));
+        colDatos.setCellValueFactory(c -> value(TextoInterfaz.datos(c.getValue())));
         colDificultad.setCellValueFactory(c -> value(String.valueOf(c.getValue().getDificultad())));
-        colOrigen.setCellValueFactory(c -> value(c.getValue().getOrigen()));
+        colOrigen.setCellValueFactory(c -> value(TextoInterfaz.origen(c.getValue().getOrigen())));
         colResultadoAlgoritmo.setCellValueFactory(c -> value(c.getValue().algoritmo()));
         colResultadoEjercicio.setCellValueFactory(c -> value(c.getValue().ejercicio()));
         colResultadoDetalle.setCellValueFactory(c -> value(c.getValue().detalle()));
@@ -110,6 +140,15 @@ public class GestionContenidoController {
                 cmbOrigen.setValue(e.getOrigen());
                 spDificultad.getValueFactory().setValue(e.getDificultad());
                 txtDatosEjercicio.setText(e.getDatos());
+                if (e.getAlgoritmo().getNombre().startsWith("Gauss")) {
+                    try {
+                        Fraccion[][] datos = EntradaAprendizaje.leerMatrizGuardada(e.getDatos());
+                        matrizVisual.cargar(datos);
+                    } catch (IllegalArgumentException error) {
+                        matrizVisual.limpiar();
+                        lblEstado.setText("Matriz inválida en el ejercicio " + e.getId() + ": " + error.getMessage());
+                    }
+                }
             }
         });
         try {
@@ -119,7 +158,7 @@ public class GestionContenidoController {
             recargar();
         } catch (RuntimeException e) {
             LOG.log(Level.SEVERE, "No se pudo iniciar la persistencia", e);
-            lblEstado.setText("No se pudo conectar con PostgreSQL. Revisá db.local.properties y el esquema.");
+            lblEstado.setText("No se pudo abrir la biblioteca. Revisa la conexión con la base de datos.");
         }
     }
 
@@ -145,15 +184,6 @@ public class GestionContenidoController {
         lblEstado.setText("Datos actualizados");
     }
 
-    @FXML private void guardarAlgoritmo() {
-        ejecutar(() -> {
-            Algoritmo a = leerAlgoritmo();
-            algoritmoDAO.guardar(a);
-            recargar();
-            limpiarAlgoritmo();
-        });
-    }
-
     @FXML private void actualizarAlgoritmo() {
         ejecutar(() -> {
             Algoritmo seleccionado = requerido(tblAlgoritmos.getSelectionModel().getSelectedItem(), "Seleccioná un algoritmo");
@@ -162,17 +192,6 @@ public class GestionContenidoController {
             algoritmoDAO.actualizar(a);
             recargar();
             limpiarAlgoritmo();
-        });
-    }
-
-    @FXML private void eliminarAlgoritmo() {
-        ejecutar(() -> {
-            Algoritmo a = requerido(tblAlgoritmos.getSelectionModel().getSelectedItem(), "Seleccioná un algoritmo");
-            if (confirmarEliminacion(a.getNombre())) {
-                algoritmoDAO.eliminar(a.getId());
-                recargar();
-                limpiarAlgoritmo();
-            }
         });
     }
 
@@ -232,18 +251,40 @@ public class GestionContenidoController {
         cmbOrigen.setValue(null);
         spDificultad.getValueFactory().setValue(1);
         txtDatosEjercicio.clear();
+        matrizVisual.limpiar();
     }
 
     private Ejercicio leerEjercicio() {
         Algoritmo algoritmo = cmbAlgoritmoEjercicio.getValue();
         Integer dificultad = spDificultad.getValue();
-        ValidacionesFormulario.validarEjercicio(algoritmo, cmbOrigen.getValue(), dificultad, txtDatosEjercicio.getText());
+        boolean matricial = algoritmo != null && algoritmo.getNombre().startsWith("Gauss");
+        String datos = matricial ? matrizVisual.texto() : txtDatosEjercicio.getText();
+        ValidacionesFormulario.validarEjercicio(algoritmo, cmbOrigen.getValue(), dificultad, datos);
+        if (matricial) {
+            matrizVisual.leerMatriz();
+        }
         Ejercicio e = new Ejercicio();
         e.setAlgoritmo(algoritmo);
         e.setOrigen(cmbOrigen.getValue());
         e.setDificultad(dificultad);
-        e.setDatos(txtDatosEjercicio.getText().trim());
+        e.setDatos(datos.trim());
         return e;
+    }
+
+    @FXML private void generarEjercicio() {
+        try {
+            Algoritmo algoritmo = requerido(cmbAlgoritmoEjercicio.getValue(), "Seleccioná un algoritmo");
+            String datos = new GeneradorEjercicios().datosPara(algoritmo.getNombre(), spDificultad.getValue());
+            if (algoritmo.getNombre().startsWith("Gauss")) {
+                matrizVisual.cargar(FormatoDatos.leerMatriz(datos));
+            } else {
+                txtDatosEjercicio.setText(datos);
+            }
+            cmbOrigen.setValue("ALEATORIO");
+            lblEstado.setText("Ejercicio generado. Pulsa Guardar para añadirlo a la biblioteca.");
+        } catch (IllegalArgumentException e) {
+            mostrarAlerta(Alert.AlertType.WARNING, "No se pudo generar", e.getMessage());
+        }
     }
 
     @FXML private void buscarEjercicios() {
@@ -251,8 +292,8 @@ public class GestionContenidoController {
             Algoritmo a = requerido(cmbFiltroAlgoritmo.getValue(), "Seleccioná un algoritmo");
             tblResultados.setItems(FXCollections.observableArrayList(
                     ejercicioDAO.listarPorAlgoritmo(a.getId()).stream()
-                            .map(e -> new ResultadoConsulta(a.getNombre(), e.getDatos(),
-                                    "Dificultad " + e.getDificultad() + " · " + e.getOrigen()))
+                            .map(e -> new ResultadoConsulta(TextoInterfaz.algoritmo(a.getNombre()), TextoInterfaz.datos(e),
+                                    "Dificultad " + e.getDificultad() + " · " + TextoInterfaz.origen(e.getOrigen())))
                             .toList()));
             lblEstado.setText("Ejercicios encontrados: " + tblResultados.getItems().size());
         });
@@ -263,8 +304,9 @@ public class GestionContenidoController {
             Perfil p = requerido(cmbFiltroPerfil.getValue(), "Seleccioná un perfil");
             List<Intento> intentos = intentoDAO.listarPorPerfil(p.getId());
             tblResultados.setItems(FXCollections.observableArrayList(intentos.stream()
-                    .map(i -> new ResultadoConsulta(i.getEjercicio().getAlgoritmo().getNombre(),
-                            i.getEjercicio().getDatos(), i.getModo() + " · " + i.getFechaInicio()))
+                    .map(i -> new ResultadoConsulta(TextoInterfaz.algoritmo(i.getEjercicio().getAlgoritmo().getNombre()),
+                            TextoInterfaz.datos(i.getEjercicio()), TextoInterfaz.modo(i.getModo())
+                                    + " · " + TextoInterfaz.fecha(i.getFechaInicio())))
                     .toList()));
             lblEstado.setText("Intentos encontrados: " + intentos.size());
         });
@@ -279,6 +321,7 @@ public class GestionContenidoController {
 
     private boolean confirmarEliminacion(String nombre) {
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle("Confirmar eliminación");
         alerta.setContentText("¿Eliminar " + nombre + "?");
@@ -293,13 +336,14 @@ public class GestionContenidoController {
             mostrarAlerta(Alert.AlertType.WARNING, "Revisá los datos", e.getMessage());
         } catch (RuntimeException e) {
             LOG.log(Level.SEVERE, "Falló una operación de persistencia", e);
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de persistencia",
-                    "No se pudo completar la operación. Revisá la conexión y las relaciones entre registros.");
+            mostrarAlerta(Alert.AlertType.ERROR, "No se pudo guardar el cambio",
+                    "Revisa la conexión con la base de datos y los registros relacionados.");
         }
     }
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);

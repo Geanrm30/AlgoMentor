@@ -6,6 +6,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GeneradorEjerciciosTest {
 
+    @Test void generaEjerciciosUtilizablesParaLosNueveAlgoritmos() {
+        for (var algoritmo : CatalogoAlgoritmos.values()) {
+            for (int dificultad = 1; dificultad <= 5; dificultad++) {
+                String datos = new GeneradorEjercicios(42).datosPara(algoritmo.nombre(), dificultad);
+                if (algoritmo.esOrdenamiento()) {
+                    int[] entrada = FormatoDatos.leerArreglo(datos);
+                    assertTrue(entrada.length <= FormatoDatos.MAX_ELEMENTOS_VISUALES);
+                    if (dificultad == 5) assertEquals(FormatoDatos.MAX_ELEMENTOS_VISUALES, entrada.length);
+                    String respuesta = algoritmo.crearOrdenamiento().ejecutar(entrada).estadoFinal();
+                    assertTrue(ni.edu.uam.algomentor.service.EvaluadorPractica.evaluar(algoritmo.nombre(), datos,
+                            respuesta.substring(1, respuesta.length() - 1)).correcto());
+                } else {
+                    assertEquals(ClasificacionSistema.UNICA,
+                            algoritmo.crearMatricial().ejecutar(FormatoDatos.leerMatriz(datos)).clasificacion());
+                }
+            }
+        }
+        assertThrows(IllegalArgumentException.class, () -> new GeneradorEjercicios().datosPara("Quick Sort", 0));
+        assertThrows(IllegalArgumentException.class, () -> new GeneradorEjercicios().datosPara("Quick Sort", 6));
+    }
+
     @Test
     void conLaMismaSemillaGeneraLoMismo() {
         int[] a = new GeneradorEjercicios(42).arregloAleatorio(10, -50, 50);

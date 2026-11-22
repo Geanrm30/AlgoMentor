@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ni.edu.uam.algomentor.controller.IntercambioEjerciciosController">
+    <content>
+        <VBox spacing="18" styleClass="tab-content">
+            <VBox spacing="12" styleClass="card">
+                <Label text="Compartir ejercicios" styleClass="section-title" />
+                <Label text="Guarda tus ejercicios en un archivo para compartirlos o carga los que recibiste. Antes de cargarlos, crea en la biblioteca los algoritmos que utilizan." wrapText="true" />
+                <HBox spacing="10">
+                    <Button fx:id="btnExportar" text="Guardar archivo" onAction="#exportar" styleClass="primary-button" />
+                    <Button fx:id="btnImportar" text="Cargar archivo" onAction="#importar" />
+                </HBox>
+                <Label fx:id="lblEstado" wrapText="true" />
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

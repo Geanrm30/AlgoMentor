@@ -7,14 +7,33 @@ public final class EntradaAprendizaje {
 
     private EntradaAprendizaje() { }
 
+    public static int[] leerArregloGuardado(String texto) {
+        int[] datos = texto != null && texto.strip().startsWith(FormatoDatos.VERSION + ";")
+                ? FormatoDatos.leerArreglo(texto) : leerArreglo(texto);
+        if (datos.length > FormatoDatos.MAX_ELEMENTOS_VISUALES) {
+            throw new IllegalArgumentException("Para visualizar, usa como máximo " + FormatoDatos.MAX_ELEMENTOS_VISUALES + " números.");
+        }
+        return datos;
+    }
+
+    public static Fraccion[][] leerMatrizGuardada(String texto) {
+        return texto != null && texto.strip().startsWith(FormatoDatos.VERSION + ";")
+                ? FormatoDatos.leerMatriz(texto) : leerMatriz(texto);
+    }
+
     public static int[] leerArreglo(String texto) {
+        int[] valores = leerArregloSinLimite(texto);
+        if (valores.length > FormatoDatos.MAX_ELEMENTOS_VISUALES) {
+            throw new IllegalArgumentException("Para visualizar, usa como máximo " + FormatoDatos.MAX_ELEMENTOS_VISUALES + " números.");
+        }
+        return valores;
+    }
+
+    public static int[] leerArregloSinLimite(String texto) {
         if (texto == null || texto.isBlank()) {
             throw new IllegalArgumentException("Ingresa al menos un número entero.");
         }
         String[] partes = texto.strip().split(",", -1);
-        if (partes.length > 12) {
-            throw new IllegalArgumentException("Para visualizar, usa como máximo 12 números.");
-        }
         int[] valores = new int[partes.length];
         for (int i = 0; i < partes.length; i++) {
             try {

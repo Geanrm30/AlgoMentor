@@ -15,32 +15,23 @@ public final class EvaluadorPractica {
         if (respuesta == null || respuesta.isBlank()) {
             throw new IllegalArgumentException("Ingresa una respuesta antes de verificar.");
         }
-        return switch (algoritmo) {
-            case "Bubble Sort", "Insertion Sort" -> evaluarOrdenamiento(algoritmo, datos, respuesta);
-            case "Gauss", "Gauss-Jordan" -> evaluarSistema(algoritmo, datos, respuesta);
-            default -> throw new IllegalArgumentException("Este algoritmo no tiene evaluación de práctica: " + algoritmo);
-        };
+        CatalogoAlgoritmos seleccionado = CatalogoAlgoritmos.porNombre(algoritmo);
+        return seleccionado.esOrdenamiento() ? evaluarOrdenamiento(seleccionado, datos, respuesta)
+                : evaluarSistema(seleccionado, datos, respuesta);
     }
 
-    private static Resultado evaluarOrdenamiento(String algoritmo, String datos, String respuesta) {
-        int[] entrada = datos != null && datos.startsWith("v1;")
-                ? FormatoDatos.leerArreglo(datos) : EntradaAprendizaje.leerArreglo(datos);
-        if (entrada.length == 0 || entrada.length > 12) {
-            throw new IllegalArgumentException("El ejercicio debe tener entre 1 y 12 elementos.");
-        }
+    private static Resultado evaluarOrdenamiento(CatalogoAlgoritmos algoritmo, String datos, String respuesta) {
+        int[] entrada = EntradaAprendizaje.leerArregloGuardado(datos);
         int[] propuesta = EntradaAprendizaje.leerArreglo(respuesta);
-        ResultadoEjecucion ejecucion = "Bubble Sort".equals(algoritmo)
-                ? new BubbleSort().ejecutar(entrada) : new InsertionSort().ejecutar(entrada);
+        ResultadoEjecucion ejecucion = algoritmo.crearOrdenamiento().ejecutar(entrada);
         int[] esperado = EntradaAprendizaje.leerArreglo(
                 ejecucion.estadoFinal().substring(1, ejecucion.estadoFinal().length() - 1));
         return new Resultado(Arrays.equals(propuesta, esperado), Arrays.toString(esperado));
     }
 
-    private static Resultado evaluarSistema(String algoritmo, String datos, String respuesta) {
-        Fraccion[][] entrada = datos != null && datos.startsWith("v1;")
-                ? FormatoDatos.leerMatriz(datos) : EntradaAprendizaje.leerMatriz(datos);
-        ResultadoMatriz resultado = "Gauss".equals(algoritmo)
-                ? new Gauss().ejecutar(entrada) : new GaussJordan().ejecutar(entrada);
+    private static Resultado evaluarSistema(CatalogoAlgoritmos algoritmo, String datos, String respuesta) {
+        Fraccion[][] entrada = EntradaAprendizaje.leerMatrizGuardada(datos);
+        ResultadoMatriz resultado = algoritmo.crearMatricial().ejecutar(entrada);
         if (resultado.clasificacion() != ClasificacionSistema.UNICA) {
             String esperado = resultado.clasificacion().name();
             return new Resultado(esperado.equalsIgnoreCase(respuesta.strip()), esperado);

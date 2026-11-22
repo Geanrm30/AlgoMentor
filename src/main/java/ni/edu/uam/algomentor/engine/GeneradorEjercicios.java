@@ -22,6 +22,19 @@ public class GeneradorEjercicios {
         this(System.nanoTime());
     }
 
+    /** Datos versionados, listos para guardar y usar en práctica o simulación. */
+    public String datosPara(String nombreAlgoritmo, int dificultad) {
+        if (dificultad < 1 || dificultad > 5) {
+            throw new IllegalArgumentException("La dificultad debe estar entre 1 y 5.");
+        }
+        CatalogoAlgoritmos algoritmo = CatalogoAlgoritmos.porNombre(nombreAlgoritmo);
+        if (algoritmo.esOrdenamiento()) {
+            return FormatoDatos.serializarArreglo(arregloAleatorio(
+                    Math.min(FormatoDatos.MAX_ELEMENTOS_VISUALES, 5 + dificultad * 3), -20 * dificultad, 20 * dificultad));
+        }
+        return FormatoDatos.serializarMatriz(sistemaAleatorio(Math.min(4, dificultad + 1), dificultad * 3));
+    }
+
     public int[] arregloAleatorio(int tamano, int minimo, int maximo) {
         if (tamano < 1 || tamano > FormatoDatos.MAX_ELEMENTOS) {
             throw new IllegalArgumentException("El tamano debe estar entre 1 y " + FormatoDatos.MAX_ELEMENTOS + ".");

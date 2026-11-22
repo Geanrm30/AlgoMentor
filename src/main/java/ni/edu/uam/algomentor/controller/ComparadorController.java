@@ -9,6 +9,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import ni.edu.uam.algomentor.service.ComparadorOrdenamientos;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
+import ni.edu.uam.algomentor.util.Tema;
 
 public class ComparadorController {
 
@@ -17,6 +18,10 @@ public class ComparadorController {
     @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colAlgoritmo;
     @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colComparaciones;
     @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colIntercambios;
+    @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colEscrituras;
+    @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colEscriturasCubeta;
+    @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colConteos;
+    @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colDistribuciones;
     @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colPasos;
     @FXML private TableColumn<ComparadorOrdenamientos.Metrica, String> colResultado;
 
@@ -25,6 +30,10 @@ public class ComparadorController {
         colAlgoritmo.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().algoritmo()));
         colComparaciones.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().comparaciones())));
         colIntercambios.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().intercambios())));
+        colEscrituras.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().escrituras())));
+        colEscriturasCubeta.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().escriturasCubeta())));
+        colConteos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().conteos())));
+        colDistribuciones.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().distribuciones())));
         colPasos.setCellValueFactory(c -> new ReadOnlyStringWrapper(Integer.toString(c.getValue().pasos())));
         colResultado.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().resultado()));
     }
@@ -42,6 +51,7 @@ public class ComparadorController {
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
+        Tema.estilizar(alerta);
         alerta.setHeaderText(null);
         alerta.setTitle(titulo);
         alerta.setContentText(mensaje);

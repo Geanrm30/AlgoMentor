@@ -17,13 +17,13 @@
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-tabs">
             <tabs>
-                <Tab text="Simulador">
+                <Tab text="Simular">
                     <fx:include source="simulador.fxml" />
                 </Tab>
                 <Tab text="Práctica">
                     <fx:include source="practica.fxml" />
                 </Tab>
-                <Tab text="Terminal">
+                <Tab text="Comandos">
                     <fx:include source="terminal.fxml" />
                 </Tab>
                 <Tab text="Comparar">
@@ -32,8 +32,11 @@
                 <Tab text="Progreso">
                     <fx:include source="progreso.fxml" />
                 </Tab>
-                <Tab text="Repaso API">
-                    <fx:include source="repaso-api.fxml" />
+                <Tab text="Compartir">
+                    <fx:include source="intercambio-ejercicios.fxml" />
+                </Tab>
+                <Tab text="Comprobar sistema">
+                    <fx:include source="verificar-sistema-api.fxml" />
                 </Tab>
             </tabs>
         </TabPane>

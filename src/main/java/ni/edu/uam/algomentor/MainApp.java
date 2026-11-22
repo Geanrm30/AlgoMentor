@@ -1,6 +1,7 @@
 package ni.edu.uam.algomentor;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -15,10 +16,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ni.edu.uam.algomentor.api.EjerciciosApiServer;
 import ni.edu.uam.algomentor.controller.LoginController;
 import ni.edu.uam.algomentor.model.Perfil;
+import ni.edu.uam.algomentor.service.CatalogoPersistidoService;
+import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.HibernateUtil;
 import ni.edu.uam.algomentor.util.SesionUsuario;
+import ni.edu.uam.algomentor.util.Tema;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,17 +38,27 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
-        Scene scene = new Scene(cargarLogin(), 760, 560);
-        URL stylesheet = MainApp.class.getResource("/ni/edu/uam/algomentor/css/algomentor.css");
+        try {
+            CatalogoPersistidoService.completarCatalogo();
+        } catch (RuntimeException e) {
+            LOG.log(Level.WARNING, "No se pudo sincronizar el catálogo de algoritmos", e);
+        }
+
+        Scene scene = new Scene(cargarLogin(), 900, 640);
+        URL stylesheet = Tema.hojaEstilos();
         if (stylesheet == null) {
             throw new IOException("No se encontró la hoja de estilos de AlgoMentor");
         }
         scene.getStylesheets().add(stylesheet.toExternalForm());
+        Animaciones.instalarEfectosBoton(scene);
         stage.setTitle("AlgoMentor");
         stage.setMinWidth(760);
         stage.setMinHeight(560);
         stage.setScene(scene);
-        stage.setOnCloseRequest(event -> HibernateUtil.shutdown());
+        stage.setOnCloseRequest(event -> {
+            EjerciciosApiServer.detener();
+            HibernateUtil.shutdown();
+        });
         stage.show();
     }
 
@@ -66,12 +81,12 @@ public class MainApp extends Application {
             Parent gestion = cargarVista("gestion-contenido.fxml");
             Parent resumen = cargarVista("resumen.fxml");
             TabPane navegacion = new TabPane();
-            navegacion.getStyleClass().add("content-tabs");
+            navegacion.getStyleClass().addAll("content-tabs", "nav-principal");
             navegacion.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
             navegacion.getTabs().addAll(
                     new Tab("Resumen", resumen),
                     new Tab("Aprender", experiencia),
-                    new Tab("Gestión de contenido", gestion)
+                    new Tab("Biblioteca", gestion)
             );
 
             VBox raiz = new VBox();
@@ -95,6 +110,7 @@ public class MainApp extends Application {
                 SesionUsuario.cerrar();
                 try {
                     stage.getScene().setRoot(cargarLogin());
+                    Animaciones.instalarEfectosBoton(stage.getScene());
                 } catch (IOException e) {
                     LOG.log(Level.SEVERE, "No se pudo volver al inicio de sesión", e);
                     new Alert(Alert.AlertType.ERROR,
@@ -106,9 +122,23 @@ public class MainApp extends Application {
             VBox.setVgrow(navegacion, Priority.ALWAYS);
 
             stage.getScene().setRoot(raiz);
+            Animaciones.instalarEfectosBoton(stage.getScene());
+            Animaciones.animarPestanas(navegacion);
+            animarPestanasInternas(experiencia, gestion, resumen);
+            Platform.runLater(() -> Animaciones.entrarContenido(
+                    navegacion.getSelectionModel().getSelectedItem().getContent()));
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "No se pudo abrir la aplicación", e);
             new Alert(Alert.AlertType.ERROR, "No se pudo abrir la aplicación.").showAndWait();
+        }
+    }
+
+    private void animarPestanasInternas(Parent... vistas) {
+        for (Parent vista : vistas) {
+            vista.lookupAll(".content-tabs").stream()
+                    .filter(TabPane.class::isInstance)
+                    .map(TabPane.class::cast)
+                    .forEach(Animaciones::animarPestanas);
         }
     }
 

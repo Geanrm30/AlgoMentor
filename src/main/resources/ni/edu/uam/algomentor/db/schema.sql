@@ -85,6 +85,11 @@ CREATE INDEX IF NOT EXISTS idx_progreso_habilidad    ON progreso_habilidad (habi
 INSERT INTO algoritmo (nombre, categoria, complejidad, descripcion) VALUES
                                                                         ('Bubble Sort',    'ORDENAMIENTO', 'O(n^2)', 'Compara pares adyacentes y los intercambia'),
                                                                         ('Insertion Sort', 'ORDENAMIENTO', 'O(n^2)', 'Inserta cada elemento en su posicion'),
+                                                                        ('Quick Sort', 'ORDENAMIENTO', 'O(n log n); peor O(n^2)', 'Particiones en tres vias con pivote y manejo de repetidos'),
+                                                                        ('Merge Sort', 'ORDENAMIENTO', 'O(n log n)', 'Divide subarreglos y los mezcla de forma estable'),
+                                                                        ('Counting Sort', 'ORDENAMIENTO', 'O(n+k); disperso O(n log u)', 'Cuenta frecuencias con desplazamiento; usa conteo disperso para rangos grandes'),
+                                                                        ('Radix Sort', 'ORDENAMIENTO', 'O(d(n+b))', 'Diez pasadas decimales estables sobre claves long desplazadas'),
+                                                                        ('Bucket Sort', 'ORDENAMIENTO', 'Prom. O(n+k); peor O(n^2)', 'Distribuye en cubetas, ordena por insercion y concatena'),
                                                                         ('Gauss',          'MATEMATICO',   'O(n^3)', 'Eliminacion hacia adelante y sustitucion'),
                                                                         ('Gauss-Jordan',   'MATEMATICO',   'O(n^3)', 'Reduce la matriz a la identidad')
     ON CONFLICT (nombre) DO NOTHING;

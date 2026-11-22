@@ -1,18 +1,89 @@
+<div align="center">
+
 # AlgoMentor
 
-Proyecto final de Programación de Aplicaciones de Escritorio (UAM).
+**Nueve algoritmos interactivos, práctica con detección de errores por habilidad, intercambio de ejercicios e informes PDF de progreso.**
 
-## Instalación de la base de datos
+Programación de Aplicaciones de Escritorio · Universidad Americana (UAM) · Ingeniería de Sistemas
+
+![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)
+![JavaFX](https://img.shields.io/badge/Interfaz-JavaFX%2021-4285F4)
+![Hibernate](https://img.shields.io/badge/ORM-Hibernate%206.6-59666C?logo=hibernate&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/Base%20de%20datos-PostgreSQL%2014%2B-4169E1?logo=postgresql&logoColor=white)
+![Aritmética](https://img.shields.io/badge/Aritm%C3%A9tica-fracciones%20exactas-orange)
+
+![JasperReports](https://img.shields.io/badge/JasperReports-7-DB7100)
+![Maven](https://img.shields.io/badge/Maven-Build-C71A36?logo=apachemaven&logoColor=white)
+![JUnit](https://img.shields.io/badge/JUnit-5-25A162?logo=junit5&logoColor=white)
+
+</div>
+
+---
+
+## Contenido
+
+1. [Descripción general](#1-descripción-general)
+2. [Instalación y ejecución](#2-instalación-y-ejecución)
+3. [Módulos de la aplicación](#3-módulos-de-la-aplicación)
+4. [Interfaz y animaciones](#4-interfaz-y-animaciones)
+5. [Arquitectura del proyecto](#5-arquitectura-del-proyecto)
+6. [Decisiones técnicas](#6-decisiones-técnicas)
+7. [Persistencia del aprendizaje](#7-persistencia-del-aprendizaje)
+8. [Validación y seguridad](#8-validación-y-seguridad)
+9. [Pruebas](#9-pruebas)
+10. [Trabajo en equipo y convenciones](#10-trabajo-en-equipo-y-convenciones)
+11. [Limitaciones y notas de uso](#11-limitaciones-y-notas-de-uso)
+12. [Integrantes y distribución de tareas](#12-integrantes-y-distribución-de-tareas)
+
+---
+
+## 1. Descripción general
+
+AlgoMentor es una aplicación de escritorio para aprender algoritmos paso a paso. Cuenta con siete
+algoritmos de ordenamiento y dos métodos de álgebra lineal. **Explica cada operación**, verifica
+las respuestas del estudiante, clasifica sus errores por habilidad y guarda el historial en PostgreSQL
+mediante Hibernate.
+
+### Algoritmos disponibles
+
+| Categoría | Algoritmos |
+|---|---|
+| Ordenamiento (7) | Bubble Sort, Insertion Sort, Quick Sort, Merge Sort, Counting Sort, Radix Sort y Bucket Sort. |
+| Álgebra lineal (2) | Gauss y Gauss-Jordan. |
+
+### Características principales
+
+| Área | Capacidad |
+|---|---|
+| Simulación | Nueve algoritmos con recorrido paso a paso, generación de entradas, animaciones y audio opcional. |
+| Aritmética | Fracciones exactas con `BigInteger` (`Fraccion`), sin errores de redondeo en matrices. |
+| Práctica | Evaluación de arreglos ordenados y operaciones de fila, con detección de errores. |
+| Comparación | Métricas de ejecución de los siete algoritmos de ordenamiento. |
+| Habilidades | Clasificación de errores en Signos, Fracciones, Aritmetica y Procedimiento. |
+| Persistencia | Perfiles, intentos, pasos, errores y progreso mediante Hibernate ORM y PostgreSQL. |
+| Informes | Exportación de informes PDF de progreso con JasperReports y consultas HQL. |
+| Intercambio API | Importación y exportación de ejercicios JSON mediante una API HTTP local. |
+| API externa | Verificación independiente de sistemas lineales mediante math.js. |
+| Interfaz | Tema oscuro, animaciones, resaltado de pivotes y barras de progreso. |
+
+---
+
+## 2. Instalación y ejecución
+
+### Requisitos
+
+- JDK 21.
+- PostgreSQL 14 o superior (incluye pgAdmin).
+- IntelliJ IDEA (opcional): el proyecto usa Maven y el wrapper `mvnw` está incluido.
+- Internet para descargar las dependencias de Maven la primera vez y consultar la API externa de math.js.
 
 ### 1. Instalar PostgreSQL
 
-Instalar PostgreSQL 14 o superior (incluye pgAdmin). Durante la instalación anotar la contraseña del usuario `postgres`
-y dejar el puerto por defecto, `5432`.
+Durante la instalación anota la contraseña del usuario `postgres` y deja el puerto por defecto, `5432`.
 
 ### 2. Crear la base de datos
 
-En pgAdmin: clic derecho en *Databases* > *Create* > *Database...* y usar el nombre `algomentor`.
-
+En pgAdmin: clic derecho en *Databases* > *Create* > *Database...* y usa el nombre `algomentor`.
 O desde SQL:
 
 ```sql
@@ -21,8 +92,11 @@ CREATE DATABASE algomentor;
 
 ### 3. Configurar la conexión
 
-1. En la raíz del proyecto, copiar `db.local.properties.example` como `db.local.properties`.
-2. Editar `db.local.properties` con los datos propios:
+Las credenciales **no** se guardan en el repositorio. La aplicación lee `db.local.properties`
+desde la raíz del proyecto, archivo incluido en `.gitignore`.
+
+1. Copia `db.local.properties.example` como `db.local.properties`.
+2. Edita `db.local.properties` con tus datos:
 
    ```properties
    db.url=jdbc:postgresql://localhost:5432/algomentor
@@ -30,19 +104,27 @@ CREATE DATABASE algomentor;
    db.password=LA_CONTRASEÑA_DE_POSTGRES
    ```
 
-`db.local.properties` está en `.gitignore`: no se sube a Git. Nunca publicar contraseñas ni credenciales.
+### 4. Crear el esquema
 
-### 4. Preparar el esquema del laboratorio
+Ejecuta en la base `algomentor` el archivo `src/main/resources/ni/edu/uam/algomentor/db/schema.sql`.
+El script define las tablas y sus relaciones, incluyendo `cuenta`, crea las cuatro habilidades
+iniciales (Signos, Fracciones, Aritmetica y Procedimiento) y registra los nueve algoritmos del catálogo.
 
-Ejecutar en la base `algomentor` el archivo
-`src/main/resources/ni/edu/uam/algomentor/db/schema.sql`.
-El script define las tablas y sus relaciones, y agrega algoritmos de ejemplo. También
-crea la tabla `cuenta` que necesita el inicio de sesión.
+**Bases existentes:** ejecuta `src/main/resources/ni/edu/uam/algomentor/db/actualizar-cuentas.sql`
+para crear la tabla de cuentas sin recrear ni borrar datos. Un perfil antiguo se puede reclamar
+al registrarse con el mismo nombre de usuario (sin distinguir mayúsculas); se conserva su
+progreso y ese perfil solo puede quedar vinculado a una cuenta.
 
-### 5. Abrir y ejecutar la aplicación
+**Instalaciones existentes:** al abrir la aplicación se agregan los algoritmos faltantes a la base.
+También puedes ejecutar manualmente el script
+[`actualizar-nuevos-algoritmos.sql`](src/main/resources/ni/edu/uam/algomentor/db/actualizar-nuevos-algoritmos.sql).
+La migración es transaccional e idempotente (`ON CONFLICT (nombre) DO NOTHING`): agrega los cinco
+algoritmos nuevos sin eliminar ni modificar perfiles, ejercicios, intentos, progreso o algoritmos
+existentes. No es necesario recrear la base.
 
-Abrir la carpeta del proyecto en IntelliJ IDEA como proyecto Maven y utilizar JDK 21.
-Desde una terminal en la raíz del proyecto:
+### 5. Ejecutar
+
+Abre la carpeta en IntelliJ IDEA como proyecto Maven con JDK 21, o desde una terminal en la raíz:
 
 ```powershell
 .\mvnw.cmd javafx:run
@@ -55,71 +137,369 @@ Las contraseñas se almacenan con PBKDF2 y no en texto plano. Usa **Cerrar sesi�
 barra superior para salir. La gestión de contenido permite crear, consultar, actualizar y
 eliminar algoritmos y ejercicios. La pestaña **Resumen** muestra los totales y listados de
 algoritmos, ejercicios y perfiles, además del total de intentos.
+Si la conexión a PostgreSQL falla, la aplicación muestra el problema en la barra inferior y registra
+el detalle técnico en consola.
 
-### 6. Verificar la persistencia
+### Dependencias
 
-Registra una cuenta e inicia sesión para guardar intentos en el perfil propio. En la pestaña
-Algoritmos, guardar un algoritmo y comprobar que aparece en la tabla. Después actualizarlo
-y eliminarlo. En Ejercicios, seleccionar un algoritmo, indicar origen y dificultad, ingresar
-datos, y repetir las operaciones. Por último, seleccionar
-un algoritmo en Consultas y pulsar **Buscar ejercicios**. No se puede eliminar un
-algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos ejercicios.
+| Librería | Uso |
+|---|---|
+| JavaFX 21 | Interfaz gráfica (FXML, CSS, animaciones). |
+| Hibernate ORM 6.6 | Mapeo de las entidades y consultas HQL. |
+| PostgreSQL JDBC 42.7 | Controlador de la base de datos. |
+| JasperReports 7 | Compilación de la plantilla JRXML y exportación a PDF. |
+| Jackson 2.18 | Procesamiento JSON para el intercambio de ejercicios y la comunicación con math.js. |
+| JUnit 5 | Pruebas unitarias y de integración. |
 
-## Aprendizaje
+---
 
-- La aplicación inicia con el tema oscuro. Usa el botón **Tema claro** de la barra superior para alternar entre ambos temas.
-- **Simulador:** elige Bubble Sort, Insertion Sort, Gauss o Gauss-Jordan. Escribe enteros separados por comas, o una matriz ampliada con una ecuación por línea y celdas separadas por comas. Usa **Anterior** y **Siguiente** para recorrer los pasos.
-- **Audio:** en un paso puedes cargar un MP3 o WAV local y reproducirlo. El texto del paso permanece visible. Los audios no se guardan en la base de datos ni se incluyen en el repositorio.
-- **Práctica:** usa el perfil creado para tu cuenta y selecciona un ejercicio guardado. Para ordenamiento responde con el arreglo final. Para Gauss y Gauss-Jordan selecciona una operación de filas, indica las filas con números desde 1 y el factor cuando aplique, y escribe la matriz resultante completa. Verifica y luego guarda el intento. Los errores muestran fila y columna y se asocian a Signos, Fracciones, Aritmetica o Procedimiento; los pasos correctos cuentan en Procedimiento.
-- **Terminal:** escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema operativo.
-- **Comparar:** usa la misma entrada para medir comparaciones, intercambios y pasos de ambos métodos de ordenamiento.
-- **Progreso:** consulta los intentos y aciertos por habilidad de tu cuenta. Pulsa **Vista previa** para abrir el informe en el visor de JasperReports, o **Exportar** para guardar el informe PDF. El informe incluye el resumen de intentos y los resultados por habilidad, consultados mediante Hibernate.
-- **Repaso API:** carga preguntas de opción múltiple de computación desde Open Trivia DB, permite seleccionar una respuesta y muestra el resultado. Esta función no guarda respuestas en PostgreSQL.
+## 3. Módulos de la aplicación
 
-### Informe PDF de progreso
+Tras iniciar sesión, la ventana principal muestra **Resumen**, **Aprender** (Simular, Práctica,
+Comandos, Comparar, Progreso, Compartir y Comprobar sistema) y **Biblioteca** (gestión de contenido).
 
-1. Configura PostgreSQL, ejecuta `schema.sql` e inicia la aplicación.
-2. Inicia sesión y abre **Aprender > Progreso**.
-3. Pulsa **Vista previa** para revisar el informe, o **Exportar** para guardarlo como PDF en la ubicación elegida.
-4. El informe incluye una portada resumida con tarjetas de intentos, fecha de generación, detalle de aciertos y errores por habilidad y numeración de páginas.
+### 3.1 Simulador
 
-Si tu cuenta no tiene progreso por habilidad, se genera el PDF con el resumen de intentos y un mensaje indicando que no hay datos de habilidades. Si la base de datos no está disponible, no se puede generar el informe. Para probar JasperReports sin PostgreSQL:
+La aplicación inicia con el tema oscuro; usa **Tema claro** en la barra superior para alternar su apariencia.
 
-```powershell
-.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest" test
+1. **Entrada.** Selecciona uno de los nueve algoritmos. En Simular puedes introducir enteros
+   separados por comas sin un límite fijo de elementos; para Gauss y Gauss-Jordan completa una matriz ampliada. **Generar entrada**
+   crea un ejemplo para el método seleccionado.
+2. **Recorrido.** Pulsa **Anterior** o **Siguiente** para recorrer las operaciones, sus estados y
+   explicaciones en español. Se distinguen las comparaciones, los intercambios, las escrituras,
+   las particiones, las mezclas, los conteos y las distribuciones según el algoritmo.
+3. **Audio.** Puedes cargar y reproducir un MP3 o WAV local por paso; el texto permanece visible.
+   Los audios no se guardan en PostgreSQL ni se incluyen en el repositorio.
+
+Quick Sort identifica el pivote en violeta. Los arreglos anchos tienen desplazamiento horizontal.
+Las operaciones matriciales usan fracciones exactas; `Clasificador` determina si el sistema tiene
+una solución única, infinitas soluciones o ninguna solución.
+
+**Selección de algoritmos**
+
+![Selector con los nueve algoritmos disponibles](docs/capturas/simulador.png)
+
+*Simulador con siete métodos de ordenamiento y dos métodos matriciales.*
+
+**Quick Sort: selección del pivote**
+
+![Quick Sort con el pivote resaltado en violeta](docs/capturas/quick-sort.png)
+
+*Primer paso de Quick Sort: selección del pivote de valor 1 en un arreglo de siete elementos.*
+
+**Simulación matricial**
+
+![Eliminación de un elemento mediante una operación de fila](docs/capturas/gauss-jordan.png)
+
+*El simulador muestra la matriz, las celdas activas y la explicación de la operación de fila.*
+
+### 3.2 Práctica
+
+Inicia sesión con tu cuenta y selecciona un ejercicio guardado. La práctica usa el perfil asociado
+a la sesión; no permite elegir perfiles ajenos.
+
+- **Ordenamiento:** responde con el arreglo final para cualquiera de los siete métodos.
+- **Gauss y Gauss-Jordan:** selecciona una operación de filas (intercambiar, escalar o eliminar),
+  indica las filas con números desde 1 y el factor cuando corresponda, y escribe la matriz resultante completa.
+
+Cada pulsación de **Verificar** registra automáticamente un intento, correcto o incorrecto, para
+el perfil autenticado. Las respuestas incompletas o mal escritas también cuentan como intentos
+incorrectos. Los errores matriciales identifican la fila y columna correspondientes;
+los errores se asocian a Signos, Fracciones, Aritmetica o Procedimiento. Los pasos correctos de práctica
+cuentan en Procedimiento. `RegistroPracticaService` conecta la evaluación con `IntentoService`.
+
+<!-- Pendiente: captura real de Práctica con PostgreSQL configurado. -->
+
+### 3.3 Terminal y Comparar
+
+**Terminal.** Escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema
+operativo. Además de los comandos originales, admite `ordenar quick`, `ordenar merge`, `ordenar counting`,
+`ordenar radix` y `ordenar bucket`.
+
+```text
+ordenar quick 4,-2,0,4,-7
+ordenar radix 2147483647,-2147483648,0
 ```
 
-JasperReports compila la plantilla JRXML al generar el informe. La aplicación requiere Internet solo para descargar dependencias Maven la primera vez que se compila; la generación del PDF no consulta la API externa.
+![Quick Sort ejecutado en la terminal educativa](docs/capturas/terminal-quick.png)
 
-### Repaso conceptual con Open Trivia DB
+*Traza de Quick Sort con comparaciones, particiones e intercambios.*
 
-La pestaña **Repaso API** requiere conexión a Internet. La aplicación consulta Open Trivia DB
-sin necesitar una clave de API y limita las solicitudes a una por cada cinco segundos para
-respetar el límite del servicio. Si la API no está disponible, devuelve un error o no tiene
-preguntas disponibles, la aplicación informa el problema y permite volver a intentarlo.
+<details>
+<summary>Más ejemplos de la terminal: Radix Sort y Gauss-Jordan</summary>
 
-Las preguntas provienen de un servicio externo y son un recurso complementario de repaso;
-no sustituyen las explicaciones ni la verificación de ejercicios del simulador. Para ejecutar
-las pruebas del cliente y del mapeo JSON:
+![Radix Sort con enteros negativos desde la terminal](docs/capturas/terminal-radix.png)
 
-```powershell
-.\mvnw.cmd "-Dtest=OpenTriviaClientTest,OpenTriviaResponseTest" test
+*Radix Sort: conteo de frecuencias y distribución estable, incluyendo números negativos.*
+
+![Resolución de un sistema mediante Gauss-Jordan desde la terminal](docs/capturas/terminal-jordan.png)
+
+*Gauss-Jordan resuelve el sistema y devuelve la solución exacta x1 = 4, x2 = -5.*
+
+</details>
+
+**Comparar.** Utiliza el mismo arreglo para analizar los siete ordenamientos. La tabla distingue
+comparaciones, intercambios, escrituras en el arreglo, escrituras internas de cubetas, conteos,
+distribuciones y pasos educativos. Las métricas describen la traza del método, no un tiempo de ejecución.
+
+![Comparador con los siete algoritmos y sus métricas](docs/capturas/comparador.png)
+
+*Los siete métodos reciben el mismo arreglo y producen el mismo resultado ordenado, con métricas diferenciadas.*
+
+### 3.4 Progreso e informe PDF
+
+Muestra el progreso del perfil autenticado, no un ranking global: incluye intentos, correctos,
+incorrectos, sin calificar y aciertos por habilidad. El gráfico compara aciertos y errores; la tabla
+de detalle incluye una barra animada por habilidad: verde desde 70 %, ámbar desde 40 % y roja por debajo.
+
+Para revisar o exportar el informe:
+
+1. Abre **Aprender > Progreso** después de iniciar sesión.
+2. Pulsa **Vista previa** para abrir el visor de JasperReports, o **Exportar** para guardar el PDF.
+3. El informe presenta tarjetas de resumen, la fecha de generación, resultados por habilidad y
+   numeración de páginas.
+
+Si aún no hay progreso por habilidad, el PDF muestra el resumen de intentos y un mensaje que lo indica.
+JasperReports compila la plantilla JRXML al generar el informe y obtiene los datos mediante HQL;
+no necesita consultar una API externa.
+
+<!-- Pendiente: capturas reales de Progreso y del PDF de JasperReports con PostgreSQL configurado. -->
+
+### 3.5 Intercambio API
+
+La API HTTP local escucha en `127.0.0.1:8765`. JavaFX la consume para exportar e importar ejercicios
+JSON portables, sin depender de Internet ni compartir los identificadores internos de PostgreSQL.
+Ambas instalaciones deben tener registrados los algoritmos con sus nombres originales.
+
+| Método | Endpoint | Función |
+|---|---|---|
+| GET | `/api/ejercicios/exportar` | Exporta los ejercicios. |
+| POST | `/api/ejercicios/importar` | Importa un paquete JSON. |
+
+Ejemplo de paquete JSON (versión 1):
+
+```json
+{
+  "version": 1,
+  "ejercicios": [
+    {
+      "algoritmo": "Quick Sort",
+      "datos": "8,3,6,1",
+      "dificultad": 2,
+      "origen": "MANUAL"
+    }
+  ]
+}
 ```
 
-En Gestión de contenido, crea los ejercicios con el mismo nombre de algoritmo que aparece en el simulador. Los datos pueden ser simples (`8,3,6,1` o `2,1,5` seguido de otra fila) o usar el formato versionado `v1;ARREGLO;8,3,6,1` y `v1;MATRIZ;2x3;2,1,5|1,-1,1`. Ejecuta `schema.sql` antes de guardar intentos, pues crea las cuatro habilidades iniciales.
+La importación acepta hasta 500 ejercicios y 1 MB por lote, con `Content-Type: application/json`.
+Se procesa en una sola transacción: si algún dato es inválido, no se guarda el lote. Los ejercicios
+idénticos se omiten. Para compartir entre equipos se envía el archivo exportado y se importa desde
+la instalación receptora; el servidor no se expone a la red.
 
-## Trabajo en equipo
+<!-- Pendiente: captura real de Compartir con PostgreSQL configurado. -->
 
-Cada integrante desarrolla en su rama y abre un Pull Request revisado por otra persona.
-La rama `main` debe compilar y ejecutarse después de cada integración.
+### 3.6 Verificar sistema API
 
+Este módulo consume el servicio externo [math.js](https://api.mathjs.org/) para verificar de forma
+independiente un sistema lineal de solución única.
 
-## Persistencia del aprendizaje
+1. Abre **Aprender > Comprobar sistema** e introduce una matriz ampliada de un sistema cuadrado.
+   Por ejemplo, las filas `2,1,5` y `1,-1,1`.
+2. El motor de Gauss calcula la solución exacta con fracciones.
+3. `MathJsClient` envía los coeficientes y términos independientes por HTTPS a
+   `https://api.mathjs.org/v4/` mediante una petición POST JSON.
+4. La aplicación muestra ambas soluciones como decimales con hasta seis cifras y el tiempo de cada
+   operación por separado. AlgoMentor conserva el cálculo exacto con fracciones internamente.
+   El tiempo externo incluye la preparación de la petición y la comunicación por Internet,
+   por lo que no mide únicamente el cálculo de math.js.
 
-AlgoMentor utiliza Hibernate ORM y PostgreSQL para
-almacenar el historial de aprendizaje de los estudiantes.
+Requiere Internet. Si la API falla, la solución local permanece visible. Los sistemas sin solución
+única se clasifican localmente y no se envían a math.js.
 
-El sistema permite:
+![Comparación de la solución local y la solución externa de math.js](docs/capturas/api-mathjs.png)
+
+*La solución del motor de AlgoMentor y la respuesta externa coinciden: x1 = 4, x2 = -5.*
+
+### 3.7 Biblioteca (gestión de contenido)
+
+| Pestaña | Función |
+|---|---|
+| Algoritmos | Consultar y actualizar las fichas existentes. La interfaz no permite crear ni eliminar algoritmos. |
+| Ejercicios | Generar ejercicios por algoritmo y dificultad, revisar los datos y realizar operaciones CRUD. |
+| Consultas | Buscar ejercicios por algoritmo e historial de intentos por perfil mediante HQL. |
+
+No se puede eliminar un algoritmo que tenga ejercicios relacionados; primero deben eliminarse esos
+registros según las restricciones de la base. Para que Práctica reconozca un ejercicio, emplea el
+nombre registrado en el catálogo. Se admiten datos simples y el formato versionado:
+
+```text
+v1;ARREGLO;8,3,6,1
+v1;MATRIZ;2x3;2,1,5|1,-1,1
+```
+
+Después de actualizar el esquema, selecciona cualquiera de los nueve algoritmos, elige la dificultad,
+pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda disponible para Práctica.
+
+<!-- Pendiente: captura real de Biblioteca con PostgreSQL configurado. -->
+
+---
+
+## 4. Interfaz y animaciones
+
+- **Tema oscuro:** `algomentor.css` define la paleta (cian y violeta), las tarjetas, los botones, las
+  tablas y los diálogos. `Tema` aplica la misma hoja de estilos a los cuadros de alerta.
+- **Animaciones:** `Animaciones` reúne las transiciones de JavaFX. Las pestañas y las tarjetas aparecen
+  de forma escalonada, los botones reaccionan al pasar el cursor y al pulsarlos, y la retroalimentación
+  de Práctica e Intercambio API aparece con un estado correcto o de error.
+- **Simulador:** las celdas aparecen con rebote al simular. Cuando cambia el estado entre pasos, las
+  celdas de un arreglo se deslizan de su posición anterior a la nueva (`MovimientoCeldas` calcula ese
+  desplazamiento) y las celdas activas pulsan. Las escrituras se animan en su posición, sin simular
+  intercambios inexistentes; el pivote de Quick Sort se resalta en violeta. En las matrices se resaltan
+  las celdas que cambiaron.
+- **Progreso:** las barras por habilidad se animan hasta su porcentaje y no se reinician al reutilizar celdas de la tabla.
+
+---
+
+## 5. Arquitectura del proyecto
+
+```text
+src/main/java/ni/edu/uam/algomentor/
+├── Launcher.java, MainApp.java       Punto de entrada y navegación principal
+├── controller/                      Controladores JavaFX de los módulos de Aprender y Biblioteca
+├── engine/                          Motor independiente de JavaFX y PostgreSQL
+│   ├── AlgoritmoOrdenamiento         Contrato de los siete ordenamientos
+│   ├── BubbleSort, InsertionSort      Ordenamientos por comparación
+│   ├── QuickSort, MergeSort          División y conquista
+│   ├── CountingSort, RadixSort       Ordenamiento por frecuencias y dígitos
+│   ├── BucketSort                    Distribución en cubetas
+│   ├── Gauss, GaussJordan            Métodos matriciales con fracciones exactas
+│   ├── CatalogoAlgoritmos            Registro centralizado de algoritmos
+│   ├── Paso, TrazaOrdenamiento       Registro de estados y operaciones educativas
+│   ├── Fraccion, Clasificador        Aritmética exacta y clasificación de sistemas
+│   └── VerificadorOperaciones        Verificación de operaciones de filas
+├── service/                         Evaluación, registro de intentos, progreso,
+│                                    comparador, terminal e informes PDF
+├── dao/                             CRUD genérico, acceso a datos y consultas HQL
+├── model/                           Entidades persistentes del aprendizaje y cuentas
+├── api/                             Intercambio JSON por HTTP y cliente math.js
+└── util/                            Hibernate, validaciones, tema y animaciones
+
+src/main/resources/ni/edu/uam/algomentor/
+├── view/                            Vistas FXML
+├── css/algomentor.css               Hoja de estilos
+├── db/
+│   ├── schema.sql                    Esquema PostgreSQL y datos iniciales
+│   └── actualizar-nuevos-algoritmos.sql   Migración idempotente
+└── report/progreso.jrxml            Plantilla JasperReports
+
+src/test/java/                      Pruebas JUnit e integración
+```
+
+### Flujo de los componentes principales
+
+```mermaid
+flowchart TD
+    UI[JavaFX: FXML y controladores] --> S[Servicios]
+    UI --> E[Motor de algoritmos]
+    S --> E
+    S --> DAO[DAO y consultas HQL]
+    DAO --> ORM[Hibernate ORM]
+    ORM --> DB[(PostgreSQL)]
+    S --> R[JasperReports: PDF]
+    UI --> A[Intercambio HTTP local]
+    A --> DAO
+    UI --> M[Cliente math.js]
+    M --> EXT[API externa por HTTPS]
+```
+
+El motor de `engine/` solo calcula y devuelve resultados: no abre ventanas ni consulta la base de
+datos. El catálogo centraliza la selección de algoritmos y la traza define las operaciones que
+consume el simulador. Los servicios coordinan la lógica de negocio y la persistencia; los DAO
+encapsulan el acceso a datos y Hibernate mapea las entidades a PostgreSQL.
+
+Las entidades del aprendizaje son `Perfil`, `Algoritmo`, `Ejercicio`, `Intento`, `PasoIntento`,
+`ErrorDetectado`, `Habilidad` y `ProgresoHabilidad`; `Cuenta` guarda las credenciales protegidas
+y se vincula a un perfil. JasperReports utiliza las estadísticas de aprendizaje para producir
+el PDF; las API ofrecen funciones complementarias sin sustituir el motor local.
+
+---
+
+## 6. Decisiones técnicas
+
+**Fracciones exactas en lugar de punto flotante.** Gauss necesita saber si un elemento es exactamente
+cero para elegir pivotes y clasificar el sistema. En `double`, un valor teóricamente nulo puede quedar
+en el orden de `1e-17`. `Fraccion` usa `BigInteger`, compara con cero sin tolerancias y mantiene las
+fracciones irreducibles.
+
+**Pasos como contrato del motor.** Cada algoritmo devuelve una lista de pasos con su estado y su
+explicación. El simulador solo los recorre, y el audio y la práctica se apoyan en el mismo contrato.
+
+**Formato versionado de datos de ejercicios.** `v1;ARREGLO;…` y `v1;MATRIZ;…` permiten cambiar el
+formato sin romper los ejercicios ya guardados; también se aceptan datos simples escritos a mano.
+
+**Trabajo de base de datos fuera del hilo de JavaFX.** Las consultas y los guardados corren en hilos
+daemon y la interfaz se actualiza con `Platform.runLater`, de modo que la ventana no se congela.
+
+**Habilidades por nombre, no por ID.** `HabilidadErrorResolver` busca cada habilidad con Hibernate
+por su nombre; el código no depende de identificadores fijos de la base.
+
+**Rebote con interpolador propio.** El rebote de las celdas se implementa con un `Interpolator`
+personalizado porque `Interpolator.SPLINE` solo admite puntos de control dentro de [0, 1] y el
+rebote necesita sobrepasar el valor final.
+
+**Barras de progreso sin repetir animación.** Las celdas de la tabla se reutilizan al desplazarse;
+la celda recuerda el último porcentaje animado para no reiniciar la barra.
+
+**Catálogo y trazas reutilizables.** `CatalogoAlgoritmos` centraliza los nueve métodos; `TrazaOrdenamiento`
+registra estados anteriores y posteriores, índices y explicaciones. El pivote es un dato opcional de
+`Paso`, y `TipoOperacion` distingue escrituras, comparaciones y distribuciones reales.
+
+**Intercambio portable.** Los paquetes JSON usan nombres de algoritmos y un formato versionado, en lugar
+de IDs locales. La importación valida el lote y utiliza una transacción única.
+
+**Verificación independiente.** El motor local conserva sus fracciones exactas; math.js aporta una
+segunda solución mediante una API externa, sin reemplazar la lógica propia.
+
+### Complejidad de los algoritmos
+
+| Método | Funcionamiento | Tiempo | Memoria auxiliar |
+|---|---|---|---|
+| Bubble Sort | Comparación e intercambio de vecinos | Peor `O(n²)` | `O(1)` |
+| Insertion Sort | Inserción en el segmento ordenado | Peor `O(n²)` | `O(1)` |
+| Quick Sort | Partición en menores, iguales y mayores que el pivote | Promedio `O(n log n)`, peor `O(n²)` | `O(log n)` |
+| Merge Sort | División y mezcla estable | `O(n log n)` | `O(n)` |
+| Counting Sort | Conteo de frecuencias y reconstrucción | Denso `O(n + k)`; disperso `O(n log u)` | Denso `O(k)`; disperso `O(u)` |
+| Radix Sort | Diez pasadas decimales estables | `O(d(n + b))` | `O(n + b)` |
+| Bucket Sort | Distribución en `n` cubetas e inserción interna | Esperado `O(n)` con distribución uniforme; peor `O(n²)` | `O(n)` |
+| Gauss | Eliminación hacia forma escalonada | `O(n³)` operaciones aritméticas para un sistema cuadrado | Matriz de `O(n²)` |
+| Gauss-Jordan | Reducción hacia forma escalonada reducida | `O(n³)` operaciones aritméticas para un sistema cuadrado | Matriz de `O(n²)` |
+
+`n` representa el número de elementos o incógnitas; `k`, el rango de valores; `u`, el número de
+valores distintos; `d = 10` y `b = 10` para Radix Sort. Las cotas describen el método sin la copia
+defensiva ni las instantáneas educativas. Cada paso guarda estados completos, por lo que la traza
+requiere memoria adicional proporcional al número de pasos y al tamaño del estado. En los métodos
+matriciales, el costo de las operaciones con `BigInteger` depende además del tamaño de las fracciones.
+
+Los cinco nuevos ordenamientos aceptan negativos, cero, duplicados y los extremos de `int`, y no
+modifican el arreglo recibido. Counting Sort utiliza hasta 65 536 casillas densas; para rangos
+mayores usa un árbol de frecuencias dispersas. Radix Sort desplaza las claves en `long` para tratar
+correctamente `Integer.MIN_VALUE`, y Bucket Sort realiza sus cálculos de rango en `long`.
+
+### Interpretación de las métricas
+
+El comparador distingue decisiones de orden entre valores, intercambios, escrituras explícitas,
+conteos, distribuciones y escrituras internas de cubetas. No cuenta comprobaciones de índices ni la
+búsqueda inicial del rango como comparaciones. Las asignaciones de un intercambio no se cuentan
+otra vez como escrituras. Dividir, mezclar, seleccionar el pivote y finalizar son pasos educativos;
+no equivalen necesariamente a comparaciones. La variante dispersa de Counting Sort sí registra
+comparaciones reales de claves; la variante densa no inventa comparaciones de orden.
+
+---
+
+## 7. Persistencia del aprendizaje
+
+AlgoMentor utiliza Hibernate ORM y PostgreSQL para almacenar el historial de aprendizaje. El sistema permite:
 
 - Registrar cuentas vinculadas a perfiles de estudiantes.
 - Guardar intentos y sus pasos.
@@ -129,58 +509,179 @@ El sistema permite:
 
 ### Transacciones
 
-El registro de intentos, pasos, errores y progreso
-utiliza una única transacción de Hibernate.
+El registro de intentos, pasos, errores y, en el modo de práctica, progreso utiliza una única transacción de Hibernate.
+Si alguna operación falla, se ejecuta rollback para evitar registros parcialmente guardados.
 
-Si alguna operación falla, se ejecuta rollback
-para evitar registros parcialmente guardados.
+### Correspondencia de habilidades
 
-### Ejecución de pruebas
+`HabilidadErrorResolver` relaciona los errores del motor con las habilidades:
 
-Para ejecutar las pruebas unitarias:
+| Error del motor | Habilidad |
+|---|---|
+| `SIGNO` | Signos |
+| `FRACCION` | Fracciones |
+| `ARITMETICO` | Aritmetica |
+| `OPERACION_INVALIDA` | Procedimiento |
+
+### Concurrencia
+
+`IntentoService` usa un bloqueo pesimista sobre el perfil durante el registro del intento, y las
+actualizaciones de progreso se hacen en un orden consistente de identificadores de habilidades.
+Estas medidas reducen los conflictos cuando las operaciones pasan por `IntentoService`; las
+actualizaciones hechas por otros servicios deben respetar la misma estrategia de bloqueo.
+
+---
+
+## 8. Validación y seguridad
+
+### Validación de entradas
+
+La aplicación controla y explica, con mensajes claros y sin cerrar la ventana, los datos no válidos:
+nombres de perfil vacíos o inválidos, arreglos con valores no enteros o con más de 20 elementos en la interfaz,
+matrices con filas de distinto tamaño, operaciones de fila con índices fuera de rango, campos
+obligatorios de algoritmos y ejercicios, y operaciones sin perfil o ejercicio seleccionado.
+
+La generación y el guardado de ejercicios comparten validaciones de formato, dificultad, origen
+y límites visuales con la importación JSON. Los nuevos motores rechazan arreglos vacíos y nulos.
+
+### Seguridad
+
+- **Credenciales fuera del repositorio:** `db.local.properties` está en `.gitignore`; solo se versiona
+  `db.local.properties.example`.
+- **Consultas parametrizadas:** las consultas HQL usan parámetros con nombre (`:perfilId`,
+  `:algoritmoId`); no se concatena texto del usuario en las consultas.
+- **Terminal educativa:** solo reconoce comandos propios y nunca ejecuta comandos del sistema operativo.
+- **Nombre de archivo del informe:** los caracteres no válidos del nombre del perfil se reemplazan
+  antes de proponer el archivo PDF.
+- **API local:** escucha únicamente en la interfaz de loopback; valida tamaño del lote y contenido antes de la importación.
+- **API externa:** la verificación utiliza HTTPS y envía los coeficientes y términos independientes del sistema.
+- **Mensajes de error:** la interfaz muestra un texto comprensible; el detalle técnico y la traza
+  se registran en consola.
+
+---
+
+## 9. Pruebas
+
+De acuerdo con el [informe de ampliación del 17 de noviembre de 2026](docs/AMPLIACION_ALGORITMOS.md),
+la última verificación documentada obtuvo **190 pruebas unitarias aprobadas** y **4 pruebas de integración
+JavaFX aprobadas** (194 en la ejecución conjunta, sin fallos, errores ni omisiones).
+Las pruebas contra PostgreSQL real no se ejecutaron en esa sesión y no se declaran aprobadas.
+
+### Ejecución
+
+Todas las pruebas unitarias:
 
 ```powershell
 .\mvnw.cmd clean test
 ```
 
-Para ejecutar la prueba de integración con PostgreSQL:
+Pruebas de carga FXML y controles JavaFX (requieren escritorio):
 
 ```powershell
-.\mvnw.cmd "-Dtest=PersistenciaAprendizajeIT" test
+.\mvnw.cmd "-Dtest=InterfazAlgoritmosIT" test
 ```
 
-La prueba de integración requiere PostgreSQL configurado
-y el esquema de AlgoMentor creado.
+Ejecución conjunta de pruebas unitarias e integración JavaFX:
 
-La clase PersistenciaAprendizajeIT no se ejecuta
-automáticamente mediante mvn test debido a su nombre.
+```powershell
+.\mvnw.cmd test "-Dtest=*Test,InterfazAlgoritmosIT"
+```
 
-### Correspondencia de habilidades
+Pruebas específicas del informe PDF:
 
-Los errores del motor se relacionan con las habilidades
-mediante HabilidadErrorResolver:
+```powershell
+.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest" test
+```
 
-- SIGNO: Signos
-- FRACCION: Fracciones
-- ARITMETICO: Aritmetica
-- OPERACION_INVALIDA: Procedimiento
+Pruebas de integración con PostgreSQL real (requieren conexión configurada y esquema actualizado):
 
-Los identificadores se consultan mediante Hibernate,
-sin depender de IDs fijos.
+```powershell
+.\mvnw.cmd "-Dtest=PersistenciaAprendizajeIT,NuevosAlgoritmosPostgresIT" test
+```
 
-### Concurrencia
+Las clases terminadas en `IT` no se ejecutan automáticamente con `mvn test` y deben solicitarse
+explícitamente. Las pruebas de PostgreSQL comprueban persistencia, rollback, migración idempotente,
+intercambio de ejercicios, registro de intentos y progreso. Usan registros temporales, que se eliminan
+al terminar, sin recurrir a bases de datos alternativas.
 
-IntentoService utiliza un bloqueo pesimista sobre
-el perfil durante el registro del intento.
+### Cobertura por área
 
-Las actualizaciones de progreso se realizan en un
-orden consistente de identificadores de habilidades.
+| Área | Clases de prueba |
+|---|---|
+| Ordenamiento | `BubbleSortTest`, `InsertionSortTest`, `QuickSortTest`, `MergeSortTest`, `CountingSortTest`, `RadixSortTest`, `BucketSortTest` |
+| Álgebra lineal | `GaussTest`, `GaussJordanTest`, `FraccionTest`, `FormatoMatrizTest`, `VerificadorOperacionesTest` |
+| Catálogo y ejercicios | `CatalogoAlgoritmosTest`, `CatalogoSqlTest`, `GeneradorEjerciciosTest`, `EvaluadorPracticaTest`, `EvaluadorPasoMatrizTest`, `EntradaAprendizajeTest` |
+| Persistencia y servicios | `IntentoServiceTest`, `RegistroPracticaServiceTest`, `ProgresoHabilidadServiceTest`, `PerfilServiceTest`, `HabilidadErrorResolverTest`, `CalculoProgresoTest` |
+| Terminal y comparador | `ComandosTerminalTest`, `ComparadorOrdenamientosTest` |
+| Estadísticas | `EstadisticasDAOTest` |
+| Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest` |
+| Intercambio JSON | `EjerciciosApiServerTest`, `PaqueteNuevosAlgoritmosTest` |
+| Animaciones y validación | `MovimientoCeldasTest`, `ValidacionesFormularioTest` |
+| Integración JavaFX | `InterfazAlgoritmosIT` |
+| Integración PostgreSQL | `PersistenciaAprendizajeIT`, `NuevosAlgoritmosPostgresIT` |
 
-Estas medidas reducen los conflictos de concurrencia
-cuando las operaciones utilizan IntentoService.
+Los cinco motores nuevos verifican entradas ordenadas, inversas, repetidas, negativas, cero,
+valores extremos, entradas inválidas y conservación del arreglo original. El contrato de pruebas
+compartido compara cada implementación con `Arrays.sort` y comprueba la continuidad e índices de
+los pasos. `Arrays.sort` sirve como referencia de prueba, no como implementación del motor.
 
-Las actualizaciones realizadas por otros servicios
-deben respetar la misma estrategia de bloqueo.
+### Guía de verificación manual
 
-La concurrencia real y el rollback deben comprobarse
-mediante pruebas de integración con PostgreSQL.
+| Prueba | Cómo comprobarla |
+|---|---|
+| Simulación | Seleccionar cada algoritmo; generar una entrada y recorrer los pasos en ambos sentidos. |
+| Quick Sort | Comprobar el marcado del pivote y las particiones. |
+| Comparación | Introducir `8,3,6,1,5` y verificar las siete filas de resultados. |
+| Persistencia de algoritmos y ejercicios | Crear, consultar y actualizar registros desde Biblioteca; verificar restricciones de eliminación. |
+| Generación de ejercicios | Elegir el algoritmo y dificultad, generar y guardar el ejercicio. |
+| Práctica | Iniciar sesión, elegir un ejercicio y verificar que cada intento se registra en el perfil propio. |
+| Progreso | Consultar gráfico y detalle de habilidades del perfil autenticado. |
+| Informe PDF | Abrir **Vista previa** o usar **Exportar** y revisar el PDF generado. |
+| Intercambio API | Exportar JSON e importar un paquete válido; verificar que los duplicados se omiten. |
+| Verificación externa | Resolver las filas `2,1,5` y `1,-1,1` y comparar la respuesta de math.js con Gauss. |
+
+La concurrencia real y el rollback deben comprobarse en PostgreSQL antes de declarar validada la
+persistencia de extremo a extremo.
+
+---
+
+## 10. Trabajo en equipo y convenciones
+
+El equipo desarrolla las funcionalidades en ramas independientes y las integra mediante Pull Requests.
+La rama `main` debe compilar y ejecutarse después de cada integración.
+
+- **Commits:** formato `tipo: descripción en español`, por ejemplo
+  `feat: implementar Gauss y Gauss-Jordan con clasificacion de sistemas`. Tipos usados: `feat`, `fix`,
+  `docs`, `test` y `chore`.
+- **Ramas:** una por funcionalidad (`feature/…`), y una propia para la documentación (`docs/…`).
+- **Código:** nombres en español y descriptivos, comentarios solo para explicar el porqué de una
+  decisión, y sin código muerto.
+- **Secretos:** nunca se versionan contraseñas ni credenciales.
+
+---
+
+## 11. Limitaciones y notas de uso
+
+- Simular no impone un máximo fijo de enteros al introducir el arreglo manualmente. La fila se centra cuando cabe y se desplaza hasta el elemento activo durante los pasos. Biblioteca, Práctica y Comparar conservan su límite visual de 20, y el formato de almacenamiento mantiene el límite de 30 por compatibilidad. Los arreglos muy grandes requieren más tiempo y memoria porque se conserva el estado de cada paso.
+- Práctica reconoce los nueve algoritmos del catálogo. Los ejercicios deben usar los nombres registrados, como `Quick Sort` o `Gauss-Jordan`.
+- Ejecuta `schema.sql` en una instalación nueva. En una existente, la aplicación completa automáticamente los algoritmos faltantes sin modificar los registros ya presentes; `actualizar-nuevos-algoritmos.sql` sigue disponible para una migración manual. Las cuatro habilidades iniciales deben estar disponibles antes de registrar intentos.
+- La API externa math.js requiere Internet y verifica únicamente sistemas cuadrados con solución única; la solución local sigue disponible ante fallos del servicio.
+- El intercambio es local y está limitado a 500 ejercicios y 1 MB por lote. Ambos equipos deben disponer de los algoritmos correspondientes.
+- Las trazas guardan instantáneas de los estados: las métricas educativas no representan una medición directa de tiempo ni memoria real de ejecución.
+- Los audios del simulador son archivos locales y no se guardan en la base de datos.
+- Hibernate valida el esquema al iniciar (`hbm2ddl.auto=validate`); no lo crea ni lo migra automáticamente.
+- La carpeta `target/` se genera al compilar y no forma parte del repositorio.
+- La última verificación documentada no incluye la ejecución de las pruebas contra PostgreSQL real.
+
+---
+
+## 12. Integrantes y distribución de tareas
+
+| Integrante | Usuario GitHub | Responsabilidades |
+|---|---|---|
+| Geanfranco Alexander Rodriguez Mendieta | [Geanrm30](https://github.com/Geanrm30) | Estructura del proyecto y configuración de la base, esquema PostgreSQL, mapeo de las ocho entidades, `SessionFactory`, motor de algoritmos (Bubble Sort, Insertion Sort, Gauss y Gauss-Jordan, fracciones exactas, verificador de operaciones y generador de ejercicios), tema visual y animaciones. |
+| Anthony Sying Gonzalez Chow | [AnthonySGC](https://github.com/AnthonySGC) | DAO base e interfaz CRUD genérica, persistencia de algoritmos y ejercicios, consultas HQL y estadísticas, gestión y validación de perfiles, registro transaccional de intentos, errores por habilidad, progreso y prueba de integración con rollback. Ampliación de los cinco algoritmos (Quick Sort, Merge Sort, Counting Sort, Radix Sort y Bucket Sort), catálogo, integración con los módulos, migración y pruebas. |
+| Jeremy Josue Gradiz Noguera | [JJGradiz](https://github.com/JJGradiz) | Consumo de la API de repaso en la etapa inicial del proyecto; plantilla JasperReports, generación y exportación del informe PDF y sus pruebas. |
+| Claudio Antonio De La Rocha Acevedo | [Def-Claudingo](https://github.com/Def-Claudingo) | Experiencia JavaFX: navegación, simulador, práctica con evaluación de operaciones y errores por habilidad, terminal, comparador, progreso, audio por paso e integración de la gestión con Hibernate. Intercambio de ejercicios por API, verificación externa con math.js y mejoras de navegación y entrada de matrices. |
+
+Docente: José A. Durán García · Noviembre 2026
