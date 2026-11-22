@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -16,6 +17,8 @@ import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.PerfilService;
@@ -24,6 +27,7 @@ import ni.edu.uam.algomentor.service.ReporteProgresoService;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import javax.swing.SwingUtilities;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +39,7 @@ public class ProgresoController {
 
     @FXML private ComboBox<Perfil> cmbPerfil;
     @FXML private Label lblResumen;
+    @FXML private Button btnVistaPrevia;
     @FXML private BarChart<String, Number> graficoHabilidades;
     @FXML private CategoryAxis axisHabilidad;
     @FXML private NumberAxis axisCantidad;
@@ -164,6 +169,45 @@ public class ProgresoController {
                 });
             }
         }, "algomentor-reporte-progreso");
+        hilo.setDaemon(true);
+        hilo.start();
+    }
+
+    @FXML
+    private void previsualizarReporte() {
+        Perfil perfil = cmbPerfil.getValue();
+        if (perfil == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Perfil requerido",
+                    "Selecciona un perfil antes de previsualizar el reporte.");
+            return;
+        }
+
+        Long perfilId = perfil.getId();
+        String nombrePerfil = perfil.getNombre();
+        btnVistaPrevia.setDisable(true);
+        lblResumen.setText("Preparando vista previa del reporte…");
+        Thread hilo = new Thread(() -> {
+            try {
+                JasperPrint reporte = new ReporteProgresoService()
+                        .prepararReporte(perfilId);
+                SwingUtilities.invokeLater(() -> {
+                    JasperViewer visor = new JasperViewer(reporte, false);
+                    visor.setTitle("Vista previa del reporte - " + nombrePerfil);
+                    visor.setVisible(true);
+                });
+                Platform.runLater(() ->
+                        lblResumen.setText("Vista previa abierta para " + nombrePerfil + "."));
+            } catch (JRException | IOException | RuntimeException e) {
+                LOG.log(Level.SEVERE, "No se pudo preparar la vista previa del informe", e);
+                Platform.runLater(() -> {
+                    lblResumen.setText("No se pudo preparar la vista previa.");
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error al previsualizar informe",
+                            "No se pudo preparar el reporte. Revisa la conexión con PostgreSQL.");
+                });
+            } finally {
+                Platform.runLater(() -> btnVistaPrevia.setDisable(false));
+            }
+        }, "algomentor-vista-previa-reporte");
         hilo.setDaemon(true);
         hilo.start();
     }

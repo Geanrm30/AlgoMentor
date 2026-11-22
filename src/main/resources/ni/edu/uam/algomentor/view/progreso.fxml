@@ -9,6 +9,7 @@
         <ComboBox fx:id="cmbPerfil" promptText="Perfil" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
         <Button text="Actualizar" onAction="#cargarPerfiles" />
         <Button text="Ver progreso" onAction="#verProgreso" styleClass="primary-button" />
+        <Button fx:id="btnVistaPrevia" text="Vista previa" onAction="#previsualizarReporte" />
         <Button text="Exportar" onAction="#generarReporte" />
     </HBox>
     <Label fx:id="lblResumen" text="Selecciona un perfil." wrapText="true" />
