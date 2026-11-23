@@ -75,6 +75,7 @@ public class GestionContenidoController {
 
     @FXML
     private void initialize() {
+        configurarMenusContextuales();
         matrizVisual = new EntradaMatrizVisual();
         entradaMatrizEjercicio.getChildren().add(matrizVisual);
         entradaMatrizEjercicio.setVisible(false);
@@ -160,6 +161,19 @@ public class GestionContenidoController {
             LOG.log(Level.SEVERE, "No se pudo iniciar la persistencia", e);
             lblEstado.setText("No se pudo abrir la biblioteca. Revisa la conexión con la base de datos.");
         }
+    }
+
+    /** Clic derecho en las tablas de la biblioteca. */
+    private void configurarMenusContextuales() {
+        ni.edu.uam.algomentor.util.MenuContextual.instalar(tblAlgoritmos,
+                ni.edu.uam.algomentor.util.MenuContextual.sobreSeleccion(tblAlgoritmos, "Limpiar selección",
+                        this::limpiarAlgoritmo));
+        ni.edu.uam.algomentor.util.MenuContextual.instalar(tblEjercicios,
+                ni.edu.uam.algomentor.util.MenuContextual.sobreSeleccion(tblEjercicios, "Eliminar ejercicio…",
+                        this::eliminarEjercicio),
+                ni.edu.uam.algomentor.util.MenuContextual.sobreSeleccion(tblEjercicios, "Limpiar selección",
+                        this::limpiarEjercicio));
+        ni.edu.uam.algomentor.util.MenuContextual.instalar(tblResultados);
     }
 
     private ReadOnlyStringWrapper value(String text) {

@@ -32,7 +32,7 @@ public class IntercambioEjerciciosController {
     private void initialize() {
         try {
             EjerciciosApiServer.iniciar();
-            lblEstado.setText("Listo para compartir ejercicios.");
+            lblEstado.setText("Listo para exportar o importar ejercicios.");
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "No se pudo iniciar la API de ejercicios", e);
             lblEstado.setText("No se pudo preparar el intercambio. Comprueba si AlgoMentor ya está abierto en otra ventana.");
@@ -41,10 +41,20 @@ public class IntercambioEjerciciosController {
         }
     }
 
+    /** Permite abrir el diálogo de exportación desde el menú Archivo. */
+    public void exportarEjercicios() {
+        exportar();
+    }
+
+    /** Permite abrir el diálogo de importación desde el menú Archivo. */
+    public void importarEjercicios() {
+        importar();
+    }
+
     @FXML
     private void exportar() {
         FileChooser selector = new FileChooser();
-        selector.setTitle("Guardar archivo de ejercicios");
+        selector.setTitle("Exportar ejercicios");
         selector.setInitialFileName("ejercicios-algomentor.json");
         selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo JSON", "*.json"));
         java.io.File archivo = selector.showSaveDialog(btnExportar.getScene().getWindow());
@@ -66,7 +76,7 @@ public class IntercambioEjerciciosController {
     @FXML
     private void importar() {
         FileChooser selector = new FileChooser();
-        selector.setTitle("Cargar archivo de ejercicios");
+        selector.setTitle("Importar ejercicios");
         selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo JSON", "*.json"));
         java.io.File archivo = selector.showOpenDialog(btnImportar.getScene().getWindow());
         if (archivo == null) {
@@ -78,7 +88,7 @@ public class IntercambioEjerciciosController {
             }
             ResultadoImportacion resultado = cliente.importar(Files.readAllBytes(archivo.toPath()));
             return "Ejercicios agregados: " + resultado.importados() + " · Ya existentes: " + resultado.existentes()
-                    + ". Pulsa Actualizar en Práctica o vuelve a Biblioteca.";
+                    + ". Los ejercicios importados ya están disponibles en Práctica y en Biblioteca.";
         });
     }
 

@@ -724,7 +724,7 @@
 }
 
 .app-root.light-theme .content-tabs .tab:selected .tab-label {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #0f172a;
 }
 
 .app-root.light-theme .card,
@@ -803,4 +803,206 @@
 .app-root.light-theme .chart-vertical-grid-lines,
 .app-root.light-theme .chart-horizontal-grid-lines {
     -fx-stroke: #d1d5db;
+}
+
+/* ---------- Barra de menú principal ---------- */
+
+.app-menubar {
+    -fx-padding: 4 16;
+    -fx-background-color: -ac-surface;
+    -fx-border-color: transparent transparent -ac-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-menubar .menu-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.app-menubar .menu-bar .menu .label {
+    -fx-text-fill: -ac-text;
+    -fx-font-weight: bold;
+}
+
+.sesion-activa {
+    -fx-text-fill: -ac-muted;
+}
+
+.app-contenido {
+    -fx-background-color: transparent;
+}
+
+.app-root.light-theme .app-menubar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #d1d5db transparent;
+}
+
+.app-root.light-theme .app-menubar .menu-bar .menu .label {
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .sesion-activa {
+    -fx-text-fill: #4b5563;
+}
+
+.app-root.light-theme .context-menu {
+    -fx-background-color: #ffffff;
+}
+
+.app-root.light-theme .context-menu .menu-item .label {
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .context-menu .menu-item:focused {
+    -fx-background-color: #bae6fd;
+}
+
+.app-root.light-theme .context-menu .menu-item:focused .label {
+    -fx-text-fill: #0c4a6e;
+}
+
+/* ---------- Gráficos adicionales ---------- */
+
+.grafico-errores .chart-bar.default-color0 {
+    -fx-bar-fill: #f97316;
+}
+
+.pie-resultados .default-color0.chart-pie {
+    -fx-pie-color: #22c55e;
+}
+
+.pie-resultados .default-color1.chart-pie {
+    -fx-pie-color: #f97316;
+}
+
+.pie-resultados .default-color2.chart-pie {
+    -fx-pie-color: #9ca3af;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #22d3ee;
+    -fx-stroke-width: 2.5px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #22d3ee, #0b1020;
+}
+
+.app-root.light-theme .default-color0.chart-line-symbol {
+    -fx-background-color: #0284c7, #ffffff;
+}
+
+.app-root.light-theme .default-color0.chart-series-line {
+    -fx-stroke: #0284c7;
+}
+
+/* ---------- Inicio de sesión con tema claro ---------- */
+
+.app-root.light-theme .login-card,
+.app-root.light-theme .login-card .content-tabs .tab-content-area,
+.app-root.light-theme .login-card .content-tabs .tab-content {
+    -fx-background-color: #ffffff;
+}
+
+/* ---------- Páginas con desplazamiento (Progreso) ---------- */
+
+.pagina-desplazable,
+.pagina-desplazable > .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.pagina-desplazable {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* La leyenda del gráfico circular se lee completa a la derecha. */
+.chart-legend {
+    -fx-padding: 8 12;
+}
+
+/* Pestañas en tema claro: texto oscuro también en la pestaña activa y al pasar el ratón. */
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: #e5e7eb;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: #cbd5e1;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent -ac-accent transparent;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: #475569;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:hover .tab-label,
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: #0f172a;
+}
+
+/* ---------- Estado vacío ---------- */
+
+.aviso-vacio {
+    -fx-padding: 14 16;
+    -fx-background-color: -ac-surface;
+    -fx-background-radius: 10;
+    -fx-border-color: -ac-accent;
+    -fx-border-width: 0 0 0 4;
+}
+
+.aviso-vacio-titulo {
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+.app-root.light-theme .aviso-vacio {
+    -fx-background-color: #eff6ff;
+}
+
+/* ---------- Casillas de verificación ---------- */
+
+.check-box {
+    -fx-text-fill: -ac-text;
+    -fx-padding: 4 0;
+    -fx-cursor: hand;
+}
+
+.check-box .box {
+    -fx-background-color: -ac-field;
+    -fx-background-radius: 4;
+    -fx-border-color: #3d4b78;
+    -fx-border-radius: 4;
+}
+
+.check-box:hover .box,
+.check-box:selected .box {
+    -fx-border-color: -ac-accent;
+}
+
+.check-box:selected {
+    -fx-mark-color: -ac-accent;
+}
+
+.app-root.light-theme .check-box {
+    -fx-text-fill: #1f2937;
+}
+
+.app-root.light-theme .check-box .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #9ca3af;
+}
+
+.app-root.light-theme .check-box:selected {
+    -fx-mark-color: #0284c7;
+}
+
+.app-root.light-theme .check-box:selected .box {
+    -fx-border-color: #0284c7;
 }

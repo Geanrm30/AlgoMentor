@@ -36,6 +36,67 @@ public class CuentaDAO {
         }
     }
 
+    public Optional<Cuenta> buscarPorPerfilId(Long perfilId) {
+        if (perfilId == null) {
+            return Optional.empty();
+        }
+        try (Session session = factory.openSession()) {
+            return session.createQuery("""
+                            SELECT c
+                            FROM Cuenta c
+                            JOIN FETCH c.perfil
+                            WHERE c.perfil.id = :perfilId
+                            """, Cuenta.class)
+                    .setParameter("perfilId", perfilId)
+                    .uniqueResultOptional();
+        }
+    }
+
+    /** @return true si se actualizó la cuenta de ese perfil. */
+    public boolean actualizarContrasenaHash(Long perfilId, String nuevoHash) {
+        try (Session session = factory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            try {
+                int filas = session.createMutationQuery("""
+                                UPDATE Cuenta c
+                                SET c.contrasenaHash = :hash
+                                WHERE c.perfil.id = :perfilId
+                                """)
+                        .setParameter("hash", nuevoHash)
+                        .setParameter("perfilId", perfilId)
+                        .executeUpdate();
+                transaction.commit();
+                return filas > 0;
+            } catch (RuntimeException e) {
+                if (transaction.isActive()) {
+                    try {
+                        transaction.rollback();
+                    } catch (RuntimeException rollbackError) {
+                        e.addSuppressed(rollbackError);
+                    }
+                }
+                throw e;
+            }
+        }
+    }
+
+    /** Consulta el rol en la base de datos en cada llamada: nada del cliente decide si alguien es administrador. */
+    public boolean tieneRol(Long perfilId, String rol) {
+        if (perfilId == null || rol == null) {
+            return false;
+        }
+        try (Session session = factory.openSession()) {
+            return session.createQuery("""
+                            SELECT COUNT(c)
+                            FROM Cuenta c
+                            WHERE c.perfil.id = :perfilId AND c.rol = :rol
+                            """, Long.class)
+                    .setParameter("perfilId", perfilId)
+                    .setParameter("rol", rol)
+                    .getSingleResult() > 0;
+        }
+    }
+
     public Perfil registrar(String usuario, String contrasenaHash) {
         try (Session session = factory.openSession()) {
             Transaction transaction = session.beginTransaction();
@@ -77,6 +138,7 @@ public class CuentaDAO {
                 cuenta.setUsuario(usuario);
                 cuenta.setContrasenaHash(contrasenaHash);
                 cuenta.setPerfil(perfil);
+                cuenta.setRol(Cuenta.ROL_USUARIO);
                 session.persist(cuenta);
 
                 transaction.commit();

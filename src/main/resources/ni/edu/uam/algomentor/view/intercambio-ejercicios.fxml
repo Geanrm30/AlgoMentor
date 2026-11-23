@@ -8,11 +8,11 @@
     <content>
         <VBox spacing="18" styleClass="tab-content">
             <VBox spacing="12" styleClass="card">
-                <Label text="Compartir ejercicios" styleClass="section-title" />
-                <Label text="Guarda tus ejercicios en un archivo para compartirlos o carga los que recibiste. Antes de cargarlos, crea en la biblioteca los algoritmos que utilizan." wrapText="true" />
+                <Label text="Exportar e importar ejercicios" styleClass="section-title" />
+                <Label text="Exporta tus ejercicios a un archivo para pasarlos a otro equipo, o importa los que recibiste. Cada ejercicio debe usar un algoritmo que ya esté en el catálogo de AlgoMentor." wrapText="true" />
                 <HBox spacing="10">
-                    <Button fx:id="btnExportar" text="Guardar archivo" onAction="#exportar" styleClass="primary-button" />
-                    <Button fx:id="btnImportar" text="Cargar archivo" onAction="#importar" />
+                    <Button fx:id="btnExportar" text="Exportar a archivo" onAction="#exportar" styleClass="primary-button" />
+                    <Button fx:id="btnImportar" text="Importar desde archivo" onAction="#importar" />
                 </HBox>
                 <Label fx:id="lblEstado" wrapText="true" />
             </VBox>

@@ -22,6 +22,10 @@ public final class SesionUsuario {
         return perfil;
     }
 
+    public static synchronized boolean haySesion() {
+        return perfil != null;
+    }
+
     public static synchronized void cerrar() {
         perfil = null;
     }

@@ -8,6 +8,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.Objects;
@@ -23,25 +25,45 @@ public class AutenticacionService {
     private static final Pattern FORMATO_USUARIO =
             Pattern.compile("[\\p{L}\\p{N}._-]{3,40}");
 
+    private static final int MAXIMO_FALLOS = 5;
+    private static final Duration DURACION_BLOQUEO = Duration.ofSeconds(30);
+    /** Compartido: el controlador crea un servicio nuevo en cada intento. */
+    private static final LimitadorIntentos LIMITADOR_GLOBAL =
+            new LimitadorIntentos(MAXIMO_FALLOS, DURACION_BLOQUEO);
+
     private final CuentaDAO cuentaDAO;
+    private final LimitadorIntentos limitador;
 
     public AutenticacionService() {
         this(new CuentaDAO());
     }
 
     public AutenticacionService(CuentaDAO cuentaDAO) {
+        this(cuentaDAO, LIMITADOR_GLOBAL);
+    }
+
+    AutenticacionService(CuentaDAO cuentaDAO, LimitadorIntentos limitador) {
         this.cuentaDAO = Objects.requireNonNull(cuentaDAO);
+        this.limitador = Objects.requireNonNull(limitador);
     }
 
     public Optional<Perfil> iniciarSesion(String usuario, char[] contrasena) {
         String usuarioNormalizado = validarUsuario(usuario);
         validarContrasena(contrasena);
+        long espera = limitador.segundosRestantes(usuarioNormalizado);
+        if (espera > 0) {
+            throw new IllegalArgumentException(
+                    "Demasiados intentos fallidos. Espera " + espera + " segundos e inténtalo de nuevo."
+            );
+        }
         Optional<Cuenta> cuenta = cuentaDAO.buscarPorUsuario(usuarioNormalizado);
 
         if (cuenta.isEmpty()
                 || !verificarContrasena(contrasena, cuenta.get().getContrasenaHash())) {
+            limitador.registrarFallo(usuarioNormalizado);
             return Optional.empty();
         }
+        limitador.registrarExito(usuarioNormalizado);
         return Optional.of(cuenta.get().getPerfil());
     }
 
@@ -49,6 +71,40 @@ public class AutenticacionService {
         String usuarioNormalizado = validarUsuario(usuario);
         validarContrasena(contrasena);
         return cuentaDAO.registrar(usuarioNormalizado, hashContrasena(contrasena));
+    }
+
+    /**
+     * Cambia la contraseña de la cuenta del perfil autenticado. Pide la actual (con el mismo límite de
+     * intentos fallidos que el inicio de sesión) y guarda la nueva con un hash y una sal nuevos.
+     *
+     * @throws IllegalArgumentException si la actual no coincide, la nueva no es válida o es igual a la actual.
+     */
+    public void cambiarContrasena(Long perfilId, char[] actual, char[] nueva) {
+        validarNuevaContrasena(actual, nueva);
+        Cuenta cuenta = cuentaDAO.buscarPorPerfilId(perfilId).orElseThrow(() ->
+                new IllegalArgumentException("Tu perfil no tiene una cuenta con contraseña."));
+        String clave = "cambio:" + cuenta.getUsuario();
+        long espera = limitador.segundosRestantes(clave);
+        if (espera > 0) {
+            throw new IllegalArgumentException(
+                    "Demasiados intentos fallidos. Espera " + espera + " segundos e inténtalo de nuevo."
+            );
+        }
+        if (!verificarContrasena(actual, cuenta.getContrasenaHash())) {
+            limitador.registrarFallo(clave);
+            throw new IllegalArgumentException("La contraseña actual no es correcta.");
+        }
+        limitador.registrarExito(clave);
+        if (!cuentaDAO.actualizarContrasenaHash(perfilId, hashContrasena(nueva))) {
+            throw new IllegalStateException("No se pudo actualizar la contraseña.");
+        }
+    }
+
+    static void validarNuevaContrasena(char[] actual, char[] nueva) {
+        validarContrasena(nueva);
+        if (actual != null && Arrays.equals(actual, nueva)) {
+            throw new IllegalArgumentException("La nueva contraseña debe ser distinta de la actual.");
+        }
     }
 
     public static String validarUsuario(String usuario) {

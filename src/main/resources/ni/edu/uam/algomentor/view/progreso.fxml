@@ -3,27 +3,95 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
+<ScrollPane fx:id="raiz" fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="pagina-desplazable" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
+    <content>
+    <VBox spacing="16" styleClass="tab-content">
     <Label text="Progreso de aprendizaje" styleClass="section-title" />
     <HBox spacing="10">
         <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnVolver" text="Volver al resumen" onAction="#volver" visible="false" managed="false" />
         <Button text="Actualizar" onAction="#verProgreso" styleClass="primary-button" />
         <Button fx:id="btnVistaPrevia" text="Vista previa" onAction="#previsualizarReporte" />
-        <Button text="Exportar" onAction="#generarReporte" />
+        <Button text="Exportar PDF" onAction="#generarReporte" />
+        <Button text="Exportar CSV" onAction="#exportarHistorialCsv" />
     </HBox>
+    <FlowPane hgap="12" vgap="12">
+        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
+            <Label text="Intentos" styleClass="summary-label" />
+            <Label fx:id="lblIntentos" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
+            <Label text="Correctos" styleClass="summary-label" />
+            <Label fx:id="lblCorrectos" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
+            <Label text="Incorrectos" styleClass="summary-label" />
+            <Label fx:id="lblIncorrectos" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
+            <Label text="Acierto" styleClass="summary-label" />
+            <Label fx:id="lblPorcentajeGeneral" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
+            <Label text="Racha de aciertos" styleClass="summary-label" />
+            <Label fx:id="lblRacha" text="—" styleClass="summary-value" />
+        </VBox>
+        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
+            <Label text="Tiempo promedio" styleClass="summary-label" />
+            <Label fx:id="lblTiempoPromedio" text="—" styleClass="summary-value" />
+        </VBox>
+    </FlowPane>
+    <VBox fx:id="panelVacio" spacing="4" styleClass="aviso-vacio" visible="false" managed="false">
+        <Label text="Aún no hay actividad" styleClass="aviso-vacio-titulo" />
+        <Label fx:id="lblBienvenida" wrapText="true" />
+    </VBox>
     <Label fx:id="lblResumen" text="Cargando progreso…" wrapText="true" />
-    <TabPane VBox.vgrow="ALWAYS" styleClass="content-tabs">
+    <TabPane VBox.vgrow="ALWAYS" minHeight="460" styleClass="content-tabs">
         <tabs>
-            <Tab text="Gráfico" closable="false">
+            <Tab text="Gráficos" closable="false">
                 <content>
-                    <BarChart fx:id="graficoHabilidades" animated="false" legendVisible="true">
-                        <xAxis>
-                            <CategoryAxis fx:id="axisHabilidad" label="Habilidad" tickLabelRotation="-25" />
-                        </xAxis>
-                        <yAxis>
-                            <NumberAxis fx:id="axisCantidad" label="Evaluaciones" forceZeroInRange="true" />
-                        </yAxis>
-                    </BarChart>
+                    <VBox spacing="10" styleClass="tab-content">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Gráfico:" />
+                            <ComboBox fx:id="cmbGrafico" prefWidth="340" />
+                        </HBox>
+                        <Label fx:id="lblAyudaGrafico" wrapText="true" styleClass="subtitle" />
+                        <StackPane VBox.vgrow="ALWAYS" minHeight="340">
+                            <BarChart fx:id="graficoHabilidades" animated="false" legendVisible="true">
+                                <xAxis>
+                                    <CategoryAxis fx:id="axisHabilidad" label="Habilidad" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="axisCantidad" label="Evaluaciones" forceZeroInRange="true" />
+                                </yAxis>
+                            </BarChart>
+                            <StackedBarChart fx:id="graficoAlgoritmos" animated="false" legendVisible="true" visible="false" managed="false">
+                                <xAxis>
+                                    <NumberAxis fx:id="axisIntentosAlgoritmo" label="Intentos" forceZeroInRange="true" minorTickCount="0" />
+                                </xAxis>
+                                <yAxis>
+                                    <CategoryAxis fx:id="axisAlgoritmo" />
+                                </yAxis>
+                            </StackedBarChart>
+                            <BarChart fx:id="graficoErrores" styleClass="grafico-errores" animated="false" legendVisible="false" visible="false" managed="false">
+                                <xAxis>
+                                    <CategoryAxis fx:id="axisTipoError" label="Tipo de error" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="axisCantidadErrores" label="Errores" forceZeroInRange="true" />
+                                </yAxis>
+                            </BarChart>
+                            <LineChart fx:id="graficoEvolucion" animated="false" legendVisible="false" createSymbols="true" visible="false" managed="false">
+                                <xAxis>
+                                    <NumberAxis fx:id="axisIntento" label="Intentos calificados (del más antiguo al más reciente)" forceZeroInRange="false" minorTickCount="0" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="axisAcierto" label="Acierto acumulado (%)" autoRanging="false" lowerBound="0" upperBound="100" tickUnit="25" />
+                                </yAxis>
+                            </LineChart>
+                            <PieChart fx:id="graficoResultados" styleClass="pie-resultados" animated="false" labelsVisible="false" legendVisible="true" legendSide="RIGHT" visible="false" managed="false" />
+                        </StackPane>
+                    </VBox>
                 </content>
             </Tab>
             <Tab text="Detalle" closable="false">
@@ -38,6 +106,34 @@
                     </TableView>
                 </content>
             </Tab>
+            <Tab text="Por algoritmo" closable="false">
+                <content>
+                    <TableView fx:id="tablaRendimiento">
+                        <columns>
+                            <TableColumn fx:id="colRendAlgoritmo" text="Algoritmo" prefWidth="200" />
+                            <TableColumn fx:id="colRendIntentos" text="Intentos" prefWidth="100" />
+                            <TableColumn fx:id="colRendCorrectos" text="Correctos" prefWidth="110" />
+                            <TableColumn fx:id="colRendIncorrectos" text="Incorrectos" prefWidth="110" />
+                            <TableColumn fx:id="colRendPorcentaje" text="Acierto %" prefWidth="240" />
+                        </columns>
+                    </TableView>
+                </content>
+            </Tab>
+            <Tab text="Historial" closable="false">
+                <content>
+                    <TableView fx:id="tablaHistorial">
+                        <columns>
+                            <TableColumn fx:id="colHistFecha" text="Fecha" prefWidth="160" />
+                            <TableColumn fx:id="colHistAlgoritmo" text="Algoritmo" prefWidth="190" />
+                            <TableColumn fx:id="colHistModo" text="Modo" prefWidth="110" />
+                            <TableColumn fx:id="colHistResultado" text="Resultado" prefWidth="120" />
+                            <TableColumn fx:id="colHistDuracion" text="Duración" prefWidth="100" />
+                        </columns>
+                    </TableView>
+                </content>
+            </Tab>
         </tabs>
     </TabPane>
-</VBox>
+    </VBox>
+    </content>
+</ScrollPane>

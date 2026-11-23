@@ -39,4 +39,15 @@ class AutenticacionServiceTest {
         assertDoesNotThrow(() ->
                 AutenticacionService.validarContrasena("ClaveSegura123".toCharArray()));
     }
+
+    @Test
+    void laNuevaContrasenaDebeSerValidaYDistintaDeLaActual() {
+        char[] actual = "ClaveSegura123".toCharArray();
+        assertDoesNotThrow(() ->
+                AutenticacionService.validarNuevaContrasena(actual, "OtraClave456".toCharArray()));
+        assertThrows(IllegalArgumentException.class,
+                () -> AutenticacionService.validarNuevaContrasena(actual, "ClaveSegura123".toCharArray()));
+        assertThrows(IllegalArgumentException.class,
+                () -> AutenticacionService.validarNuevaContrasena(actual, "corta".toCharArray()));
+    }
 }

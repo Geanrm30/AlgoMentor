@@ -9,3 +9,7 @@ CREATE TABLE IF NOT EXISTS cuenta (
     perfil_id       BIGINT       NOT NULL UNIQUE
                     REFERENCES perfil (id) ON DELETE CASCADE
 );
+
+-- Rol de la cuenta. Todas las cuentas existentes quedan como USUARIO; para
+-- nombrar administradores se usa promover-administrador.sql.
+ALTER TABLE cuenta ADD COLUMN IF NOT EXISTS rol VARCHAR(20) NOT NULL DEFAULT 'USUARIO';
