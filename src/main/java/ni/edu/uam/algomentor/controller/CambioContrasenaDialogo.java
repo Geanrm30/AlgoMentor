@@ -6,12 +6,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import ni.edu.uam.algomentor.service.AutenticacionService;
+import ni.edu.uam.algomentor.util.MostrarContrasena;
 import ni.edu.uam.algomentor.util.Tema;
 
 import java.util.Arrays;
@@ -42,7 +44,9 @@ public final class CambioContrasenaDialogo {
         confirmar.setPromptText("Confirmar la nueva contraseña");
         Label estado = new Label("Elige una contraseña que no uses en otros sitios.");
         estado.setWrapText(true);
-        VBox contenido = new VBox(10, actual, nueva, confirmar, estado);
+        CheckBox mostrar = new CheckBox("Mostrar contraseñas");
+        VBox contenido = new VBox(10, actual, nueva, confirmar, mostrar, estado);
+        MostrarContrasena.vincular(mostrar, actual, nueva, confirmar);
         contenido.getStyleClass().add("tab-content");
         contenido.setPrefWidth(360);
         dialogo.getDialogPane().setContent(contenido);

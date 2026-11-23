@@ -16,6 +16,7 @@
                         <VBox spacing="12" styleClass="tab-content">
                             <TextField fx:id="txtUsuario" promptText="Usuario" />
                             <PasswordField fx:id="txtContrasena" promptText="Contraseña" onAction="#iniciarSesion" />
+                            <CheckBox fx:id="chkMostrarContrasena" text="Mostrar contraseña" />
                             <CheckBox fx:id="chkRecordarUsuario" text="Recordar mi usuario en este equipo" />
                             <Button fx:id="btnIniciarSesion" text="Entrar" onAction="#iniciarSesion" styleClass="primary-button" maxWidth="Infinity" />
                         </VBox>
@@ -27,6 +28,7 @@
                             <TextField fx:id="txtNuevoUsuario" promptText="Usuario (3 a 40 caracteres)" />
                             <PasswordField fx:id="txtNuevaContrasena" promptText="Contraseña (mínimo 8 caracteres)" />
                             <PasswordField fx:id="txtConfirmarContrasena" promptText="Confirmar contraseña" onAction="#registrar" />
+                            <CheckBox fx:id="chkMostrarNuevaContrasena" text="Mostrar contraseñas" />
                             <Button fx:id="btnRegistrar" text="Crear cuenta" onAction="#registrar" styleClass="primary-button" maxWidth="Infinity" />
                         </VBox>
                     </content>

@@ -44,6 +44,12 @@ public class ResumenAdministracionService {
                 clasificar(new EstadisticasDAO().listarResumenesPerfiles()));
     }
 
+    /** Perfiles disponibles para elegir de quién se quiere el informe; solo para administradores. */
+    public List<Perfil> listarPerfiles(Long perfilSolicitante) {
+        autorizacion.exigirAdministrador(perfilSolicitante);
+        return new BaseDAO<>(Perfil.class).listar();
+    }
+
     private static double acierto(EstadisticasDAO.ResumenIntentos r) {
         long calificados = r.correctos() + r.incorrectos();
         return calificados == 0 ? 0.0 : r.correctos() * 100.0 / calificados;

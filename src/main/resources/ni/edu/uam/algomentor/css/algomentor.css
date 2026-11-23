@@ -965,3 +965,44 @@
 .app-root.light-theme .aviso-vacio {
     -fx-background-color: #eff6ff;
 }
+
+/* ---------- Casillas de verificación ---------- */
+
+.check-box {
+    -fx-text-fill: -ac-text;
+    -fx-padding: 4 0;
+    -fx-cursor: hand;
+}
+
+.check-box .box {
+    -fx-background-color: -ac-field;
+    -fx-background-radius: 4;
+    -fx-border-color: #3d4b78;
+    -fx-border-radius: 4;
+}
+
+.check-box:hover .box,
+.check-box:selected .box {
+    -fx-border-color: -ac-accent;
+}
+
+.check-box:selected {
+    -fx-mark-color: -ac-accent;
+}
+
+.app-root.light-theme .check-box {
+    -fx-text-fill: #1f2937;
+}
+
+.app-root.light-theme .check-box .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #9ca3af;
+}
+
+.app-root.light-theme .check-box:selected {
+    -fx-mark-color: #0284c7;
+}
+
+.app-root.light-theme .check-box:selected .box {
+    -fx-border-color: #0284c7;
+}

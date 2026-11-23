@@ -3,7 +3,7 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="pagina-desplazable" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
+<ScrollPane fx:id="raiz" fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="pagina-desplazable" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
     <content>
     <VBox spacing="16" styleClass="tab-content">
     <Label text="Progreso de aprendizaje" styleClass="section-title" />

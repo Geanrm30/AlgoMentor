@@ -123,9 +123,12 @@ Para promover una cuenta, edita el usuario en
 con el Resumen general (todos los perfiles y ejercicios); el servicio que entrega esos datos vuelve a
 comprobar el rol en la base de datos, así que ocultar el menú no es la única protección.
 
-En el Resumen general, la pestaña **Perfiles** permite elegir un perfil y usar **Ver progreso** (abre
+![Resumen general de administración con la pestaña Perfiles](docs/capturas/resumen-administracion.png)
+
+En el Resumen general, la pestaña **Perfiles** permite elegir un perfil (también con clic derecho) y usar **Ver progreso** (abre
 el progreso de esa persona, con un botón para volver) o **Exportar informe** (PDF de ese perfil). La
 pestaña **Ranking** ordena a todos los perfiles por intentos correctos y luego por porcentaje de acierto.
+**Archivo > Exportar informe de progreso** también deja a un administrador elegir de qué perfil quiere el PDF.
 Un usuario normal solo puede ver y exportar su propio progreso: `AutorizacionService.exigirAccesoAPerfil`
 se comprueba en cada consulta y en cada informe.
 
@@ -147,7 +150,7 @@ Abre la carpeta en IntelliJ IDEA como proyecto Maven con JDK 21, o desde una ter
 La aplicación inicia en la pantalla de acceso. Crea una cuenta con un usuario de 3 a 40
 caracteres y una contraseña de 8 a 128 caracteres, o inicia sesión. Cada cuenta queda
 vinculada a un perfil; al registrar el nombre de un perfil previo se conserva su progreso.
-Las contraseñas se almacenan con PBKDF2 y no en texto plano; la pantalla de acceso puede recordar solo tu nombre de usuario (nunca la contraseña) y **Archivo > Cambiar contraseña** pide la actual antes de guardar la nueva. Usa **Archivo > Cerrar sesión** para salir. La gestión de contenido permite crear, consultar, actualizar y
+Las contraseñas se almacenan con PBKDF2 y no en texto plano; la pantalla de acceso puede recordar solo tu nombre de usuario (nunca la contraseña) y **Archivo > Cambiar contraseña** pide la actual antes de guardar la nueva. Los campos de contraseña tienen una casilla **Mostrar contraseña** para revisar lo que escribes. Usa **Archivo > Cerrar sesión** para salir. La gestión de contenido permite crear, consultar, actualizar y
 eliminar algoritmos y ejercicios. El **Resumen general** (menú **Administración**) es solo para administradores: incluye un selector de gráficos (ejercicios por algoritmo, por dificultad y por origen) y muestra los totales y listados de
 algoritmos, ejercicios y perfiles, además del total de intentos.
 Si la conexión a PostgreSQL falla, la aplicación muestra el problema en la barra inferior y registra
@@ -172,13 +175,24 @@ Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a 
 
 | Menú | Opciones |
 |---|---|
-| **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF), Cambiar contraseña, Cerrar sesión y Salir. |
+| **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF; un administrador elige primero el perfil), Cambiar contraseña, Cerrar sesión y Salir. |
 | **Inicio** | Mi progreso. |
 | **Administración** | Resumen general. Solo aparece para cuentas administradoras. |
 | **Aprender** | Simular, Práctica y Comandos. |
 | **Herramientas** | Comparar algoritmos, Comprobar sistema (math.js) y Biblioteca de contenido. |
 | **Ver** | Tema claro u oscuro. |
 | **Ayuda** | Acerca de AlgoMentor. |
+
+**Clic derecho:** además del menú, casi todas las pantallas tienen un menú contextual.
+
+| Dónde | Opciones |
+|---|---|
+| Zona libre de cualquier sección | Ir a Mi progreso, Resumen general (admin), Simular, Práctica o Comparar; exportar informe; cambiar tema; pantalla completa. |
+| Resumen: Perfiles y Ranking (admin) | Ver progreso, Exportar informe PDF y Copiar fila. |
+| Resumen: Algoritmos y Ejercicios | Copiar fila (separada por tabuladores, lista para pegar en Excel). |
+| Progreso (página) | Actualizar, Vista previa, Exportar PDF y Exportar CSV. |
+| Progreso: tablas | Copiar fila; en Historial, también Exportar CSV. |
+| Biblioteca: ejercicios y algoritmos | Eliminar ejercicio, Limpiar selección y Copiar fila. |
 
 Atajos de teclado (en macOS, `Cmd` en lugar de `Ctrl`):
 

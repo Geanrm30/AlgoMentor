@@ -44,4 +44,11 @@ class AutorizacionServiceTest {
         assertThrows(SecurityException.class, () -> soloPerfilUno.exigirAccesoAPerfil(null, 1L));
         assertThrows(SecurityException.class, () -> soloPerfilUno.exigirAccesoAPerfil(1L, null));
     }
+
+    @Test
+    void laListaDePerfilesParaElegirInformeSeNiegaAUnUsuarioNormal() {
+        ResumenAdministracionService servicio =
+                new ResumenAdministracionService(new AutorizacionService(id -> false));
+        assertThrows(SecurityException.class, () -> servicio.listarPerfiles(2L));
+    }
 }

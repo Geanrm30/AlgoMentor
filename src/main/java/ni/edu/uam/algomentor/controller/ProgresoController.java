@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -36,6 +37,7 @@ import ni.edu.uam.algomentor.service.ReporteProgresoService;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.CsvHistorial;
+import ni.edu.uam.algomentor.util.MenuContextual;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.Tema;
 import ni.edu.uam.algomentor.util.TextoInterfaz;
@@ -83,6 +85,7 @@ public class ProgresoController implements Actualizable {
     /** Solo se muestra la última consulta; evita que una respuesta lenta pise a otra más reciente. */
     private int ultimaSolicitud;
 
+    @FXML private ScrollPane raiz;
     @FXML private Label lblResumen;
     @FXML private Label lblPerfilActual;
     @FXML private Button btnVolver;
@@ -145,6 +148,7 @@ public class ProgresoController implements Actualizable {
         axisCantidad.setForceZeroInRange(true);
         graficoHabilidades.setCategoryGap(24);
         graficoHabilidades.setBarGap(6);
+        configurarMenusContextuales();
         configurarSelectorDeGraficos();
         configurarTablaRendimiento();
         configurarTablaHistorial();
@@ -206,6 +210,20 @@ public class ProgresoController implements Actualizable {
                 c.getValue().duracionSegundos() == null ? "—" : c.getValue().duracionSegundos() + " s"));
         tablaHistorial.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         tablaHistorial.setPlaceholder(new Label("Todavía no hay intentos registrados."));
+    }
+
+    /** Clic derecho: en cualquier parte de la página y, con acciones propias, en las tablas. */
+    private void configurarMenusContextuales() {
+        javafx.scene.control.ContextMenu pagina = new javafx.scene.control.ContextMenu(
+                MenuContextual.accion("Actualizar", this::verProgreso),
+                MenuContextual.accion("Vista previa del informe", this::previsualizarReporte),
+                MenuContextual.accion("Exportar informe PDF…", this::generarReporte),
+                MenuContextual.accion("Exportar historial CSV…", this::exportarHistorialCsv));
+        raiz.setContextMenu(pagina);
+        MenuContextual.instalar(tablaHistorial,
+                MenuContextual.accion("Exportar historial CSV…", this::exportarHistorialCsv));
+        MenuContextual.instalar(tabla);
+        MenuContextual.instalar(tablaRendimiento);
     }
 
     private Perfil perfilActivo() {

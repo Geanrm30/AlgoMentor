@@ -9,6 +9,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.AutenticacionService;
+import ni.edu.uam.algomentor.util.MostrarContrasena;
 import ni.edu.uam.algomentor.util.UsuarioRecordado;
 
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public class LoginController {
     @FXML private PasswordField txtConfirmarContrasena;
     @FXML private Label lblEstado;
     @FXML private CheckBox chkRecordarUsuario;
+    @FXML private CheckBox chkMostrarContrasena;
+    @FXML private CheckBox chkMostrarNuevaContrasena;
     @FXML private Button btnIniciarSesion;
     @FXML private Button btnRegistrar;
 
@@ -36,6 +39,8 @@ public class LoginController {
 
     @FXML
     private void initialize() {
+        MostrarContrasena.vincular(chkMostrarContrasena, txtContrasena);
+        MostrarContrasena.vincular(chkMostrarNuevaContrasena, txtNuevaContrasena, txtConfirmarContrasena);
         usuarioRecordado.leer().ifPresent(usuario -> {
             txtUsuario.setText(usuario);
             chkRecordarUsuario.setSelected(true);

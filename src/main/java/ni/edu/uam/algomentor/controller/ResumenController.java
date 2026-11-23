@@ -20,6 +20,7 @@ import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.ResumenAdministracionService;
 import ni.edu.uam.algomentor.util.Actualizable;
+import ni.edu.uam.algomentor.util.MenuContextual;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.TextoInterfaz;
 
@@ -47,6 +48,7 @@ public class ResumenController implements Actualizable {
     private int huellaMostrada;
     private boolean hayDatosMostrados;
     private boolean cargando;
+    private List<Perfil> perfilesCargados = List.of();
     private Consumer<Perfil> alVerProgreso = perfil -> { };
     private Consumer<Perfil> alExportarInforme = perfil -> { };
 
@@ -96,6 +98,28 @@ public class ResumenController implements Actualizable {
         alExportarInforme = accion == null ? perfil -> { } : accion;
     }
 
+    /** Clic derecho: acciones sobre el perfil elegido y copiar la fila. */
+    private void configurarMenusContextuales() {
+        MenuContextual.instalar(tablaPerfiles,
+                MenuContextual.sobreSeleccion(tablaPerfiles, "Ver progreso", this::verProgresoPerfil),
+                MenuContextual.sobreSeleccion(tablaPerfiles, "Exportar informe PDF…", this::exportarInformePerfil));
+        MenuContextual.instalar(tablaRanking,
+                MenuContextual.sobreSeleccion(tablaRanking, "Ver progreso",
+                        () -> perfilDelRanking().ifPresent(alVerProgreso)),
+                MenuContextual.sobreSeleccion(tablaRanking, "Exportar informe PDF…",
+                        () -> perfilDelRanking().ifPresent(alExportarInforme)));
+        MenuContextual.instalar(tablaAlgoritmos);
+        MenuContextual.instalar(tablaEjercicios);
+    }
+
+    private java.util.Optional<Perfil> perfilDelRanking() {
+        ResumenAdministracionService.PuestoRanking puesto = tablaRanking.getSelectionModel().getSelectedItem();
+        if (puesto == null) {
+            return java.util.Optional.empty();
+        }
+        return perfilesCargados.stream().filter(p -> p.getId().equals(puesto.perfilId())).findFirst();
+    }
+
     @FXML
     private void verProgresoPerfil() {
         Perfil elegido = tablaPerfiles.getSelectionModel().getSelectedItem();
@@ -118,6 +142,7 @@ public class ResumenController implements Actualizable {
                 tablaPerfiles.getSelectionModel().selectedItemProperty().isNull());
         btnExportarPerfil.disableProperty().bind(
                 tablaPerfiles.getSelectionModel().selectedItemProperty().isNull());
+        configurarMenusContextuales();
         colRankPuesto.setCellValueFactory(c -> texto(c.getValue().puesto()));
         colRankPerfil.setCellValueFactory(c -> texto(c.getValue().nombre()));
         colRankIntentos.setCellValueFactory(c -> texto(c.getValue().intentos()));
@@ -221,6 +246,7 @@ public class ResumenController implements Actualizable {
                         perfiles.stream().filter(p -> p.getId().equals(seleccionado.getId())).findFirst()
                                 .ifPresent(p -> tablaPerfiles.getSelectionModel().select(p));
                     }
+                    perfilesCargados = perfiles;
                     tablaRanking.setItems(FXCollections.observableArrayList(ranking));
                     lblCantidadAlgoritmos.setText(Integer.toString(algoritmos.size()));
                     lblCantidadEjercicios.setText(Integer.toString(ejercicios.size()));

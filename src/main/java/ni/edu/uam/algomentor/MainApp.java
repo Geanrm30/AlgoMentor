@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -26,6 +27,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import ni.edu.uam.algomentor.api.EjerciciosApiServer;
 import ni.edu.uam.algomentor.controller.CambioContrasenaDialogo;
+import ni.edu.uam.algomentor.controller.ElegirPerfilDialogo;
 import ni.edu.uam.algomentor.controller.IntercambioEjerciciosController;
 import ni.edu.uam.algomentor.controller.LoginController;
 import ni.edu.uam.algomentor.controller.ProgresoController;
@@ -33,6 +35,7 @@ import ni.edu.uam.algomentor.controller.ResumenController;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.AutorizacionService;
 import ni.edu.uam.algomentor.service.CatalogoPersistidoService;
+import ni.edu.uam.algomentor.service.ResumenAdministracionService;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.HibernateUtil;
@@ -42,6 +45,7 @@ import ni.edu.uam.algomentor.util.Tema;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +62,9 @@ public class MainApp extends Application {
     private final Map<String, Vista> vistas = new HashMap<>();
     private String vistaActual;
     private Timeline actualizacionAutomatica;
+    private boolean administrador;
+    private CheckMenuItem itemTema;
+    private ContextMenu menuContextual;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -119,9 +126,10 @@ public class MainApp extends Application {
         if (temaClaro) {
             raiz.getStyleClass().add("light-theme");
         }
-        boolean administrador = esAdministrador(perfil);
+        administrador = esAdministrador(perfil);
         raiz.setTop(crearBarraSuperior(perfil, raiz, administrador));
         raiz.setCenter(contenido);
+        instalarMenuContextual();
 
         stage.getScene().setRoot(raiz);
         Animaciones.instalarEfectosBoton(stage.getScene());
@@ -138,13 +146,66 @@ public class MainApp extends Application {
         ResumenController resumen = mostrar("resumen", "resumen.fxml", true);
         if (resumen != null) {
             resumen.setAlVerProgreso(this::verProgresoDe);
-            resumen.setAlExportarInforme(perfil -> {
-                ProgresoController progreso = verProgresoDe(perfil);
-                if (progreso != null) {
-                    Platform.runLater(progreso::exportarInforme);
-                }
-            });
+            resumen.setAlExportarInforme(this::exportarInformeDe);
         }
+    }
+
+    private void exportarInformeDe(Perfil perfil) {
+        ProgresoController progreso = verProgresoDe(perfil);
+        if (progreso != null) {
+            Platform.runLater(progreso::exportarInforme);
+        }
+    }
+
+    /** Un usuario exporta su propio informe; un administrador elige primero de qué perfil. */
+    private void exportarInformeConEleccion() {
+        Perfil propio = SesionUsuario.obtenerPerfil();
+        if (!administrador) {
+            exportarInformeDe(propio);
+            return;
+        }
+        Thread hilo = new Thread(() -> {
+            try {
+                List<Perfil> perfiles = new ResumenAdministracionService().listarPerfiles(propio.getId());
+                Platform.runLater(() -> ElegirPerfilDialogo.mostrar(stage, perfiles, propio)
+                        .ifPresent(this::exportarInformeDe));
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "No se pudo listar los perfiles", e);
+                Platform.runLater(() -> new Alert(Alert.AlertType.ERROR,
+                        "No se pudo cargar la lista de perfiles. Revisa PostgreSQL.").showAndWait());
+            }
+        }, "algomentor-lista-perfiles");
+        hilo.setDaemon(true);
+        hilo.start();
+    }
+
+    /** Clic derecho en cualquier zona libre: salto rápido a las secciones y a las opciones de vista. */
+    private void instalarMenuContextual() {
+        contenido.setOnContextMenuRequested(evento -> {
+            if (menuContextual != null) {
+                menuContextual.hide();
+            }
+            menuContextual = new ContextMenu();
+            menuContextual.getItems().add(elemento("Mi progreso", () -> mostrar("progreso", "progreso.fxml", true)));
+            if (administrador) {
+                menuContextual.getItems().add(elemento("Resumen general", this::mostrarResumenGeneral));
+            }
+            menuContextual.getItems().addAll(
+                    elemento("Simular", () -> mostrar("simulador", "simulador.fxml", false)),
+                    elemento("Práctica", () -> mostrar("practica", "practica.fxml", true)),
+                    elemento("Comparar algoritmos", () -> mostrar("comparador", "comparador.fxml", false)),
+                    new SeparatorMenuItem(),
+                    elemento("Exportar informe de progreso (PDF)…", this::exportarInformeConEleccion),
+                    elemento("Cambiar tema", () -> {
+                        if (itemTema != null) {
+                            itemTema.setSelected(!itemTema.isSelected());
+                            itemTema.fire();
+                        }
+                    }),
+                    elemento("Pantalla completa", () -> stage.setFullScreen(!stage.isFullScreen())));
+            menuContextual.show(contenido, evento.getScreenX(), evento.getScreenY());
+            evento.consume();
+        });
     }
 
     /** Vista de administrador: el controlador y el servicio comprueban el rol antes de mostrar nada. */
@@ -230,12 +291,8 @@ public class MainApp extends Application {
                 Platform.runLater(c::importarEjercicios);
             }
         });
-        MenuItem exportarInforme = elemento("Exportar informe de progreso (PDF)…", "Shortcut+E", () -> {
-            ProgresoController c = mostrar("progreso", "progreso.fxml", true);
-            if (c != null) {
-                Platform.runLater(c::exportarInforme);
-            }
-        });
+        MenuItem exportarInforme = elemento("Exportar informe de progreso (PDF)…", "Shortcut+E",
+                this::exportarInformeConEleccion);
         MenuItem cambiarContrasena = elemento("Cambiar contraseña…", "Shortcut+Shift+P", () ->
                 CambioContrasenaDialogo.mostrar(stage, SesionUsuario.obtenerPerfil().getId()));
         MenuItem cerrarSesion = elemento("Cerrar sesión", "Shortcut+Shift+L", this::cerrarSesion);
@@ -274,6 +331,7 @@ public class MainApp extends Application {
 
     private Menu crearMenuVer(BorderPane raiz) {
         CheckMenuItem tema = new CheckMenuItem("Tema claro");
+        itemTema = tema;
         tema.setSelected(temaClaro);
         tema.setAccelerator(KeyCombination.keyCombination("Shortcut+T"));
         tema.setOnAction(event -> {
