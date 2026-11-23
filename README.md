@@ -132,6 +132,10 @@ pestaña **Ranking** ordena a todos los perfiles por intentos correctos y luego 
 Un usuario normal solo puede ver y exportar su propio progreso: `AutorizacionService.exigirAccesoAPerfil`
 se comprueba en cada consulta y en cada informe.
 
+![Resumen general: selector de gráficos](docs/capturas/resumen-graficos.png)
+
+![Resumen general: ranking de perfiles](docs/capturas/ranking.png)
+
 **Instalaciones existentes:** al abrir la aplicación se agregan los algoritmos faltantes a la base.
 También puedes ejecutar manualmente el script
 [`actualizar-nuevos-algoritmos.sql`](src/main/resources/ni/edu/uam/algomentor/db/actualizar-nuevos-algoritmos.sql).
@@ -155,6 +159,12 @@ eliminar algoritmos y ejercicios. El **Resumen general** (menú **Administració
 algoritmos, ejercicios y perfiles, además del total de intentos.
 Si la conexión a PostgreSQL falla, la aplicación muestra el problema en la barra inferior y registra
 el detalle técnico en consola.
+
+![Inicio de sesión en tema oscuro](docs/capturas/login-oscuro.png)
+
+![Inicio de sesión en tema claro, con las casillas de usuario recordado y mostrar contraseña](docs/capturas/login-claro.png)
+
+![Cambiar contraseña](docs/capturas/cambiar-contrasena.png)
 
 ### Dependencias
 
@@ -193,6 +203,8 @@ Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a 
 | Progreso (página) | Actualizar, Vista previa, Exportar PDF y Exportar CSV. |
 | Progreso: tablas | Copiar fila; en Historial, también Exportar CSV. |
 | Biblioteca: ejercicios y algoritmos | Eliminar ejercicio, Limpiar selección y Copiar fila. |
+
+![Menú contextual con clic derecho](docs/capturas/menu-contextual.png)
 
 Atajos de teclado (en macOS, `Cmd` en lugar de `Ctrl`):
 
@@ -265,7 +277,9 @@ incorrectos. Los errores matriciales identifican la fila y columna correspondien
 los errores se asocian a Signos, Fracciones, Aritmetica o Procedimiento. Los pasos correctos de práctica
 cuentan en Procedimiento. `RegistroPracticaService` conecta la evaluación con `IntentoService`.
 
-<!-- Pendiente: captura real de Práctica con PostgreSQL configurado. -->
+![Práctica: ejercicio guardado y respuesta del estudiante](docs/capturas/practica.png)
+
+![Práctica: corrección con el error detectado](docs/capturas/practica-error.png)
 
 ### 3.3 Terminal y Comparar
 
@@ -337,7 +351,13 @@ tabla muestra una fila que lo indica en lugar de desaparecer.
 JasperReports compila la plantilla JRXML al generar el informe y obtiene los datos mediante HQL;
 no necesita consultar una API externa.
 
-<!-- Pendiente: capturas reales de Progreso y del PDF de JasperReports con PostgreSQL configurado. -->
+![Progreso con el selector de gráficos](docs/capturas/progreso-graficos.png)
+
+![Progreso: historial de intentos](docs/capturas/progreso-historial.png)
+
+![Informe PDF generado con JasperReports](docs/capturas/informe-pdf.png)
+
+![Vista previa del informe en el visor](docs/capturas/vista-previa-informe.png)
 
 ### 3.5 Exportar e importar ejercicios (API local)
 
@@ -371,7 +391,10 @@ Se procesa en una sola transacción: si algún dato es inválido, no se guarda e
 idénticos se omiten. Para pasar ejercicios a otro equipo se envía el archivo exportado (**Archivo > Exportar ejercicios**) y se importa desde
 la instalación receptora (**Archivo > Importar ejercicios**); el servidor no se expone a la red.
 
-<!-- Pendiente: captura real de Exportar e importar ejercicios con PostgreSQL configurado. -->
+![Exportar e importar ejercicios](docs/capturas/exportar-importar.png)
+
+<!-- CAPTURA: Importación desde Postman
+![Importación desde Postman](docs/capturas/postman-importar.png) -->
 
 ### 3.6 Verificar sistema API
 
@@ -393,7 +416,7 @@ Requiere Internet. Si la API falla, la solución local permanece visible. Los si
 
 ![Comparación de la solución local y la solución externa de math.js](docs/capturas/api-mathjs.png)
 
-*La solución del motor de AlgoMentor y la respuesta externa coinciden: x1 = 4, x2 = -5.*
+*La solución del motor de AlgoMentor y la respuesta externa coinciden: x1 = 2, x2 = 1.*
 
 ### 3.7 Biblioteca (gestión de contenido)
 
@@ -415,7 +438,9 @@ v1;MATRIZ;2x3;2,1,5|1,-1,1
 Después de actualizar el esquema, selecciona cualquiera de los nueve algoritmos, elige la dificultad,
 pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda disponible para Práctica.
 
-<!-- Pendiente: captura real de Biblioteca con PostgreSQL configurado. -->
+![Biblioteca: algoritmos](docs/capturas/biblioteca-algoritmos.png)
+
+![Biblioteca: ejercicios](docs/capturas/biblioteca-ejercicios.png)
 
 ---
 

@@ -18,6 +18,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -90,8 +91,12 @@ public class MainApp extends Application {
         stage.focusedProperty().addListener((obs, antes, ahora) -> {
             if (ahora) {
                 actualizarVistaActual();
+            } else {
+                ocultarMenuContextual();
             }
         });
+        // Cualquier clic en la ventana cierra el menú contextual, no solo los clics sobre sus opciones.
+        scene.addEventFilter(MouseEvent.MOUSE_PRESSED, evento -> ocultarMenuContextual());
         stage.setScene(scene);
         stage.setOnCloseRequest(event -> {
             EjerciciosApiServer.detener();
@@ -179,13 +184,18 @@ public class MainApp extends Application {
         hilo.start();
     }
 
+    private void ocultarMenuContextual() {
+        if (menuContextual != null && menuContextual.isShowing()) {
+            menuContextual.hide();
+        }
+    }
+
     /** Clic derecho en cualquier zona libre: salto rápido a las secciones y a las opciones de vista. */
     private void instalarMenuContextual() {
         contenido.setOnContextMenuRequested(evento -> {
-            if (menuContextual != null) {
-                menuContextual.hide();
-            }
+            ocultarMenuContextual();
             menuContextual = new ContextMenu();
+            menuContextual.setAutoHide(true);
             menuContextual.getItems().add(elemento("Mi progreso", () -> mostrar("progreso", "progreso.fxml", true)));
             if (administrador) {
                 menuContextual.getItems().add(elemento("Resumen general", this::mostrarResumenGeneral));
@@ -430,6 +440,7 @@ public class MainApp extends Application {
             }
             Parent raiz = vista.raiz();
             vistaActual = clave;
+            ocultarMenuContextual();
             contenido.getChildren().setAll(raiz);
             Platform.runLater(() -> Animaciones.entrarContenido(raiz));
             return (T) vista.controlador();
