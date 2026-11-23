@@ -25,9 +25,11 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import ni.edu.uam.algomentor.api.EjerciciosApiServer;
+import ni.edu.uam.algomentor.controller.CambioContrasenaDialogo;
 import ni.edu.uam.algomentor.controller.IntercambioEjerciciosController;
 import ni.edu.uam.algomentor.controller.LoginController;
 import ni.edu.uam.algomentor.controller.ProgresoController;
+import ni.edu.uam.algomentor.controller.ResumenController;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.AutorizacionService;
 import ni.edu.uam.algomentor.service.CatalogoPersistidoService;
@@ -125,11 +127,34 @@ public class MainApp extends Application {
         Animaciones.instalarEfectosBoton(stage.getScene());
         precargarIntercambio();
         if (administrador) {
-            mostrar("resumen", "resumen.fxml", true);
+            mostrarResumenGeneral();
         } else {
             mostrar("progreso", "progreso.fxml", true);
         }
         iniciarActualizacionAutomatica();
+    }
+
+    private void mostrarResumenGeneral() {
+        ResumenController resumen = mostrar("resumen", "resumen.fxml", true);
+        if (resumen != null) {
+            resumen.setAlVerProgreso(this::verProgresoDe);
+            resumen.setAlExportarInforme(perfil -> {
+                ProgresoController progreso = verProgresoDe(perfil);
+                if (progreso != null) {
+                    Platform.runLater(progreso::exportarInforme);
+                }
+            });
+        }
+    }
+
+    /** Vista de administrador: el controlador y el servicio comprueban el rol antes de mostrar nada. */
+    private ProgresoController verProgresoDe(Perfil perfil) {
+        ProgresoController progreso = mostrar("progreso-perfil", "progreso.fxml", true);
+        if (progreso != null) {
+            progreso.setAlVolver(this::mostrarResumenGeneral);
+            progreso.mostrarPerfil(perfil);
+        }
+        return progreso;
     }
 
     /** Solo decide qué menús se muestran; cada servicio con datos globales vuelve a comprobar el rol. */
@@ -211,11 +236,13 @@ public class MainApp extends Application {
                 Platform.runLater(c::exportarInforme);
             }
         });
+        MenuItem cambiarContrasena = elemento("Cambiar contraseña…", "Shortcut+Shift+P", () ->
+                CambioContrasenaDialogo.mostrar(stage, SesionUsuario.obtenerPerfil().getId()));
         MenuItem cerrarSesion = elemento("Cerrar sesión", "Shortcut+Shift+L", this::cerrarSesion);
         MenuItem salir = elemento("Salir", "Shortcut+Q", () ->
                 stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST)));
         return new Menu("Archivo", null, exportarEjercicios, importarEjercicios, exportarInforme,
-                new SeparatorMenuItem(), cerrarSesion, salir);
+                new SeparatorMenuItem(), cambiarContrasena, cerrarSesion, salir);
     }
 
     private Menu crearMenuInicio() {
@@ -225,7 +252,7 @@ public class MainApp extends Application {
 
     private Menu crearMenuAdministracion() {
         return new Menu("Administración", null,
-                elemento("Resumen general", "Shortcut+0", () -> mostrar("resumen", "resumen.fxml", true)));
+                elemento("Resumen general", "Shortcut+0", this::mostrarResumenGeneral));
     }
 
     private Menu crearMenuAprender() {

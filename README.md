@@ -123,6 +123,12 @@ Para promover una cuenta, edita el usuario en
 con el Resumen general (todos los perfiles y ejercicios); el servicio que entrega esos datos vuelve a
 comprobar el rol en la base de datos, así que ocultar el menú no es la única protección.
 
+En el Resumen general, la pestaña **Perfiles** permite elegir un perfil y usar **Ver progreso** (abre
+el progreso de esa persona, con un botón para volver) o **Exportar informe** (PDF de ese perfil). La
+pestaña **Ranking** ordena a todos los perfiles por intentos correctos y luego por porcentaje de acierto.
+Un usuario normal solo puede ver y exportar su propio progreso: `AutorizacionService.exigirAccesoAPerfil`
+se comprueba en cada consulta y en cada informe.
+
 **Instalaciones existentes:** al abrir la aplicación se agregan los algoritmos faltantes a la base.
 También puedes ejecutar manualmente el script
 [`actualizar-nuevos-algoritmos.sql`](src/main/resources/ni/edu/uam/algomentor/db/actualizar-nuevos-algoritmos.sql).
@@ -141,7 +147,7 @@ Abre la carpeta en IntelliJ IDEA como proyecto Maven con JDK 21, o desde una ter
 La aplicación inicia en la pantalla de acceso. Crea una cuenta con un usuario de 3 a 40
 caracteres y una contraseña de 8 a 128 caracteres, o inicia sesión. Cada cuenta queda
 vinculada a un perfil; al registrar el nombre de un perfil previo se conserva su progreso.
-Las contraseñas se almacenan con PBKDF2 y no en texto plano. Usa **Archivo > Cerrar sesión** para salir. La gestión de contenido permite crear, consultar, actualizar y
+Las contraseñas se almacenan con PBKDF2 y no en texto plano; la pantalla de acceso puede recordar solo tu nombre de usuario (nunca la contraseña) y **Archivo > Cambiar contraseña** pide la actual antes de guardar la nueva. Usa **Archivo > Cerrar sesión** para salir. La gestión de contenido permite crear, consultar, actualizar y
 eliminar algoritmos y ejercicios. El **Resumen general** (menú **Administración**) es solo para administradores: incluye un selector de gráficos (ejercicios por algoritmo, por dificultad y por origen) y muestra los totales y listados de
 algoritmos, ejercicios y perfiles, además del total de intentos.
 Si la conexión a PostgreSQL falla, la aplicación muestra el problema en la barra inferior y registra
@@ -166,7 +172,7 @@ Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a 
 
 | Menú | Opciones |
 |---|---|
-| **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF), Cerrar sesión y Salir. |
+| **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF), Cambiar contraseña, Cerrar sesión y Salir. |
 | **Inicio** | Mi progreso. |
 | **Administración** | Resumen general. Solo aparece para cuentas administradoras. |
 | **Aprender** | Simular, Práctica y Comandos. |
@@ -184,6 +190,7 @@ Atajos de teclado (en macOS, `Cmd` en lugar de `Ctrl`):
 | `Ctrl+3` | Mi progreso | `Ctrl+E` | Exportar informe PDF |
 | `Ctrl+4` | Comandos | `Ctrl+Shift+E` / `Ctrl+I` | Exportar / importar ejercicios |
 | `Ctrl+T` | Tema claro u oscuro | `Ctrl+Shift+L` / `Ctrl+Q` | Cerrar sesión / salir |
+| `Ctrl+Shift+P` | Cambiar contraseña | | |
 | `F11` | Pantalla completa | | |
 
 Las secciones con datos (Resumen, Progreso, Práctica y Biblioteca) se cargan de nuevo cada vez que se
@@ -296,17 +303,23 @@ seguidos y tiempo promedio por intento. Debajo, cuatro pestañas:
 - **Por algoritmo:** tabla con intentos, correctos, incorrectos y porcentaje de acierto de cada algoritmo.
 - **Historial:** los 20 intentos más recientes con fecha, algoritmo, modo, resultado y duración.
 
+Un perfil sin intentos ve un aviso de bienvenida que indica cómo empezar. **Exportar CSV** guarda el historial
+(hasta los 200 intentos más recientes) en un archivo que abre Excel; las celdas que parecen fórmulas se
+neutralizan para que la hoja de cálculo no las ejecute.
+
 La racha cuenta los aciertos consecutivos más recientes; ignora las simulaciones, que no se califican,
 y se reinicia con el primer error. Los datos se obtienen con consultas HQL agrupadas y parametrizadas.
 
 Para revisar o exportar el informe:
 
 1. Abre **Inicio > Mi progreso** después de iniciar sesión (o **Archivo > Exportar informe de progreso**).
-2. Pulsa **Vista previa** para abrir el visor de JasperReports, o **Exportar** para guardar el PDF.
-3. El informe presenta tarjetas de resumen, la fecha de generación, resultados por habilidad y
-   numeración de páginas.
+2. Pulsa **Vista previa** para abrir el visor de JasperReports, o **Exportar PDF** para guardar el informe.
+3. El informe presenta ocho tarjetas (intentos, correctos, incorrectos, sin calificar, porcentaje de acierto,
+   racha, tiempo promedio y algoritmos usados) y cuatro tablas: resultados por habilidad, por algoritmo,
+   errores por tipo y los 15 últimos intentos, con numeración de páginas.
 
-Si aún no hay progreso por habilidad, el PDF muestra el resumen de intentos y un mensaje que lo indica.
+Cada sección del informe se agrupa por un campo de sección en la plantilla; si todavía no hay datos, la
+tabla muestra una fila que lo indica en lugar de desaparecer.
 JasperReports compila la plantilla JRXML al generar el informe y obtiene los datos mediante HQL;
 no necesita consultar una API externa.
 
@@ -664,7 +677,9 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Persistencia y servicios | `IntentoServiceTest`, `RegistroPracticaServiceTest`, `ProgresoHabilidadServiceTest`, `PerfilServiceTest`, `HabilidadErrorResolverTest`, `CalculoProgresoTest` |
 | Terminal y comparador | `ComandosTerminalTest`, `ComparadorOrdenamientosTest` |
 | Estadísticas | `EstadisticasDAOTest` |
-| Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest` |
+| Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest` |
+| Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |
+| Utilidades | `CsvHistorialTest`, `UsuarioRecordadoTest` |
 | Intercambio JSON | `EjerciciosApiServerTest`, `PaqueteNuevosAlgoritmosTest` |
 | Animaciones y validación | `MovimientoCeldasTest`, `ValidacionesFormularioTest` |
 | Integración JavaFX | `InterfazAlgoritmosIT` |

@@ -36,6 +36,50 @@ public class CuentaDAO {
         }
     }
 
+    public Optional<Cuenta> buscarPorPerfilId(Long perfilId) {
+        if (perfilId == null) {
+            return Optional.empty();
+        }
+        try (Session session = factory.openSession()) {
+            return session.createQuery("""
+                            SELECT c
+                            FROM Cuenta c
+                            JOIN FETCH c.perfil
+                            WHERE c.perfil.id = :perfilId
+                            """, Cuenta.class)
+                    .setParameter("perfilId", perfilId)
+                    .uniqueResultOptional();
+        }
+    }
+
+    /** @return true si se actualizó la cuenta de ese perfil. */
+    public boolean actualizarContrasenaHash(Long perfilId, String nuevoHash) {
+        try (Session session = factory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            try {
+                int filas = session.createMutationQuery("""
+                                UPDATE Cuenta c
+                                SET c.contrasenaHash = :hash
+                                WHERE c.perfil.id = :perfilId
+                                """)
+                        .setParameter("hash", nuevoHash)
+                        .setParameter("perfilId", perfilId)
+                        .executeUpdate();
+                transaction.commit();
+                return filas > 0;
+            } catch (RuntimeException e) {
+                if (transaction.isActive()) {
+                    try {
+                        transaction.rollback();
+                    } catch (RuntimeException rollbackError) {
+                        e.addSuppressed(rollbackError);
+                    }
+                }
+                throw e;
+            }
+        }
+    }
+
     /** Consulta el rol en la base de datos en cada llamada: nada del cliente decide si alguien es administrador. */
     public boolean tieneRol(Long perfilId, String rol) {
         if (perfilId == null || rol == null) {

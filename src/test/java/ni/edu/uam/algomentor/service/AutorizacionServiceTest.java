@@ -35,4 +35,13 @@ class AutorizacionServiceTest {
                 new ResumenAdministracionService(new AutorizacionService(id -> false));
         assertThrows(SecurityException.class, () -> servicio.cargar(2L));
     }
+
+    @Test
+    void cadaPerfilVeSuPropioProgresoPeroSoloUnAdminVeElDeOtros() {
+        assertDoesNotThrow(() -> soloPerfilUno.exigirAccesoAPerfil(2L, 2L));
+        assertDoesNotThrow(() -> soloPerfilUno.exigirAccesoAPerfil(1L, 2L));
+        assertThrows(SecurityException.class, () -> soloPerfilUno.exigirAccesoAPerfil(2L, 1L));
+        assertThrows(SecurityException.class, () -> soloPerfilUno.exigirAccesoAPerfil(null, 1L));
+        assertThrows(SecurityException.class, () -> soloPerfilUno.exigirAccesoAPerfil(1L, null));
+    }
 }

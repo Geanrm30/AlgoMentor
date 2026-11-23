@@ -9,6 +9,7 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.Objects;
@@ -70,6 +71,40 @@ public class AutenticacionService {
         String usuarioNormalizado = validarUsuario(usuario);
         validarContrasena(contrasena);
         return cuentaDAO.registrar(usuarioNormalizado, hashContrasena(contrasena));
+    }
+
+    /**
+     * Cambia la contraseña de la cuenta del perfil autenticado. Pide la actual (con el mismo límite de
+     * intentos fallidos que el inicio de sesión) y guarda la nueva con un hash y una sal nuevos.
+     *
+     * @throws IllegalArgumentException si la actual no coincide, la nueva no es válida o es igual a la actual.
+     */
+    public void cambiarContrasena(Long perfilId, char[] actual, char[] nueva) {
+        validarNuevaContrasena(actual, nueva);
+        Cuenta cuenta = cuentaDAO.buscarPorPerfilId(perfilId).orElseThrow(() ->
+                new IllegalArgumentException("Tu perfil no tiene una cuenta con contraseña."));
+        String clave = "cambio:" + cuenta.getUsuario();
+        long espera = limitador.segundosRestantes(clave);
+        if (espera > 0) {
+            throw new IllegalArgumentException(
+                    "Demasiados intentos fallidos. Espera " + espera + " segundos e inténtalo de nuevo."
+            );
+        }
+        if (!verificarContrasena(actual, cuenta.getContrasenaHash())) {
+            limitador.registrarFallo(clave);
+            throw new IllegalArgumentException("La contraseña actual no es correcta.");
+        }
+        limitador.registrarExito(clave);
+        if (!cuentaDAO.actualizarContrasenaHash(perfilId, hashContrasena(nueva))) {
+            throw new IllegalStateException("No se pudo actualizar la contraseña.");
+        }
+    }
+
+    static void validarNuevaContrasena(char[] actual, char[] nueva) {
+        validarContrasena(nueva);
+        if (actual != null && Arrays.equals(actual, nueva)) {
+            throw new IllegalArgumentException("La nueva contraseña debe ser distinta de la actual.");
+        }
     }
 
     public static String validarUsuario(String usuario) {

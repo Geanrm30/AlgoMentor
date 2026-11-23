@@ -3,11 +3,13 @@ package ni.edu.uam.algomentor.controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.AutenticacionService;
+import ni.edu.uam.algomentor.util.UsuarioRecordado;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -25,10 +27,21 @@ public class LoginController {
     @FXML private PasswordField txtNuevaContrasena;
     @FXML private PasswordField txtConfirmarContrasena;
     @FXML private Label lblEstado;
+    @FXML private CheckBox chkRecordarUsuario;
     @FXML private Button btnIniciarSesion;
     @FXML private Button btnRegistrar;
 
+    private final UsuarioRecordado usuarioRecordado = new UsuarioRecordado();
     private Consumer<Perfil> alAutenticar = perfil -> { };
+
+    @FXML
+    private void initialize() {
+        usuarioRecordado.leer().ifPresent(usuario -> {
+            txtUsuario.setText(usuario);
+            chkRecordarUsuario.setSelected(true);
+            Platform.runLater(txtContrasena::requestFocus);
+        });
+    }
 
     public void setAlAutenticar(Consumer<Perfil> accion) {
         alAutenticar = accion;
@@ -37,6 +50,7 @@ public class LoginController {
     @FXML
     private void iniciarSesion() {
         String usuario = txtUsuario.getText();
+        boolean recordar = chkRecordarUsuario.isSelected();
         char[] contrasena = txtContrasena.getText().toCharArray();
         ejecutarAutenticacion("Verificando credenciales…", () -> {
             try {
@@ -44,6 +58,11 @@ public class LoginController {
                         .iniciarSesion(usuario, contrasena);
                 if (perfil.isEmpty()) {
                     throw new CredencialesInvalidasException();
+                }
+                if (recordar) {
+                    usuarioRecordado.guardar(usuario);
+                } else {
+                    usuarioRecordado.olvidar();
                 }
                 return perfil.get();
             } finally {

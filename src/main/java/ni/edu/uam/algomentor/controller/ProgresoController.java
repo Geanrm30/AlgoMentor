@@ -23,6 +23,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import net.sf.jasperreports.engine.JRException;
@@ -30,9 +31,11 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.model.Perfil;
+import ni.edu.uam.algomentor.service.AutorizacionService;
 import ni.edu.uam.algomentor.service.ReporteProgresoService;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.Animaciones;
+import ni.edu.uam.algomentor.util.CsvHistorial;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.Tema;
 import ni.edu.uam.algomentor.util.TextoInterfaz;
@@ -74,9 +77,17 @@ public class ProgresoController implements Actualizable {
     /** Huella de los últimos datos mostrados; permite saltar la actualización automática si nada cambió. */
     private int huellaMostrada;
     private boolean hayDatosMostrados;
+    /** Perfil que se está mostrando; null significa el de la sesión. Un administrador puede ver otros. */
+    private Perfil perfilVisto;
+    private Runnable alVolver = () -> { };
+    /** Solo se muestra la última consulta; evita que una respuesta lenta pise a otra más reciente. */
+    private int ultimaSolicitud;
 
     @FXML private Label lblResumen;
     @FXML private Label lblPerfilActual;
+    @FXML private Button btnVolver;
+    @FXML private VBox panelVacio;
+    @FXML private Label lblBienvenida;
     @FXML private Button btnVistaPrevia;
     @FXML private Label lblIntentos;
     @FXML private Label lblCorrectos;
@@ -119,7 +130,7 @@ public class ProgresoController implements Actualizable {
 
     @FXML
     private void initialize() {
-        lblPerfilActual.setText("Perfil: " + SesionUsuario.obtenerPerfil().getNombre());
+        actualizarEtiquetaPerfil();
         colHabilidad.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().nombre()));
         colAciertos.setCellValueFactory(c ->
@@ -190,28 +201,46 @@ public class ProgresoController implements Actualizable {
         colHistModo.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(TextoInterfaz.modo(c.getValue().modo())));
         colHistResultado.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(textoResultado(c.getValue().correcto())));
+                new ReadOnlyStringWrapper(TextoInterfaz.resultado(c.getValue().correcto())));
         colHistDuracion.setCellValueFactory(c -> new ReadOnlyStringWrapper(
                 c.getValue().duracionSegundos() == null ? "—" : c.getValue().duracionSegundos() + " s"));
         tablaHistorial.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         tablaHistorial.setPlaceholder(new Label("Todavía no hay intentos registrados."));
     }
 
-    private static String textoResultado(Boolean correcto) {
-        if (correcto == null) {
-            return "Sin calificar";
-        }
-        return correcto ? "Correcto" : "Incorrecto";
+    private Perfil perfilActivo() {
+        return perfilVisto != null ? perfilVisto : SesionUsuario.obtenerPerfil();
     }
 
-    private static String etiquetaTipoError(String tipo) {
-        return switch (tipo) {
-            case "SIGNO" -> "Signo";
-            case "FRACCION" -> "Fracción";
-            case "ARITMETICO" -> "Aritmético";
-            case "OPERACION_INVALIDA" -> "Operación inválida";
-            default -> tipo;
-        };
+    private boolean esPerfilPropio() {
+        return perfilActivo().getId().equals(SesionUsuario.obtenerPerfil().getId());
+    }
+
+    private void actualizarEtiquetaPerfil() {
+        lblPerfilActual.setText("Perfil: " + perfilActivo().getNombre()
+                + (esPerfilPropio() ? "" : " (vista de administrador)"));
+        btnVolver.setVisible(!esPerfilPropio());
+        btnVolver.setManaged(!esPerfilPropio());
+    }
+
+    /**
+     * Muestra el progreso de otro perfil. Solo funciona para administradores: la comprobación se repite en
+     * {@link AutorizacionService} cada vez que se consultan datos o se genera un informe.
+     */
+    public void mostrarPerfil(Perfil perfil) {
+        perfilVisto = perfil;
+        hayDatosMostrados = false;
+        actualizarEtiquetaPerfil();
+        cargarProgreso(false);
+    }
+
+    public void setAlVolver(Runnable accion) {
+        alVolver = accion == null ? () -> { } : accion;
+    }
+
+    @FXML
+    private void volver() {
+        alVolver.run();
     }
 
     @FXML
@@ -225,13 +254,16 @@ public class ProgresoController implements Actualizable {
     }
 
     private void cargarProgreso(boolean automatico) {
-        Perfil perfil = SesionUsuario.obtenerPerfil();
+        Perfil perfil = perfilActivo();
+        boolean propio = esPerfilPropio();
+        int solicitud = ++ultimaSolicitud;
         if (!automatico) {
             lblResumen.setText("Cargando progreso…");
         }
         ejecutarEnSegundoPlano(() -> {
-            EstadisticasDAO dao = new EstadisticasDAO();
             Long perfilId = perfil.getId();
+            new AutorizacionService().exigirAccesoAPerfil(SesionUsuario.obtenerPerfil().getId(), perfilId);
+            EstadisticasDAO dao = new EstadisticasDAO();
             var resumen = dao.obtenerResumenIntentos(perfilId);
             List<EstadisticasDAO.EstadisticaHabilidad> habilidades =
                     dao.listarProgresoPorHabilidad(perfilId);
@@ -244,6 +276,9 @@ public class ProgresoController implements Actualizable {
             int huella = Objects.hash(resumen, habilidades, rendimiento, errores, recientes,
                     duracionPromedio);
             Platform.runLater(() -> {
+                if (solicitud != ultimaSolicitud) {
+                    return;
+                }
                 if (automatico && hayDatosMostrados && huella == huellaMostrada) {
                     return;
                 }
@@ -259,6 +294,7 @@ public class ProgresoController implements Actualizable {
                 tablaHistorial.setItems(FXCollections.observableArrayList(
                         recientes.subList(0, Math.min(INTENTOS_EN_HISTORIAL, recientes.size()))));
                 actualizarTarjetas(resumen, recientes, duracionPromedio);
+                actualizarEstadoVacio(resumen.total() == 0, propio, perfil.getNombre());
                 lblResumen.setText("Última actualización: " + LocalTime.now().format(FORMATO_HORA)
                         + (resumen.sinCalificar() > 0
                         ? " · Sin calificar: " + resumen.sinCalificar() + " (simulaciones)" : "")
@@ -266,6 +302,15 @@ public class ProgresoController implements Actualizable {
                         ? "\nSin progreso por habilidad registrado." : ""));
             });
         });
+    }
+
+    private void actualizarEstadoVacio(boolean sinIntentos, boolean propio, String nombre) {
+        panelVacio.setVisible(sinIntentos);
+        panelVacio.setManaged(sinIntentos);
+        lblBienvenida.setText(propio
+                ? "Todavía no tienes intentos. Resuelve tu primer ejercicio en Aprender > Práctica "
+                + "o prueba una simulación, y aquí verás tu avance."
+                : nombre + " todavía no tiene intentos registrados.");
     }
 
     private void actualizarGraficoAlgoritmos(List<EstadisticasDAO.RendimientoAlgoritmo> rendimiento) {
@@ -323,7 +368,7 @@ public class ProgresoController implements Actualizable {
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
         serie.setName("Errores detectados");
         for (EstadisticasDAO.ErrorPorTipo error : errores) {
-            serie.getData().add(new XYChart.Data<>(etiquetaTipoError(error.tipo()), error.cantidad()));
+            serie.getData().add(new XYChart.Data<>(TextoInterfaz.tipoError(error.tipo()), error.cantidad()));
         }
         graficoErrores.setTitle(errores.isEmpty() ? "Sin errores registrados" : "Errores por tipo");
         graficoErrores.setData(FXCollections.observableArrayList(serie));
@@ -351,7 +396,7 @@ public class ProgresoController implements Actualizable {
 
     @FXML
     private void generarReporte() {
-        Perfil perfil = SesionUsuario.obtenerPerfil();
+        Perfil perfil = perfilActivo();
         FileChooser selector = new FileChooser();
         selector.setTitle("Guardar informe de progreso");
         selector.getExtensionFilters().add(
@@ -367,6 +412,7 @@ public class ProgresoController implements Actualizable {
 
         lblResumen.setText("Generando informe PDF…");
         Long perfilId = perfil.getId();
+        Long solicitanteId = SesionUsuario.obtenerPerfil().getId();
         Path destinoElegido = archivo.toPath();
         Path destino = destinoElegido.getFileName().toString()
                 .toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")
@@ -374,7 +420,7 @@ public class ProgresoController implements Actualizable {
                 : destinoElegido.resolveSibling(destinoElegido.getFileName() + ".pdf");
         Thread hilo = new Thread(() -> {
             try {
-                Path generado = new ReporteProgresoService().generarReporte(perfilId, destino);
+                Path generado = new ReporteProgresoService().generarReporte(solicitanteId, perfilId, destino);
                 Platform.runLater(() -> {
                     lblResumen.setText("Informe guardado: " + generado.getFileName());
                     mostrarAlerta(Alert.AlertType.INFORMATION, "Informe generado",
@@ -394,15 +440,57 @@ public class ProgresoController implements Actualizable {
     }
 
     @FXML
-    private void previsualizarReporte() {
-        Perfil perfil = SesionUsuario.obtenerPerfil();
+    private void exportarHistorialCsv() {
+        Perfil perfil = perfilActivo();
         Long perfilId = perfil.getId();
+        Long solicitanteId = SesionUsuario.obtenerPerfil().getId();
+        FileChooser selector = new FileChooser();
+        selector.setTitle("Guardar historial de intentos");
+        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo CSV", "*.csv"));
+        selector.setInitialFileName("historial-" + perfil.getNombre().replaceAll("[\\\\/:*?\"<>|]", "_") + ".csv");
+        Window ventana = tabla.getScene() == null ? null : tabla.getScene().getWindow();
+        java.io.File archivo = selector.showSaveDialog(ventana);
+        if (archivo == null) {
+            return;
+        }
+        Path elegido = archivo.toPath();
+        Path destino = elegido.getFileName().toString().toLowerCase(java.util.Locale.ROOT).endsWith(".csv")
+                ? elegido : elegido.resolveSibling(elegido.getFileName() + ".csv");
+        lblResumen.setText("Exportando historial…");
+        Thread hilo = new Thread(() -> {
+            try {
+                new AutorizacionService().exigirAccesoAPerfil(solicitanteId, perfilId);
+                List<EstadisticasDAO.IntentoReciente> intentos =
+                        new EstadisticasDAO().listarIntentosRecientes(perfilId, 200);
+                Path escrito = CsvHistorial.escribir(destino, intentos);
+                Platform.runLater(() -> {
+                    lblResumen.setText("Historial guardado: " + escrito.getFileName()
+                            + " (" + intentos.size() + " intentos, hasta los 200 más recientes).");
+                });
+            } catch (IOException | RuntimeException e) {
+                LOG.log(Level.SEVERE, "No se pudo exportar el historial", e);
+                Platform.runLater(() -> {
+                    lblResumen.setText("No se pudo exportar el historial.");
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error al exportar",
+                            "No se pudo guardar el archivo CSV. Revisa el destino seleccionado.");
+                });
+            }
+        }, "algomentor-historial-csv");
+        hilo.setDaemon(true);
+        hilo.start();
+    }
+
+    @FXML
+    private void previsualizarReporte() {
+        Perfil perfil = perfilActivo();
+        Long perfilId = perfil.getId();
+        Long solicitanteId = SesionUsuario.obtenerPerfil().getId();
         String nombrePerfil = perfil.getNombre();
         btnVistaPrevia.setDisable(true);
         lblResumen.setText("Preparando vista previa del reporte…");
         Thread hilo = new Thread(() -> {
             try {
-                JasperPrint reporte = new ReporteProgresoService().prepararReporte(perfilId);
+                JasperPrint reporte = new ReporteProgresoService().prepararReporte(solicitanteId, perfilId);
                 SwingUtilities.invokeLater(() -> {
                     JasperViewer visor = new JasperViewer(reporte, false);
                     visor.setTitle("Vista previa del reporte - " + nombrePerfil);
@@ -471,6 +559,8 @@ public class ProgresoController implements Actualizable {
         Thread hilo = new Thread(() -> {
             try {
                 accion.run();
+            } catch (SecurityException e) {
+                Platform.runLater(() -> lblResumen.setText("No tienes acceso al progreso de ese perfil."));
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, "No se pudo consultar el progreso", e);
                 Platform.runLater(() -> lblResumen.setText(

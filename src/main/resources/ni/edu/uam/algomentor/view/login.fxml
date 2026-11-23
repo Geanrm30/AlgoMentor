@@ -16,6 +16,7 @@
                         <VBox spacing="12" styleClass="tab-content">
                             <TextField fx:id="txtUsuario" promptText="Usuario" />
                             <PasswordField fx:id="txtContrasena" promptText="Contraseña" onAction="#iniciarSesion" />
+                            <CheckBox fx:id="chkRecordarUsuario" text="Recordar mi usuario en este equipo" />
                             <Button fx:id="btnIniciarSesion" text="Entrar" onAction="#iniciarSesion" styleClass="primary-button" maxWidth="Infinity" />
                         </VBox>
                     </content>

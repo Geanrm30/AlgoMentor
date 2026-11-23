@@ -80,13 +80,37 @@
             </Tab>
             <Tab text="Perfiles" closable="false">
                 <content>
-                    <TableView fx:id="tablaPerfiles">
-                        <columns>
-                            <TableColumn fx:id="colPerfilId" text="ID" prefWidth="90" />
-                            <TableColumn fx:id="colPerfilNombre" text="Nombre" prefWidth="300" />
-                            <TableColumn fx:id="colPerfilCreacion" text="Fecha de creación" prefWidth="190" />
-                        </columns>
-                    </TableView>
+                    <VBox spacing="10" styleClass="tab-content">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Selecciona un perfil para revisar su avance." maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                            <Button fx:id="btnVerProgresoPerfil" text="Ver progreso" onAction="#verProgresoPerfil" disable="true" />
+                            <Button fx:id="btnExportarPerfil" text="Exportar informe" onAction="#exportarInformePerfil" disable="true" />
+                        </HBox>
+                        <TableView fx:id="tablaPerfiles" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colPerfilId" text="ID" prefWidth="90" />
+                                <TableColumn fx:id="colPerfilNombre" text="Nombre" prefWidth="300" />
+                                <TableColumn fx:id="colPerfilCreacion" text="Fecha de creación" prefWidth="190" />
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </content>
+            </Tab>
+            <Tab text="Ranking" closable="false">
+                <content>
+                    <VBox spacing="10" styleClass="tab-content">
+                        <Label text="Ordenado por intentos correctos y luego por porcentaje de acierto (sobre los intentos calificados)." wrapText="true" />
+                        <TableView fx:id="tablaRanking" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colRankPuesto" text="#" prefWidth="60" />
+                                <TableColumn fx:id="colRankPerfil" text="Perfil" prefWidth="240" />
+                                <TableColumn fx:id="colRankIntentos" text="Intentos" prefWidth="100" />
+                                <TableColumn fx:id="colRankCorrectos" text="Correctos" prefWidth="110" />
+                                <TableColumn fx:id="colRankIncorrectos" text="Incorrectos" prefWidth="110" />
+                                <TableColumn fx:id="colRankPorcentaje" text="Acierto %" prefWidth="120" />
+                            </columns>
+                        </TableView>
+                    </VBox>
                 </content>
             </Tab>
         </tabs>

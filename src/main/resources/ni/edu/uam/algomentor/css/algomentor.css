@@ -724,7 +724,7 @@
 }
 
 .app-root.light-theme .content-tabs .tab:selected .tab-label {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #0f172a;
 }
 
 .app-root.light-theme .card,
@@ -921,4 +921,47 @@
 /* La leyenda del gráfico circular se lee completa a la derecha. */
 .chart-legend {
     -fx-padding: 8 12;
+}
+
+/* Pestañas en tema claro: texto oscuro también en la pestaña activa y al pasar el ratón. */
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: #e5e7eb;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: #cbd5e1;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent -ac-accent transparent;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: #475569;
+}
+
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:hover .tab-label,
+.app-root.light-theme .content-tabs > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: #0f172a;
+}
+
+/* ---------- Estado vacío ---------- */
+
+.aviso-vacio {
+    -fx-padding: 14 16;
+    -fx-background-color: -ac-surface;
+    -fx-background-radius: 10;
+    -fx-border-color: -ac-accent;
+    -fx-border-width: 0 0 0 4;
+}
+
+.aviso-vacio-titulo {
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+.app-root.light-theme .aviso-vacio {
+    -fx-background-color: #eff6ff;
 }

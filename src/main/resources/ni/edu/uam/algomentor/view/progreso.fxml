@@ -9,9 +9,11 @@
     <Label text="Progreso de aprendizaje" styleClass="section-title" />
     <HBox spacing="10">
         <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnVolver" text="Volver al resumen" onAction="#volver" visible="false" managed="false" />
         <Button text="Actualizar" onAction="#verProgreso" styleClass="primary-button" />
         <Button fx:id="btnVistaPrevia" text="Vista previa" onAction="#previsualizarReporte" />
-        <Button text="Exportar" onAction="#generarReporte" />
+        <Button text="Exportar PDF" onAction="#generarReporte" />
+        <Button text="Exportar CSV" onAction="#exportarHistorialCsv" />
     </HBox>
     <FlowPane hgap="12" vgap="12">
         <VBox spacing="5" styleClass="summary-card" prefWidth="150">
@@ -39,6 +41,10 @@
             <Label fx:id="lblTiempoPromedio" text="—" styleClass="summary-value" />
         </VBox>
     </FlowPane>
+    <VBox fx:id="panelVacio" spacing="4" styleClass="aviso-vacio" visible="false" managed="false">
+        <Label text="Aún no hay actividad" styleClass="aviso-vacio-titulo" />
+        <Label fx:id="lblBienvenida" wrapText="true" />
+    </VBox>
     <Label fx:id="lblResumen" text="Cargando progreso…" wrapText="true" />
     <TabPane VBox.vgrow="ALWAYS" minHeight="460" styleClass="content-tabs">
         <tabs>

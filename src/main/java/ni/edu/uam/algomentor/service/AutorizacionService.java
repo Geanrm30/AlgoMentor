@@ -37,4 +37,18 @@ public class AutorizacionService {
             throw new SecurityException("Esta sección es solo para administradores.");
         }
     }
+
+    /**
+     * Cada perfil puede ver el suyo; el de otro perfil solo lo puede ver un administrador.
+     *
+     * @throws SecurityException si el solicitante no tiene acceso al perfil.
+     */
+    public void exigirAccesoAPerfil(Long solicitanteId, Long perfilId) {
+        if (solicitanteId == null || perfilId == null) {
+            throw new SecurityException("Se necesita una sesión y un perfil.");
+        }
+        if (!solicitanteId.equals(perfilId)) {
+            exigirAdministrador(solicitanteId);
+        }
+    }
 }

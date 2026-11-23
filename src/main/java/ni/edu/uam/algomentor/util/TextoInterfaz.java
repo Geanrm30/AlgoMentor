@@ -55,6 +55,24 @@ public final class TextoInterfaz {
         };
     }
 
+    public static String tipoError(String valor) {
+        return switch (valor) {
+            case "SIGNO" -> "Signo";
+            case "FRACCION" -> "Fracción";
+            case "ARITMETICO" -> "Aritmético";
+            case "OPERACION_INVALIDA" -> "Operación inválida";
+            default -> valor;
+        };
+    }
+
+    /** {@code null} significa que el intento no se calificó (por ejemplo, una simulación). */
+    public static String resultado(Boolean correcto) {
+        if (correcto == null) {
+            return "Sin calificar";
+        }
+        return correcto ? "Correcto" : "Incorrecto";
+    }
+
     public static String fecha(LocalDateTime valor) {
         return valor == null ? "Sin fecha" : FECHA.format(valor);
     }

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,6 +47,8 @@ public class ResumenController implements Actualizable {
     private int huellaMostrada;
     private boolean hayDatosMostrados;
     private boolean cargando;
+    private Consumer<Perfil> alVerProgreso = perfil -> { };
+    private Consumer<Perfil> alExportarInforme = perfil -> { };
 
     @FXML private Label lblCantidadAlgoritmos;
     @FXML private Label lblCantidadEjercicios;
@@ -53,6 +56,15 @@ public class ResumenController implements Actualizable {
     @FXML private Label lblCantidadIntentos;
     @FXML private Label lblEstado;
     @FXML private Button btnActualizar;
+    @FXML private Button btnVerProgresoPerfil;
+    @FXML private Button btnExportarPerfil;
+    @FXML private TableView<ResumenAdministracionService.PuestoRanking> tablaRanking;
+    @FXML private TableColumn<ResumenAdministracionService.PuestoRanking, String> colRankPuesto;
+    @FXML private TableColumn<ResumenAdministracionService.PuestoRanking, String> colRankPerfil;
+    @FXML private TableColumn<ResumenAdministracionService.PuestoRanking, String> colRankIntentos;
+    @FXML private TableColumn<ResumenAdministracionService.PuestoRanking, String> colRankCorrectos;
+    @FXML private TableColumn<ResumenAdministracionService.PuestoRanking, String> colRankIncorrectos;
+    @FXML private TableColumn<ResumenAdministracionService.PuestoRanking, String> colRankPorcentaje;
     @FXML private PieChart graficoEjerciciosAlgoritmo;
     @FXML private ComboBox<String> cmbGrafico;
     @FXML private PieChart graficoEjerciciosOrigen;
@@ -75,8 +87,46 @@ public class ResumenController implements Actualizable {
     @FXML private TableColumn<Perfil, String> colPerfilNombre;
     @FXML private TableColumn<Perfil, String> colPerfilCreacion;
 
+    /** MainApp decide cómo mostrar el progreso de otro perfil; este controlador solo avisa cuál se eligió. */
+    public void setAlVerProgreso(Consumer<Perfil> accion) {
+        alVerProgreso = accion == null ? perfil -> { } : accion;
+    }
+
+    public void setAlExportarInforme(Consumer<Perfil> accion) {
+        alExportarInforme = accion == null ? perfil -> { } : accion;
+    }
+
+    @FXML
+    private void verProgresoPerfil() {
+        Perfil elegido = tablaPerfiles.getSelectionModel().getSelectedItem();
+        if (elegido != null) {
+            alVerProgreso.accept(elegido);
+        }
+    }
+
+    @FXML
+    private void exportarInformePerfil() {
+        Perfil elegido = tablaPerfiles.getSelectionModel().getSelectedItem();
+        if (elegido != null) {
+            alExportarInforme.accept(elegido);
+        }
+    }
+
     @FXML
     private void initialize() {
+        btnVerProgresoPerfil.disableProperty().bind(
+                tablaPerfiles.getSelectionModel().selectedItemProperty().isNull());
+        btnExportarPerfil.disableProperty().bind(
+                tablaPerfiles.getSelectionModel().selectedItemProperty().isNull());
+        colRankPuesto.setCellValueFactory(c -> texto(c.getValue().puesto()));
+        colRankPerfil.setCellValueFactory(c -> texto(c.getValue().nombre()));
+        colRankIntentos.setCellValueFactory(c -> texto(c.getValue().intentos()));
+        colRankCorrectos.setCellValueFactory(c -> texto(c.getValue().correctos()));
+        colRankIncorrectos.setCellValueFactory(c -> texto(c.getValue().incorrectos()));
+        colRankPorcentaje.setCellValueFactory(c -> texto(
+                String.format(java.util.Locale.ROOT, "%.1f%%", c.getValue().porcentaje())));
+        tablaRanking.setPlaceholder(new Label("Todavía no hay perfiles."));
+
         colAlgoritmoId.setCellValueFactory(c -> texto(c.getValue().getId()));
         colAlgoritmoNombre.setCellValueFactory(c -> texto(c.getValue().getNombre()));
         colAlgoritmoCategoria.setCellValueFactory(c -> texto(c.getValue().getCategoria()));
@@ -146,6 +196,7 @@ public class ResumenController implements Actualizable {
                 List<Ejercicio> ejercicios = datos.ejercicios();
                 List<Perfil> perfiles = datos.perfiles();
                 int totalIntentos = datos.totalIntentos();
+                List<ResumenAdministracionService.PuestoRanking> ranking = datos.ranking();
                 int huella = Objects.hash(
                         algoritmos.stream().map(a -> Objects.hash(
                                 a.getId(), a.getNombre(), a.getCategoria(), a.getComplejidad())).toList(),
@@ -153,7 +204,8 @@ public class ResumenController implements Actualizable {
                                 e.getId(), e.getAlgoritmo().getNombre(), e.getDificultad(),
                                 e.getOrigen(), e.getDatos())).toList(),
                         perfiles.stream().map(p -> Objects.hash(p.getId(), p.getNombre())).toList(),
-                        totalIntentos);
+                        totalIntentos,
+                        ranking);
                 Platform.runLater(() -> {
                     cargando = false;
                     if (automatico && hayDatosMostrados && huella == huellaMostrada) {
@@ -163,7 +215,13 @@ public class ResumenController implements Actualizable {
                     hayDatosMostrados = true;
                     tablaAlgoritmos.setItems(FXCollections.observableArrayList(algoritmos));
                     tablaEjercicios.setItems(FXCollections.observableArrayList(ejercicios));
+                    Perfil seleccionado = tablaPerfiles.getSelectionModel().getSelectedItem();
                     tablaPerfiles.setItems(FXCollections.observableArrayList(perfiles));
+                    if (seleccionado != null) {
+                        perfiles.stream().filter(p -> p.getId().equals(seleccionado.getId())).findFirst()
+                                .ifPresent(p -> tablaPerfiles.getSelectionModel().select(p));
+                    }
+                    tablaRanking.setItems(FXCollections.observableArrayList(ranking));
                     lblCantidadAlgoritmos.setText(Integer.toString(algoritmos.size()));
                     lblCantidadEjercicios.setText(Integer.toString(ejercicios.size()));
                     lblCantidadPerfiles.setText(Integer.toString(perfiles.size()));
