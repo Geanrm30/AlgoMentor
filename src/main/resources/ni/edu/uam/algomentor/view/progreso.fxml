@@ -3,7 +3,9 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
+<ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="pagina-desplazable" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
+    <content>
+    <VBox spacing="16" styleClass="tab-content">
     <Label text="Progreso de aprendizaje" styleClass="section-title" />
     <HBox spacing="10">
         <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
@@ -38,18 +40,52 @@
         </VBox>
     </FlowPane>
     <Label fx:id="lblResumen" text="Cargando progreso…" wrapText="true" />
-    <TabPane VBox.vgrow="ALWAYS" styleClass="content-tabs">
+    <TabPane VBox.vgrow="ALWAYS" minHeight="460" styleClass="content-tabs">
         <tabs>
-            <Tab text="Gráfico" closable="false">
+            <Tab text="Gráficos" closable="false">
                 <content>
-                    <BarChart fx:id="graficoHabilidades" animated="false" legendVisible="true">
-                        <xAxis>
-                            <CategoryAxis fx:id="axisHabilidad" label="Habilidad" tickLabelRotation="-25" />
-                        </xAxis>
-                        <yAxis>
-                            <NumberAxis fx:id="axisCantidad" label="Evaluaciones" forceZeroInRange="true" />
-                        </yAxis>
-                    </BarChart>
+                    <VBox spacing="10" styleClass="tab-content">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Gráfico:" />
+                            <ComboBox fx:id="cmbGrafico" prefWidth="340" />
+                        </HBox>
+                        <Label fx:id="lblAyudaGrafico" wrapText="true" styleClass="subtitle" />
+                        <StackPane VBox.vgrow="ALWAYS" minHeight="340">
+                            <BarChart fx:id="graficoHabilidades" animated="false" legendVisible="true">
+                                <xAxis>
+                                    <CategoryAxis fx:id="axisHabilidad" label="Habilidad" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="axisCantidad" label="Evaluaciones" forceZeroInRange="true" />
+                                </yAxis>
+                            </BarChart>
+                            <StackedBarChart fx:id="graficoAlgoritmos" animated="false" legendVisible="true" visible="false" managed="false">
+                                <xAxis>
+                                    <NumberAxis fx:id="axisIntentosAlgoritmo" label="Intentos" forceZeroInRange="true" minorTickCount="0" />
+                                </xAxis>
+                                <yAxis>
+                                    <CategoryAxis fx:id="axisAlgoritmo" />
+                                </yAxis>
+                            </StackedBarChart>
+                            <BarChart fx:id="graficoErrores" styleClass="grafico-errores" animated="false" legendVisible="false" visible="false" managed="false">
+                                <xAxis>
+                                    <CategoryAxis fx:id="axisTipoError" label="Tipo de error" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="axisCantidadErrores" label="Errores" forceZeroInRange="true" />
+                                </yAxis>
+                            </BarChart>
+                            <LineChart fx:id="graficoEvolucion" animated="false" legendVisible="false" createSymbols="true" visible="false" managed="false">
+                                <xAxis>
+                                    <NumberAxis fx:id="axisIntento" label="Intentos calificados (del más antiguo al más reciente)" forceZeroInRange="false" minorTickCount="0" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="axisAcierto" label="Acierto acumulado (%)" autoRanging="false" lowerBound="0" upperBound="100" tickUnit="25" />
+                                </yAxis>
+                            </LineChart>
+                            <PieChart fx:id="graficoResultados" styleClass="pie-resultados" animated="false" labelsVisible="false" legendVisible="true" legendSide="RIGHT" visible="false" managed="false" />
+                        </StackPane>
+                    </VBox>
                 </content>
             </Tab>
             <Tab text="Detalle" closable="false">
@@ -66,57 +102,15 @@
             </Tab>
             <Tab text="Por algoritmo" closable="false">
                 <content>
-                    <VBox spacing="12">
-                        <StackedBarChart fx:id="graficoAlgoritmos" animated="false" legendVisible="true" prefHeight="240" minHeight="200">
-                            <xAxis>
-                                <CategoryAxis fx:id="axisAlgoritmo" label="Algoritmo" tickLabelRotation="-15" />
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis fx:id="axisIntentosAlgoritmo" label="Intentos" forceZeroInRange="true" />
-                            </yAxis>
-                        </StackedBarChart>
-                        <TableView fx:id="tablaRendimiento" VBox.vgrow="ALWAYS">
-                            <columns>
-                                <TableColumn fx:id="colRendAlgoritmo" text="Algoritmo" prefWidth="200" />
-                                <TableColumn fx:id="colRendIntentos" text="Intentos" prefWidth="100" />
-                                <TableColumn fx:id="colRendCorrectos" text="Correctos" prefWidth="110" />
-                                <TableColumn fx:id="colRendIncorrectos" text="Incorrectos" prefWidth="110" />
-                                <TableColumn fx:id="colRendPorcentaje" text="Acierto %" prefWidth="240" />
-                            </columns>
-                        </TableView>
-                    </VBox>
-                </content>
-            </Tab>
-            <Tab text="Errores" closable="false">
-                <content>
-                    <VBox spacing="10">
-                        <Label text="Cada error detectado en Práctica se clasifica por tipo y suma a una habilidad: signo en Signos, fracción en Fracciones, aritmético en Aritmética y operación inválida en Procedimiento." wrapText="true" />
-                        <BarChart fx:id="graficoErrores" styleClass="grafico-errores" animated="false" legendVisible="false" VBox.vgrow="ALWAYS">
-                            <xAxis>
-                                <CategoryAxis fx:id="axisTipoError" label="Tipo de error" />
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis fx:id="axisCantidadErrores" label="Errores" forceZeroInRange="true" />
-                            </yAxis>
-                        </BarChart>
-                    </VBox>
-                </content>
-            </Tab>
-            <Tab text="Evolución" closable="false">
-                <content>
-                    <LineChart fx:id="graficoEvolucion" animated="false" legendVisible="false" createSymbols="true">
-                        <xAxis>
-                            <NumberAxis fx:id="axisIntento" label="Intentos calificados (del más antiguo al más reciente)" forceZeroInRange="false" minorTickCount="0" />
-                        </xAxis>
-                        <yAxis>
-                            <NumberAxis fx:id="axisAcierto" label="Acierto acumulado (%)" autoRanging="false" lowerBound="0" upperBound="100" tickUnit="25" />
-                        </yAxis>
-                    </LineChart>
-                </content>
-            </Tab>
-            <Tab text="Resultados" closable="false">
-                <content>
-                    <PieChart fx:id="graficoResultados" styleClass="pie-resultados" animated="false" labelsVisible="false" legendVisible="true" legendSide="RIGHT" />
+                    <TableView fx:id="tablaRendimiento">
+                        <columns>
+                            <TableColumn fx:id="colRendAlgoritmo" text="Algoritmo" prefWidth="200" />
+                            <TableColumn fx:id="colRendIntentos" text="Intentos" prefWidth="100" />
+                            <TableColumn fx:id="colRendCorrectos" text="Correctos" prefWidth="110" />
+                            <TableColumn fx:id="colRendIncorrectos" text="Incorrectos" prefWidth="110" />
+                            <TableColumn fx:id="colRendPorcentaje" text="Acierto %" prefWidth="240" />
+                        </columns>
+                    </TableView>
                 </content>
             </Tab>
             <Tab text="Historial" closable="false">
@@ -134,4 +128,6 @@
             </Tab>
         </tabs>
     </TabPane>
-</VBox>
+    </VBox>
+    </content>
+</ScrollPane>

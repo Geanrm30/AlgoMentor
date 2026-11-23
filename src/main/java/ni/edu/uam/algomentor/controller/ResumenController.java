@@ -9,18 +9,18 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import ni.edu.uam.algomentor.dao.AlgoritmoDAO;
-import ni.edu.uam.algomentor.dao.BaseDAO;
-import ni.edu.uam.algomentor.dao.EjercicioDAO;
 import ni.edu.uam.algomentor.model.Algoritmo;
 import ni.edu.uam.algomentor.model.Ejercicio;
-import ni.edu.uam.algomentor.model.Intento;
 import ni.edu.uam.algomentor.model.Perfil;
+import ni.edu.uam.algomentor.service.ResumenAdministracionService;
 import ni.edu.uam.algomentor.util.Actualizable;
+import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.TextoInterfaz;
 
 import java.time.format.DateTimeFormatter;
@@ -35,6 +35,10 @@ import java.util.logging.Logger;
 public class ResumenController implements Actualizable {
 
     private static final Logger LOG = Logger.getLogger(ResumenController.class.getName());
+    private static final List<String> NOMBRES_GRAFICOS = List.of(
+            "Ejercicios por algoritmo (circular)",
+            "Ejercicios por dificultad (barras)",
+            "Ejercicios por origen (circular)");
     private static final DateTimeFormatter FORMATO_FECHA =
             DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -50,6 +54,8 @@ public class ResumenController implements Actualizable {
     @FXML private Label lblEstado;
     @FXML private Button btnActualizar;
     @FXML private PieChart graficoEjerciciosAlgoritmo;
+    @FXML private ComboBox<String> cmbGrafico;
+    @FXML private PieChart graficoEjerciciosOrigen;
     @FXML private BarChart<String, Number> graficoEjerciciosDificultad;
     @FXML private CategoryAxis axisDificultad;
     @FXML private NumberAxis axisCantidadEjercicios;
@@ -92,7 +98,24 @@ public class ResumenController implements Actualizable {
                         ? ""
                         : c.getValue().getFechaCreacion().format(FORMATO_FECHA)
         ));
+        cmbGrafico.getItems().setAll(NOMBRES_GRAFICOS);
+        cmbGrafico.getSelectionModel().selectedIndexProperty().addListener(
+                (obs, antes, ahora) -> mostrarGrafico(ahora.intValue()));
+        cmbGrafico.getSelectionModel().selectFirst();
+        mostrarGrafico(0);
         cargarResumen();
+    }
+
+    private void mostrarGrafico(int indice) {
+        List<Node> graficos = List.of(graficoEjerciciosAlgoritmo, graficoEjerciciosDificultad,
+                graficoEjerciciosOrigen);
+        if (indice < 0 || indice >= graficos.size()) {
+            return;
+        }
+        for (int i = 0; i < graficos.size(); i++) {
+            graficos.get(i).setVisible(i == indice);
+            graficos.get(i).setManaged(i == indice);
+        }
     }
 
     @FXML
@@ -116,10 +139,13 @@ public class ResumenController implements Actualizable {
         }
         Thread hilo = new Thread(() -> {
             try {
-                List<Algoritmo> algoritmos = new AlgoritmoDAO().listar();
-                List<Ejercicio> ejercicios = new EjercicioDAO().listarConAlgoritmo();
-                List<Perfil> perfiles = new BaseDAO<>(Perfil.class).listar();
-                List<Intento> intentos = new BaseDAO<>(Intento.class).listar();
+                // El servicio vuelve a comprobar en la base de datos que el perfil sea administrador.
+                ResumenAdministracionService.Datos datos = new ResumenAdministracionService()
+                        .cargar(SesionUsuario.obtenerPerfil().getId());
+                List<Algoritmo> algoritmos = datos.algoritmos();
+                List<Ejercicio> ejercicios = datos.ejercicios();
+                List<Perfil> perfiles = datos.perfiles();
+                int totalIntentos = datos.totalIntentos();
                 int huella = Objects.hash(
                         algoritmos.stream().map(a -> Objects.hash(
                                 a.getId(), a.getNombre(), a.getCategoria(), a.getComplejidad())).toList(),
@@ -127,7 +153,7 @@ public class ResumenController implements Actualizable {
                                 e.getId(), e.getAlgoritmo().getNombre(), e.getDificultad(),
                                 e.getOrigen(), e.getDatos())).toList(),
                         perfiles.stream().map(p -> Objects.hash(p.getId(), p.getNombre())).toList(),
-                        intentos.size());
+                        totalIntentos);
                 Platform.runLater(() -> {
                     cargando = false;
                     if (automatico && hayDatosMostrados && huella == huellaMostrada) {
@@ -141,10 +167,16 @@ public class ResumenController implements Actualizable {
                     lblCantidadAlgoritmos.setText(Integer.toString(algoritmos.size()));
                     lblCantidadEjercicios.setText(Integer.toString(ejercicios.size()));
                     lblCantidadPerfiles.setText(Integer.toString(perfiles.size()));
-                    lblCantidadIntentos.setText(Integer.toString(intentos.size()));
+                    lblCantidadIntentos.setText(Integer.toString(totalIntentos));
                     actualizarGraficos(ejercicios);
                     lblEstado.setText("Resumen actualizado.");
                     btnActualizar.setDisable(false);
+                });
+            } catch (SecurityException e) {
+                Platform.runLater(() -> {
+                    cargando = false;
+                    lblEstado.setText("Acceso restringido: el resumen general es solo para administradores.");
+                    btnActualizar.setDisable(true);
                 });
             } catch (RuntimeException e) {
                 LOG.log(Level.SEVERE, "No se pudo cargar el resumen general", e);
@@ -177,6 +209,15 @@ public class ResumenController implements Actualizable {
         porDificultad.forEach((dificultad, cantidad) ->
                 serie.getData().add(new XYChart.Data<>("Nivel " + dificultad, cantidad)));
         graficoEjerciciosDificultad.setData(FXCollections.observableArrayList(serie));
+
+        Map<String, Long> porOrigen = ejercicios.stream().collect(Collectors.groupingBy(
+                e -> e.getOrigen() == null || e.getOrigen().isBlank() ? "Sin origen" : e.getOrigen(),
+                TreeMap::new, Collectors.counting()));
+        graficoEjerciciosOrigen.setData(FXCollections.observableArrayList(
+                porOrigen.entrySet().stream()
+                        .map(entrada -> new PieChart.Data(entrada.getKey() + " (" + entrada.getValue() + ")",
+                                entrada.getValue()))
+                        .toList()));
     }
 
     private ReadOnlyStringWrapper texto(Object valor) {

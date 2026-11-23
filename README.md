@@ -116,6 +116,13 @@ borrar datos (también puedes ejecutar manualmente
 al registrarse con el mismo nombre de usuario (sin distinguir mayúsculas); se conserva su
 progreso y ese perfil solo puede quedar vinculado a una cuenta.
 
+**Administradores:** toda cuenta nueva es `USUARIO`; la aplicación no permite crear administradores.
+Para promover una cuenta, edita el usuario en
+`src/main/resources/ni/edu/uam/algomentor/db/promover-administrador.sql` y ejecútalo en PostgreSQL
+(el rol `rol` se agrega solo al abrir la aplicación). Los administradores ven el menú **Administración**
+con el Resumen general (todos los perfiles y ejercicios); el servicio que entrega esos datos vuelve a
+comprobar el rol en la base de datos, así que ocultar el menú no es la única protección.
+
 **Instalaciones existentes:** al abrir la aplicación se agregan los algoritmos faltantes a la base.
 También puedes ejecutar manualmente el script
 [`actualizar-nuevos-algoritmos.sql`](src/main/resources/ni/edu/uam/algomentor/db/actualizar-nuevos-algoritmos.sql).
@@ -135,7 +142,7 @@ La aplicación inicia en la pantalla de acceso. Crea una cuenta con un usuario d
 caracteres y una contraseña de 8 a 128 caracteres, o inicia sesión. Cada cuenta queda
 vinculada a un perfil; al registrar el nombre de un perfil previo se conserva su progreso.
 Las contraseñas se almacenan con PBKDF2 y no en texto plano. Usa **Archivo > Cerrar sesión** para salir. La gestión de contenido permite crear, consultar, actualizar y
-eliminar algoritmos y ejercicios. La sección **Inicio > Resumen general** incluye gráficos de ejercicios por algoritmo (circular) y por dificultad (barras) y muestra los totales y listados de
+eliminar algoritmos y ejercicios. El **Resumen general** (menú **Administración**) es solo para administradores: incluye un selector de gráficos (ejercicios por algoritmo, por dificultad y por origen) y muestra los totales y listados de
 algoritmos, ejercicios y perfiles, además del total de intentos.
 Si la conexión a PostgreSQL falla, la aplicación muestra el problema en la barra inferior y registra
 el detalle técnico en consola.
@@ -160,7 +167,8 @@ Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a 
 | Menú | Opciones |
 |---|---|
 | **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF), Cerrar sesión y Salir. |
-| **Inicio** | Resumen general y Mi progreso. |
+| **Inicio** | Mi progreso. |
+| **Administración** | Resumen general. Solo aparece para cuentas administradoras. |
 | **Aprender** | Simular, Práctica y Comandos. |
 | **Herramientas** | Comparar algoritmos, Comprobar sistema (math.js) y Biblioteca de contenido. |
 | **Ver** | Tema claro u oscuro. |
@@ -278,14 +286,14 @@ distribuciones y pasos educativos. Las métricas describen la traza del método,
 
 Muestra el progreso del perfil autenticado, no un ranking global. Arriba hay seis tarjetas: intentos,
 correctos, incorrectos, porcentaje de acierto (solo sobre los intentos calificados), racha de aciertos
-seguidos y tiempo promedio por intento. Debajo, siete pestañas:
+seguidos y tiempo promedio por intento. Debajo, cuatro pestañas:
 
-- **Gráfico:** gráfico de barras que compara aciertos y errores por habilidad.
+- **Gráficos:** un selector permite elegir qué gráfico ver: aciertos y errores por habilidad (barras),
+  resultados por algoritmo (barras apiladas horizontales, para que se lean los nombres completos), errores por
+  tipo (signo, fracción, aritmético y operación inválida), evolución del acierto acumulado (líneas) y
+  resultados de los intentos (circular).
 - **Detalle:** una barra animada por habilidad: verde desde 70 %, ámbar desde 40 % y roja por debajo.
-- **Por algoritmo:** gráfico de barras apiladas (correctos e incorrectos) y la tabla con intentos y porcentaje de acierto de cada algoritmo.
-- **Errores:** gráfico de los errores detectados por tipo (signo, fracción, aritmético y operación inválida).
-- **Evolución:** gráfico de líneas con el acierto acumulado a lo largo de los últimos intentos calificados.
-- **Resultados:** gráfico circular con la proporción de intentos correctos, incorrectos y sin calificar.
+- **Por algoritmo:** tabla con intentos, correctos, incorrectos y porcentaje de acierto de cada algoritmo.
 - **Historial:** los 20 intentos más recientes con fecha, algoritmo, modo, resultado y duración.
 
 La racha cuenta los aciertos consecutivos más recientes; ignora las simulaciones, que no se califican,
@@ -587,6 +595,9 @@ y límites visuales con la importación JSON. Los nuevos motores rechazan arregl
 
 - **Credenciales fuera del repositorio:** `db.local.properties` está en `.gitignore`; solo se versiona
   `db.local.properties.example`.
+- **Roles:** `cuenta.rol` es `USUARIO` por defecto y solo se cambia con SQL; `AutorizacionService` lee el rol
+  de la base en cada comprobación y `ResumenAdministracionService` lanza `SecurityException` a quien no sea
+  administrador antes de consultar datos globales.
 - **Consultas parametrizadas:** las consultas HQL usan parámetros con nombre (`:perfilId`,
   `:algoritmoId`); no se concatena texto del usuario en las consultas.
 - **Terminal educativa:** solo reconoce comandos propios y nunca ejecuta comandos del sistema operativo.

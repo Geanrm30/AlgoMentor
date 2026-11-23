@@ -14,7 +14,9 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableCell;
@@ -55,6 +57,18 @@ public class ProgresoController implements Actualizable {
     private static final int INTENTOS_CONSULTADOS = 100;
     private static final int INTENTOS_EN_HISTORIAL = 20;
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final List<String> NOMBRES_GRAFICOS = List.of(
+            "Aciertos y errores por habilidad (barras)",
+            "Resultados por algoritmo (barras apiladas)",
+            "Errores por tipo (barras)",
+            "Evolución del acierto (líneas)",
+            "Resultados de los intentos (circular)");
+    private static final List<String> AYUDAS_GRAFICOS = List.of(
+            "Cuántas veces acertaste y fallaste en cada habilidad evaluada en Práctica.",
+            "Intentos correctos e incorrectos de cada algoritmo; las simulaciones no se califican.",
+            "Cada error detectado en Práctica se clasifica por tipo: signo, fracción, aritmético u operación inválida.",
+            "Porcentaje de acierto acumulado a medida que se califican tus intentos.",
+            "Proporción de intentos correctos, incorrectos y sin calificar.");
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /** Huella de los últimos datos mostrados; permite saltar la actualización automática si nada cambió. */
@@ -76,7 +90,9 @@ public class ProgresoController implements Actualizable {
     @FXML private TableColumn<EstadisticasDAO.RendimientoAlgoritmo, String> colRendCorrectos;
     @FXML private TableColumn<EstadisticasDAO.RendimientoAlgoritmo, String> colRendIncorrectos;
     @FXML private TableColumn<EstadisticasDAO.RendimientoAlgoritmo, Double> colRendPorcentaje;
-    @FXML private StackedBarChart<String, Number> graficoAlgoritmos;
+    @FXML private ComboBox<String> cmbGrafico;
+    @FXML private Label lblAyudaGrafico;
+    @FXML private StackedBarChart<Number, String> graficoAlgoritmos;
     @FXML private CategoryAxis axisAlgoritmo;
     @FXML private NumberAxis axisIntentosAlgoritmo;
     @FXML private LineChart<Number, Number> graficoEvolucion;
@@ -118,12 +134,36 @@ public class ProgresoController implements Actualizable {
         axisCantidad.setForceZeroInRange(true);
         graficoHabilidades.setCategoryGap(24);
         graficoHabilidades.setBarGap(6);
+        configurarSelectorDeGraficos();
         configurarTablaRendimiento();
         configurarTablaHistorial();
         axisCantidadErrores.setForceZeroInRange(true);
         axisIntentosAlgoritmo.setForceZeroInRange(true);
         graficoErrores.setCategoryGap(32);
+        graficoAlgoritmos.setCategoryGap(18);
         verProgreso();
+    }
+
+    /** Un solo gráfico visible a la vez: el resto se oculta y no ocupa espacio. */
+    private void configurarSelectorDeGraficos() {
+        cmbGrafico.getItems().setAll(NOMBRES_GRAFICOS);
+        cmbGrafico.getSelectionModel().selectedIndexProperty().addListener(
+                (obs, antes, ahora) -> mostrarGrafico(ahora.intValue()));
+        cmbGrafico.getSelectionModel().selectFirst();
+        mostrarGrafico(0);
+    }
+
+    private void mostrarGrafico(int indice) {
+        if (indice < 0 || indice >= NOMBRES_GRAFICOS.size()) {
+            return;
+        }
+        List<Node> graficos = List.of(graficoHabilidades, graficoAlgoritmos, graficoErrores,
+                graficoEvolucion, graficoResultados);
+        for (int i = 0; i < graficos.size(); i++) {
+            graficos.get(i).setVisible(i == indice);
+            graficos.get(i).setManaged(i == indice);
+        }
+        lblAyudaGrafico.setText(AYUDAS_GRAFICOS.get(indice));
     }
 
     private void configurarTablaRendimiento() {
@@ -229,14 +269,14 @@ public class ProgresoController implements Actualizable {
     }
 
     private void actualizarGraficoAlgoritmos(List<EstadisticasDAO.RendimientoAlgoritmo> rendimiento) {
-        XYChart.Series<String, Number> correctos = new XYChart.Series<>();
+        XYChart.Series<Number, String> correctos = new XYChart.Series<>();
         correctos.setName("Correctos");
-        XYChart.Series<String, Number> incorrectos = new XYChart.Series<>();
+        XYChart.Series<Number, String> incorrectos = new XYChart.Series<>();
         incorrectos.setName("Incorrectos");
         for (EstadisticasDAO.RendimientoAlgoritmo r : rendimiento) {
             String nombre = TextoInterfaz.algoritmo(r.algoritmo());
-            correctos.getData().add(new XYChart.Data<>(nombre, r.correctos()));
-            incorrectos.getData().add(new XYChart.Data<>(nombre, r.incorrectos()));
+            correctos.getData().add(new XYChart.Data<>(r.correctos(), nombre));
+            incorrectos.getData().add(new XYChart.Data<>(r.incorrectos(), nombre));
         }
         graficoAlgoritmos.setTitle(rendimiento.isEmpty()
                 ? "Sin intentos por algoritmo" : "Resultados por algoritmo");

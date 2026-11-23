@@ -36,6 +36,23 @@ public class CuentaDAO {
         }
     }
 
+    /** Consulta el rol en la base de datos en cada llamada: nada del cliente decide si alguien es administrador. */
+    public boolean tieneRol(Long perfilId, String rol) {
+        if (perfilId == null || rol == null) {
+            return false;
+        }
+        try (Session session = factory.openSession()) {
+            return session.createQuery("""
+                            SELECT COUNT(c)
+                            FROM Cuenta c
+                            WHERE c.perfil.id = :perfilId AND c.rol = :rol
+                            """, Long.class)
+                    .setParameter("perfilId", perfilId)
+                    .setParameter("rol", rol)
+                    .getSingleResult() > 0;
+        }
+    }
+
     public Perfil registrar(String usuario, String contrasenaHash) {
         try (Session session = factory.openSession()) {
             Transaction transaction = session.beginTransaction();
@@ -77,6 +94,7 @@ public class CuentaDAO {
                 cuenta.setUsuario(usuario);
                 cuenta.setContrasenaHash(contrasenaHash);
                 cuenta.setPerfil(perfil);
+                cuenta.setRol(Cuenta.ROL_USUARIO);
                 session.persist(cuenta);
 
                 transaction.commit();

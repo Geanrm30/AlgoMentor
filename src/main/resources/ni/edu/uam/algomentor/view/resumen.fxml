@@ -6,8 +6,8 @@
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ResumenController">
     <HBox spacing="12" alignment="CENTER_LEFT">
         <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Resumen general" styleClass="section-title" />
-            <Label text="Vista rápida del contenido y la actividad de AlgoMentor." wrapText="true" />
+            <Label text="Resumen general (administración)" styleClass="section-title" />
+            <Label text="Contenido y actividad de todos los perfiles. Solo visible para administradores." wrapText="true" />
         </VBox>
         <Button fx:id="btnActualizar" text="Actualizar" onAction="#cargarResumen" />
     </HBox>
@@ -33,17 +33,24 @@
         <tabs>
             <Tab text="Gráficos" closable="false">
                 <content>
-                    <HBox spacing="16">
-                        <PieChart fx:id="graficoEjerciciosAlgoritmo" title="Ejercicios por algoritmo" animated="false" labelsVisible="false" legendVisible="true" legendSide="BOTTOM" HBox.hgrow="ALWAYS" />
-                        <BarChart fx:id="graficoEjerciciosDificultad" title="Ejercicios por dificultad" animated="false" legendVisible="false" HBox.hgrow="ALWAYS">
-                            <xAxis>
-                                <CategoryAxis fx:id="axisDificultad" label="Dificultad" />
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis fx:id="axisCantidadEjercicios" label="Ejercicios" forceZeroInRange="true" />
-                            </yAxis>
-                        </BarChart>
-                    </HBox>
+                    <VBox spacing="10" styleClass="tab-content">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Gráfico:" />
+                            <ComboBox fx:id="cmbGrafico" prefWidth="340" />
+                        </HBox>
+                        <StackPane VBox.vgrow="ALWAYS" minHeight="320">
+                            <PieChart fx:id="graficoEjerciciosAlgoritmo" animated="false" labelsVisible="false" legendVisible="true" legendSide="RIGHT" />
+                            <BarChart fx:id="graficoEjerciciosDificultad" animated="false" legendVisible="false" visible="false" managed="false">
+                                <xAxis>
+                                    <CategoryAxis fx:id="axisDificultad" label="Dificultad" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="axisCantidadEjercicios" label="Ejercicios" forceZeroInRange="true" minorTickCount="0" />
+                                </yAxis>
+                            </BarChart>
+                            <PieChart fx:id="graficoEjerciciosOrigen" animated="false" labelsVisible="false" legendVisible="true" legendSide="RIGHT" visible="false" managed="false" />
+                        </StackPane>
+                    </VBox>
                 </content>
             </Tab>
             <Tab text="Algoritmos" closable="false">

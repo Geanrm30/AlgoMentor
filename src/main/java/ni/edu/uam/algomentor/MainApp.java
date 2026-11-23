@@ -29,6 +29,7 @@ import ni.edu.uam.algomentor.controller.IntercambioEjerciciosController;
 import ni.edu.uam.algomentor.controller.LoginController;
 import ni.edu.uam.algomentor.controller.ProgresoController;
 import ni.edu.uam.algomentor.model.Perfil;
+import ni.edu.uam.algomentor.service.AutorizacionService;
 import ni.edu.uam.algomentor.service.CatalogoPersistidoService;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.Animaciones;
@@ -116,14 +117,29 @@ public class MainApp extends Application {
         if (temaClaro) {
             raiz.getStyleClass().add("light-theme");
         }
-        raiz.setTop(crearBarraSuperior(perfil, raiz));
+        boolean administrador = esAdministrador(perfil);
+        raiz.setTop(crearBarraSuperior(perfil, raiz, administrador));
         raiz.setCenter(contenido);
 
         stage.getScene().setRoot(raiz);
         Animaciones.instalarEfectosBoton(stage.getScene());
         precargarIntercambio();
-        mostrar("resumen", "resumen.fxml", true);
+        if (administrador) {
+            mostrar("resumen", "resumen.fxml", true);
+        } else {
+            mostrar("progreso", "progreso.fxml", true);
+        }
         iniciarActualizacionAutomatica();
+    }
+
+    /** Solo decide qué menús se muestran; cada servicio con datos globales vuelve a comprobar el rol. */
+    private static boolean esAdministrador(Perfil perfil) {
+        try {
+            return new AutorizacionService().esAdministrador(perfil.getId());
+        } catch (RuntimeException e) {
+            LOG.log(Level.WARNING, "No se pudo consultar el rol de la cuenta", e);
+            return false;
+        }
     }
 
     private void iniciarActualizacionAutomatica() {
@@ -152,20 +168,22 @@ public class MainApp extends Application {
         }
     }
 
-    private HBox crearBarraSuperior(Perfil perfil, BorderPane raiz) {
+    private HBox crearBarraSuperior(Perfil perfil, BorderPane raiz, boolean administrador) {
         Label marca = new Label("AlgoMentor");
         marca.getStyleClass().add("brand");
 
-        MenuBar menu = new MenuBar(
-                crearMenuArchivo(),
-                crearMenuInicio(),
+        MenuBar menu = new MenuBar(crearMenuArchivo(), crearMenuInicio());
+        if (administrador) {
+            menu.getMenus().add(crearMenuAdministracion());
+        }
+        menu.getMenus().addAll(
                 crearMenuAprender(),
                 crearMenuHerramientas(),
                 crearMenuVer(raiz),
                 crearMenuAyuda());
         HBox.setHgrow(menu, Priority.ALWAYS);
 
-        Label usuario = new Label("Sesión: " + perfil.getNombre());
+        Label usuario = new Label("Sesión: " + perfil.getNombre() + (administrador ? " (administrador)" : ""));
         usuario.getStyleClass().add("sesion-activa");
 
         HBox barra = new HBox(14, marca, menu, usuario);
@@ -202,8 +220,12 @@ public class MainApp extends Application {
 
     private Menu crearMenuInicio() {
         return new Menu("Inicio", null,
-                elemento("Resumen general", "Shortcut+0", () -> mostrar("resumen", "resumen.fxml", true)),
                 elemento("Mi progreso", "Shortcut+3", () -> mostrar("progreso", "progreso.fxml", true)));
+    }
+
+    private Menu crearMenuAdministracion() {
+        return new Menu("Administración", null,
+                elemento("Resumen general", "Shortcut+0", () -> mostrar("resumen", "resumen.fxml", true)));
     }
 
     private Menu crearMenuAprender() {

@@ -903,3 +903,22 @@
 .app-root.light-theme .login-card .content-tabs .tab-content {
     -fx-background-color: #ffffff;
 }
+
+/* ---------- Páginas con desplazamiento (Progreso) ---------- */
+
+.pagina-desplazable,
+.pagina-desplazable > .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.pagina-desplazable {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* La leyenda del gráfico circular se lee completa a la derecha. */
+.chart-legend {
+    -fx-padding: 8 12;
+}
