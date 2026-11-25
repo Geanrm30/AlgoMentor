@@ -393,6 +393,13 @@ porcentajes por ejercicio. El informe es de solo lectura: no cambia niveles ni t
 Usa `DificultadRealDAO`, `ReporteDificultadRealService` y `dificultad-real.jrxml`, con los mismos permisos,
 vista previa y exportación del panel. Sus pruebas de consulta usan H2 en memoria, únicamente en tests.
 
+**Mapa de calor de errores por perfil** cruza todos los perfiles registrados con las cuatro categorías
+de `ErrorDetectado` (`SIGNO`, `FRACCION`, `ARITMETICO` y `OPERACION_INVALIDA`), conservando los perfiles sin
+fallos. Incluye resumen global del grupo, orientación docente automática y una matriz térmica con cuatro
+niveles de intensidad cromática (sin errores, bajo, medio y alto/crítico) calculados de forma proporcional
+sobre el máximo observado. Usa `MapaCalorErroresDAO`, `ReporteMapaCalorService` y `mapa-calor.jrxml`, con
+los mismos permisos de administrador, vista previa y exportación a PDF.
+
 Para agregar otro informe se crea una clase que implemente `InformeAdministrativo` (título, descripción,
 apartados, nombre de archivo y `prepararReporte`) y se suma en `RegistroInformes` con `informes.add(...)`; la lista,
 la vista previa y la exportación funcionan sin tocar la interfaz.
@@ -732,7 +739,7 @@ Ejecución conjunta de pruebas unitarias e integración JavaFX:
 Pruebas específicas del informe PDF:
 
 ```powershell
-.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest,ReporteCatalogoTemplateTest,ReporteCatalogoServiceTest,ReporteDificultadRealTemplateTest,ReporteDificultadRealServiceTest,CalibracionDificultadTest,DificultadRealDAOTest,RegistroInformesTest" test
+.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest,ReporteCatalogoTemplateTest,ReporteCatalogoServiceTest,ReporteDificultadRealTemplateTest,ReporteDificultadRealServiceTest,CalibracionDificultadTest,DificultadRealDAOTest,ReporteMapaCalorTemplateTest,ReporteMapaCalorServiceTest,MapaCalorErroresDAOTest,RegistroInformesTest" test
 ```
 
 Pruebas de integración con PostgreSQL real (requieren conexión configurada y esquema actualizado):
@@ -756,7 +763,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Persistencia y servicios | `IntentoServiceTest`, `RegistroPracticaServiceTest`, `ProgresoHabilidadServiceTest`, `PerfilServiceTest`, `HabilidadErrorResolverTest`, `CalculoProgresoTest` |
 | Terminal y comparador | `ComandosTerminalTest`, `ComparadorOrdenamientosTest` |
 | Estadísticas | `EstadisticasDAOTest` |
-| Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `RegistroInformesTest` |
+| Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `ReporteMapaCalorTemplateTest`, `ReporteMapaCalorServiceTest`, `MapaCalorErroresDAOTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |
 | Utilidades | `CsvHistorialTest`, `UsuarioRecordadoTest` |
 | Constancia de dominio | `ReporteDominioTemplateTest`, `ReporteDominioServiceTest` |

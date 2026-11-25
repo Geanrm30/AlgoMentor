@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="mapa_calor_errores_algomentor"
+              pageWidth="595" pageHeight="842" columnWidth="515"
+              leftMargin="40" rightMargin="40" topMargin="32" bottomMargin="32"
+              whenNoDataType="AllSectionsNoDetail">
+    <parameter name="solicitante" class="java.lang.String"/>
+    <parameter name="fechaGeneracion" class="java.lang.String"/>
+    <parameter name="totalPerfiles" class="java.lang.Long"/>
+    <parameter name="totalErrores" class="java.lang.Long"/>
+    <parameter name="perfilesConErrores" class="java.lang.Long"/>
+    <parameter name="perfilesSinErrores" class="java.lang.Long"/>
+    <parameter name="totalSigno" class="java.lang.Long"/>
+    <parameter name="totalFraccion" class="java.lang.Long"/>
+    <parameter name="totalAritmetico" class="java.lang.Long"/>
+    <parameter name="totalOperacionInvalida" class="java.lang.Long"/>
+    <parameter name="errorPredominante" class="java.lang.String"/>
+    <parameter name="perfilCritico" class="java.lang.String"/>
+    <parameter name="recomendacionDocente" class="java.lang.String"/>
+    <field name="perfil" class="java.lang.String"/>
+    <field name="signo" class="java.lang.Long"/>
+    <field name="nivelSigno" class="java.lang.Integer"/>
+    <field name="fraccion" class="java.lang.Long"/>
+    <field name="nivelFraccion" class="java.lang.Integer"/>
+    <field name="aritmetico" class="java.lang.Long"/>
+    <field name="nivelAritmetico" class="java.lang.Integer"/>
+    <field name="operacionInvalida" class="java.lang.Long"/>
+    <field name="nivelOperacionInvalida" class="java.lang.Integer"/>
+    <field name="total" class="java.lang.Long"/>
+    <field name="pesoGrupo" class="java.lang.String"/>
+    <title height="296">
+        <element kind="rectangle" x="0" y="0" width="515" height="68"
+                 mode="Opaque" backcolor="#0F172A" forecolor="#0F172A"/>
+        <element kind="rectangle" x="0" y="64" width="515" height="4"
+                 mode="Opaque" backcolor="#14B8A6" forecolor="#14B8A6"/>
+        <element kind="textField" x="16" y="10" width="483" height="16"
+                 fontSize="9.0" bold="true" forecolor="#99F6E4" vTextAlign="Middle">
+            <expression><![CDATA["ALGOMENTOR · INFORME ADMINISTRATIVO"]]></expression>
+        </element>
+        <element kind="textField" x="16" y="28" width="483" height="30"
+                 fontSize="19.0" bold="true" forecolor="#FFFFFF" vTextAlign="Middle">
+            <expression><![CDATA["Mapa de calor de errores por perfil"]]></expression>
+        </element>
+        <element kind="textField" x="0" y="76" width="305" height="20"
+                 fontSize="10.0" forecolor="#334155" textAdjust="ScaleFont" vTextAlign="Middle">
+            <expression><![CDATA["Solicitado por " + $P{solicitante}]]></expression>
+        </element>
+        <element kind="textField" x="305" y="76" width="210" height="20"
+                 fontSize="9.0" forecolor="#64748B" hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA["Generado el " + $P{fechaGeneracion}]]></expression>
+        </element>
+        <element kind="rectangle" x="0" y="104" width="123" height="52"
+                 mode="Opaque" backcolor="#F1F5F9" forecolor="#F1F5F9"/>
+        <element kind="rectangle" x="131" y="104" width="123" height="52"
+                 mode="Opaque" backcolor="#FEF2F2" forecolor="#FEF2F2"/>
+        <element kind="rectangle" x="262" y="104" width="123" height="52"
+                 mode="Opaque" backcolor="#FFF7ED" forecolor="#FFF7ED"/>
+        <element kind="rectangle" x="393" y="104" width="122" height="52"
+                 mode="Opaque" backcolor="#ECFDF5" forecolor="#ECFDF5"/>
+        <element kind="textField" x="10" y="110" width="103" height="14"
+                 fontSize="8.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["PERFILES"]]></expression>
+        </element>
+        <element kind="textField" x="10" y="126" width="103" height="24"
+                 fontSize="19.0" bold="true" forecolor="#0F172A" vTextAlign="Middle">
+            <expression><![CDATA[$P{totalPerfiles}]]></expression>
+        </element>
+        <element kind="textField" x="141" y="110" width="103" height="14"
+                 fontSize="8.0" forecolor="#B91C1C" vTextAlign="Middle">
+            <expression><![CDATA["TOTAL ERRORES"]]></expression>
+        </element>
+        <element kind="textField" x="141" y="126" width="103" height="24"
+                 fontSize="19.0" bold="true" forecolor="#B91C1C" vTextAlign="Middle">
+            <expression><![CDATA[$P{totalErrores}]]></expression>
+        </element>
+        <element kind="textField" x="272" y="110" width="103" height="14"
+                 fontSize="8.0" forecolor="#C2410C" vTextAlign="Middle">
+            <expression><![CDATA["ERROR CRÍTICO"]]></expression>
+        </element>
+        <element kind="textField" x="272" y="126" width="103" height="24"
+                 fontSize="12.0" bold="true" forecolor="#C2410C" textAdjust="ScaleFont" vTextAlign="Middle">
+            <expression><![CDATA[$P{errorPredominante}]]></expression>
+        </element>
+        <element kind="textField" x="403" y="110" width="103" height="14"
+                 fontSize="8.0" forecolor="#166534" vTextAlign="Middle">
+            <expression><![CDATA["SIN ERRORES"]]></expression>
+        </element>
+        <element kind="textField" x="403" y="126" width="103" height="24"
+                 fontSize="19.0" bold="true" forecolor="#166534" vTextAlign="Middle">
+            <expression><![CDATA[$P{perfilesSinErrores}]]></expression>
+        </element>
+        <element kind="textField" x="0" y="164" width="515" height="22"
+                 fontSize="9.0" forecolor="#1E3A5F" textAdjust="ScaleFont" vTextAlign="Middle">
+            <expression><![CDATA["Totales del grupo  ·  Signos: " + $P{totalSigno} + "  ·  Fracciones: " + $P{totalFraccion} + "  ·  Aritmético: " + $P{totalAritmetico} + "  ·  Op. inválida: " + $P{totalOperacionInvalida}]]></expression>
+        </element>
+        <element kind="textField" x="0" y="191" width="76" height="18"
+                 fontSize="8.5" bold="true" forecolor="#334155" vTextAlign="Middle">
+            <expression><![CDATA["Escala térmica:"]]></expression>
+        </element>
+        <element kind="rectangle" x="80" y="194" width="12" height="12"
+                 mode="Opaque" backcolor="#ECFDF5" forecolor="#86EFAC"/>
+        <element kind="textField" x="96" y="191" width="84" height="18"
+                 fontSize="8.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["0 (Sin errores)"]]></expression>
+        </element>
+        <element kind="rectangle" x="184" y="194" width="12" height="12"
+                 mode="Opaque" backcolor="#FEF08A" forecolor="#EAB308"/>
+        <element kind="textField" x="200" y="191" width="44" height="18"
+                 fontSize="8.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["Bajo"]]></expression>
+        </element>
+        <element kind="rectangle" x="248" y="194" width="12" height="12"
+                 mode="Opaque" backcolor="#FB923C" forecolor="#EA580C"/>
+        <element kind="textField" x="264" y="191" width="48" height="18"
+                 fontSize="8.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["Medio"]]></expression>
+        </element>
+        <element kind="rectangle" x="316" y="194" width="12" height="12"
+                 mode="Opaque" backcolor="#DC2626" forecolor="#991B1B"/>
+        <element kind="textField" x="332" y="191" width="175" height="18"
+                 fontSize="8.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["Alto / Foco crítico"]]></expression>
+        </element>
+        <element kind="rectangle" x="0" y="216" width="515" height="72"
+                 stretchType="ContainerHeight" mode="Opaque" backcolor="#F8FAFC" forecolor="#E2E8F0"/>
+        <element kind="textField" x="12" y="222" width="491" height="16"
+                 fontSize="9.5" bold="true" forecolor="#0F172A" vTextAlign="Middle">
+            <expression><![CDATA["Orientación docente y focos detectados"]]></expression>
+        </element>
+        <element kind="textField" x="12" y="241" width="491" height="39"
+                 fontSize="8.5" forecolor="#334155" textAdjust="StretchHeight">
+            <expression><![CDATA[$P{recomendacionDocente}]]></expression>
+        </element>
+    </title>
+    <columnHeader height="30">
+        <element kind="rectangle" x="0" y="0" width="515" height="30"
+                 mode="Opaque" backcolor="#1E3A5F" forecolor="#1E3A5F"/>
+        <element kind="textField" x="6" y="0" width="144" height="30"
+                 fontSize="8.0" bold="true" forecolor="#FFFFFF" vTextAlign="Middle">
+            <expression><![CDATA["PERFIL"]]></expression>
+        </element>
+        <element kind="textField" x="150" y="0" width="68" height="30"
+                 fontSize="8.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["SIGNOS"]]></expression>
+        </element>
+        <element kind="textField" x="218" y="0" width="72" height="30"
+                 fontSize="8.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["FRACCIONES"]]></expression>
+        </element>
+        <element kind="textField" x="290" y="0" width="72" height="30"
+                 fontSize="8.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["ARITMÉTICO"]]></expression>
+        </element>
+        <element kind="textField" x="362" y="0" width="72" height="30"
+                 fontSize="8.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["OP. INVÁLIDA"]]></expression>
+        </element>
+        <element kind="textField" x="434" y="0" width="42" height="30"
+                 fontSize="8.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["TOTAL"]]></expression>
+        </element>
+        <element kind="textField" x="476" y="0" width="39" height="30"
+                 fontSize="8.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+            <expression><![CDATA["%"]]></expression>
+        </element>
+    </columnHeader>
+    <detail>
+        <band height="28" splitType="Stretch">
+            <element kind="rectangle" x="0" y="0" width="515" height="28" stretchType="ContainerHeight"
+                     mode="Opaque" backcolor="#FFFFFF" forecolor="#FFFFFF"/>
+            <element kind="line" x="0" y="27" width="515" height="0"
+                     positionType="FixRelativeToBottom" forecolor="#E2E8F0"/>
+            <element kind="textField" x="6" y="0" width="142" height="28"
+                     fontSize="9.0" bold="true" forecolor="#1E293B" textAdjust="StretchHeight" vTextAlign="Middle">
+                <expression><![CDATA[$F{perfil}]]></expression>
+            </element>
+
+            <!-- SIGNOS -->
+            <element kind="rectangle" x="152" y="3" width="64" height="22"
+                     mode="Opaque" backcolor="#ECFDF5" forecolor="#BBF7D0">
+                <printWhenExpression><![CDATA[$F{nivelSigno} == 0]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="152" y="3" width="64" height="22"
+                     mode="Opaque" backcolor="#FEF08A" forecolor="#FDE047">
+                <printWhenExpression><![CDATA[$F{nivelSigno} == 1]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="152" y="3" width="64" height="22"
+                     mode="Opaque" backcolor="#FB923C" forecolor="#F97316">
+                <printWhenExpression><![CDATA[$F{nivelSigno} == 2]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="152" y="3" width="64" height="22"
+                     mode="Opaque" backcolor="#DC2626" forecolor="#B91C1C">
+                <printWhenExpression><![CDATA[$F{nivelSigno} == 3]]></printWhenExpression>
+            </element>
+            <element kind="textField" x="152" y="3" width="64" height="22"
+                     fontSize="9.0" forecolor="#166534" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelSigno} == 0]]></printWhenExpression>
+                <expression><![CDATA[$F{signo}]]></expression>
+            </element>
+            <element kind="textField" x="152" y="3" width="64" height="22"
+                     fontSize="9.0" bold="true" forecolor="#713F12" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelSigno} == 1]]></printWhenExpression>
+                <expression><![CDATA[$F{signo}]]></expression>
+            </element>
+            <element kind="textField" x="152" y="3" width="64" height="22"
+                     fontSize="9.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelSigno} >= 2]]></printWhenExpression>
+                <expression><![CDATA[$F{signo}]]></expression>
+            </element>
+
+            <!-- FRACCIONES -->
+            <element kind="rectangle" x="220" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#ECFDF5" forecolor="#BBF7D0">
+                <printWhenExpression><![CDATA[$F{nivelFraccion} == 0]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="220" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#FEF08A" forecolor="#FDE047">
+                <printWhenExpression><![CDATA[$F{nivelFraccion} == 1]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="220" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#FB923C" forecolor="#F97316">
+                <printWhenExpression><![CDATA[$F{nivelFraccion} == 2]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="220" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#DC2626" forecolor="#B91C1C">
+                <printWhenExpression><![CDATA[$F{nivelFraccion} == 3]]></printWhenExpression>
+            </element>
+            <element kind="textField" x="220" y="3" width="68" height="22"
+                     fontSize="9.0" forecolor="#166534" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelFraccion} == 0]]></printWhenExpression>
+                <expression><![CDATA[$F{fraccion}]]></expression>
+            </element>
+            <element kind="textField" x="220" y="3" width="68" height="22"
+                     fontSize="9.0" bold="true" forecolor="#713F12" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelFraccion} == 1]]></printWhenExpression>
+                <expression><![CDATA[$F{fraccion}]]></expression>
+            </element>
+            <element kind="textField" x="220" y="3" width="68" height="22"
+                     fontSize="9.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelFraccion} >= 2]]></printWhenExpression>
+                <expression><![CDATA[$F{fraccion}]]></expression>
+            </element>
+
+            <!-- ARITMETICO -->
+            <element kind="rectangle" x="292" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#ECFDF5" forecolor="#BBF7D0">
+                <printWhenExpression><![CDATA[$F{nivelAritmetico} == 0]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="292" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#FEF08A" forecolor="#FDE047">
+                <printWhenExpression><![CDATA[$F{nivelAritmetico} == 1]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="292" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#FB923C" forecolor="#F97316">
+                <printWhenExpression><![CDATA[$F{nivelAritmetico} == 2]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="292" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#DC2626" forecolor="#B91C1C">
+                <printWhenExpression><![CDATA[$F{nivelAritmetico} == 3]]></printWhenExpression>
+            </element>
+            <element kind="textField" x="292" y="3" width="68" height="22"
+                     fontSize="9.0" forecolor="#166534" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelAritmetico} == 0]]></printWhenExpression>
+                <expression><![CDATA[$F{aritmetico}]]></expression>
+            </element>
+            <element kind="textField" x="292" y="3" width="68" height="22"
+                     fontSize="9.0" bold="true" forecolor="#713F12" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelAritmetico} == 1]]></printWhenExpression>
+                <expression><![CDATA[$F{aritmetico}]]></expression>
+            </element>
+            <element kind="textField" x="292" y="3" width="68" height="22"
+                     fontSize="9.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelAritmetico} >= 2]]></printWhenExpression>
+                <expression><![CDATA[$F{aritmetico}]]></expression>
+            </element>
+
+            <!-- OPERACION INVALIDA -->
+            <element kind="rectangle" x="364" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#ECFDF5" forecolor="#BBF7D0">
+                <printWhenExpression><![CDATA[$F{nivelOperacionInvalida} == 0]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="364" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#FEF08A" forecolor="#FDE047">
+                <printWhenExpression><![CDATA[$F{nivelOperacionInvalida} == 1]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="364" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#FB923C" forecolor="#F97316">
+                <printWhenExpression><![CDATA[$F{nivelOperacionInvalida} == 2]]></printWhenExpression>
+            </element>
+            <element kind="rectangle" x="364" y="3" width="68" height="22"
+                     mode="Opaque" backcolor="#DC2626" forecolor="#B91C1C">
+                <printWhenExpression><![CDATA[$F{nivelOperacionInvalida} == 3]]></printWhenExpression>
+            </element>
+            <element kind="textField" x="364" y="3" width="68" height="22"
+                     fontSize="9.0" forecolor="#166534" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelOperacionInvalida} == 0]]></printWhenExpression>
+                <expression><![CDATA[$F{operacionInvalida}]]></expression>
+            </element>
+            <element kind="textField" x="364" y="3" width="68" height="22"
+                     fontSize="9.0" bold="true" forecolor="#713F12" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelOperacionInvalida} == 1]]></printWhenExpression>
+                <expression><![CDATA[$F{operacionInvalida}]]></expression>
+            </element>
+            <element kind="textField" x="364" y="3" width="68" height="22"
+                     fontSize="9.0" bold="true" forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle">
+                <printWhenExpression><![CDATA[$F{nivelOperacionInvalida} >= 2]]></printWhenExpression>
+                <expression><![CDATA[$F{operacionInvalida}]]></expression>
+            </element>
+
+            <!-- TOTAL Y % DEL GRUPO -->
+            <element kind="textField" x="434" y="0" width="42" height="28"
+                     fontSize="9.5" bold="true" forecolor="#0F172A" hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA[$F{total}]]></expression>
+            </element>
+            <element kind="textField" x="476" y="0" width="39" height="28"
+                     fontSize="8.0" forecolor="#475569" hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA[$F{pesoGrupo}]]></expression>
+            </element>
+        </band>
+    </detail>
+    <pageFooter height="26">
+        <element kind="line" x="0" y="0" width="515" height="0" forecolor="#CBD5E1"/>
+        <element kind="textField" x="0" y="5" width="415" height="18"
+                 fontSize="8.0" forecolor="#64748B" vTextAlign="Middle">
+            <expression><![CDATA["AlgoMentor · Mapa de calor de errores · Uso administrativo"]]></expression>
+        </element>
+        <element kind="textField" x="415" y="5" width="100" height="18"
+                 fontSize="8.0" forecolor="#64748B" hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+    </pageFooter>
+    <summary height="42">
+        <printWhenExpression><![CDATA[$P{totalPerfiles} == 0L]]></printWhenExpression>
+        <element kind="textField" x="12" y="6" width="491" height="30"
+                 fontSize="10.0" forecolor="#475569" vTextAlign="Middle">
+            <expression><![CDATA["Todavía no hay perfiles registrados."]]></expression>
+        </element>
+    </summary>
+</jasperReport>

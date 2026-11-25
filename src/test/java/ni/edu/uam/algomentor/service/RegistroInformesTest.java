@@ -23,6 +23,17 @@ class RegistroInformesTest {
     }
 
     @Test
+    void elPanelIncluyeMapaDeCalorSinReemplazarLosExistentes() {
+        var informe = RegistroInformes.todos().stream().filter(i -> "mapa-calor-errores".equals(i.id()))
+                .findFirst().orElseThrow();
+
+        assertTrue(informe instanceof ReporteMapaCalorService);
+        assertEquals("Mapa de calor de errores por perfil", informe.titulo());
+        assertFalse(informe.secciones().isEmpty());
+        assertEquals("catalogo", RegistroInformes.todos().getFirst().id());
+    }
+
+    @Test
     void elPanelIncluyeElInformeDelCatalogo() {
         List<InformeAdministrativo> informes = RegistroInformes.todos();
 
