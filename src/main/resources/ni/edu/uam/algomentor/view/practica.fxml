@@ -22,13 +22,27 @@
                 </VBox>
                 <VBox fx:id="panelMatriz" spacing="8" visible="false" managed="false">
                     <Label text="Aplica una operación elemental a la matriz inicial y escribe la matriz resultante completa." wrapText="true" />
-                    <ComboBox fx:id="cmbOperacion" promptText="Operación de filas" maxWidth="Infinity" />
-                    <HBox spacing="8">
-                        <TextField fx:id="txtDestino" promptText="Fila destino (1, 2...)" HBox.hgrow="ALWAYS" />
-                        <TextField fx:id="txtOrigen" promptText="Fila origen, si aplica" HBox.hgrow="ALWAYS" />
-                        <TextField fx:id="txtFactor" promptText="Factor, si aplica" HBox.hgrow="ALWAYS" />
+                    <ComboBox fx:id="cmbOperacion" promptText="Elige la operación de filas" prefWidth="360" />
+                    <Label fx:id="lblAyudaOperacion" wrapText="true" styleClass="subtitle" />
+                    <HBox spacing="12" alignment="BOTTOM_LEFT">
+                        <VBox fx:id="campoDestino" spacing="4">
+                            <Label fx:id="lblDestino" text="Fila destino" />
+                            <TextField fx:id="txtDestino" promptText="1, 2…" prefWidth="110" maxWidth="110" />
+                        </VBox>
+                        <VBox fx:id="campoOrigen" spacing="4">
+                            <Label fx:id="lblOrigen" text="Fila origen" />
+                            <TextField fx:id="txtOrigen" promptText="1, 2…" prefWidth="110" maxWidth="110" />
+                        </VBox>
+                        <VBox fx:id="campoFactor" spacing="4">
+                            <Label fx:id="lblFactor" text="Factor" />
+                            <TextField fx:id="txtFactor" promptText="2, -1, 3/4…" prefWidth="130" maxWidth="130" />
+                        </VBox>
                     </HBox>
+                    <Label fx:id="lblFormula" styleClass="formula-operacion" wrapText="true" />
                     <VBox fx:id="entradaMatrizEscrita" />
+                    <HBox spacing="10">
+                        <Button fx:id="btnRestablecer" text="Restablecer matriz inicial" onAction="#restablecerMatriz" />
+                    </HBox>
                 </VBox>
                 <HBox spacing="10">
                     <Button fx:id="btnVerificar" text="Verificar" onAction="#verificar" styleClass="primary-button" />

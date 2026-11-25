@@ -1006,3 +1006,125 @@
 .app-root.light-theme .check-box:selected .box {
     -fx-border-color: #0284c7;
 }
+
+/* ---------- Panel de informes (administración) ---------- */
+
+.lista-informes {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 2;
+}
+
+.lista-informes .list-cell {
+    -fx-background-color: -ac-field;
+    -fx-background-radius: 10;
+    -fx-border-color: -ac-border;
+    -fx-border-radius: 10;
+    -fx-text-fill: -ac-text;
+    -fx-padding: 10 14;
+    -fx-cursor: hand;
+}
+
+.lista-informes .list-cell:filled:hover {
+    -fx-border-color: -ac-accent;
+}
+
+.lista-informes .list-cell:filled:selected {
+    -fx-background-color: rgba(34, 211, 238, 0.16);
+    -fx-border-color: -ac-accent;
+}
+
+.lista-informes .list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.subtitulo-informe {
+    -fx-text-fill: -ac-accent;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 0 0 0;
+}
+
+.lista-contenido-informe {
+    -fx-text-fill: -ac-text-soft;
+    -fx-line-spacing: 4;
+}
+
+.nota-informe {
+    -fx-text-fill: -ac-muted;
+    -fx-font-size: 12px;
+    -fx-padding: 6 0 0 0;
+}
+
+.titulo-informe {
+    -fx-text-fill: -ac-text;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.app-root.light-theme .lista-informes .list-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #0f172a;
+}
+
+.app-root.light-theme .lista-informes .list-cell:filled:selected {
+    -fx-background-color: #e0f2fe;
+}
+
+.app-root.light-theme .lista-informes .list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.app-root.light-theme .titulo-informe {
+    -fx-text-fill: #0f172a;
+}
+
+.app-root.light-theme .subtitulo-informe {
+    -fx-text-fill: #0284c7;
+}
+
+.app-root.light-theme .lista-contenido-informe {
+    -fx-text-fill: #334155;
+}
+
+/* ---------- Práctica de matrices (Gauss y Gauss-Jordan) ---------- */
+
+.formula-operacion {
+    -fx-padding: 8 12;
+    -fx-background-color: -ac-field;
+    -fx-background-radius: 8;
+    -fx-border-color: -ac-border;
+    -fx-border-radius: 8;
+    -fx-text-fill: -ac-accent;
+    -fx-font-family: "Consolas", "Monospaced";
+    -fx-font-size: 14px;
+}
+
+.formula-operacion.formula-invalida {
+    -fx-text-fill: -ac-warn;
+    -fx-border-color: -ac-warn;
+}
+
+.celda-modificada {
+    -fx-border-color: -ac-accent;
+}
+
+.celda-correcta, .celda-correcta:focused {
+    -fx-border-color: -ac-ok;
+    -fx-border-width: 2;
+}
+
+.celda-error, .celda-error:focused {
+    -fx-border-color: -ac-bad;
+    -fx-border-width: 2;
+}
+
+.app-root.light-theme .formula-operacion {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #0369a1;
+}
+
+.app-root.light-theme .formula-operacion.formula-invalida {
+    -fx-text-fill: #b45309;
+}

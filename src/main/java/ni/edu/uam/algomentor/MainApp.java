@@ -39,6 +39,7 @@ import ni.edu.uam.algomentor.service.CatalogoPersistidoService;
 import ni.edu.uam.algomentor.service.ResumenAdministracionService;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.Animaciones;
+import ni.edu.uam.algomentor.util.ConfiguracionLogs;
 import ni.edu.uam.algomentor.util.HibernateUtil;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.Tema;
@@ -184,6 +185,13 @@ public class MainApp extends Application {
         hilo.start();
     }
 
+    /** Panel con los informes globales; cada informe vuelve a comprobar el rol en su servicio. */
+    private void mostrarInformes() {
+        if (administrador) {
+            mostrar("informes", "informes.fxml", true);
+        }
+    }
+
     private void ocultarMenuContextual() {
         if (menuContextual != null && menuContextual.isShowing()) {
             menuContextual.hide();
@@ -199,6 +207,7 @@ public class MainApp extends Application {
             menuContextual.getItems().add(elemento("Mi progreso", () -> mostrar("progreso", "progreso.fxml", true)));
             if (administrador) {
                 menuContextual.getItems().add(elemento("Resumen general", this::mostrarResumenGeneral));
+                menuContextual.getItems().add(elemento("Informes", this::mostrarInformes));
             }
             menuContextual.getItems().addAll(
                     elemento("Simular", () -> mostrar("simulador", "simulador.fxml", false)),
@@ -319,7 +328,8 @@ public class MainApp extends Application {
 
     private Menu crearMenuAdministracion() {
         return new Menu("Administración", null,
-                elemento("Resumen general", "Shortcut+0", this::mostrarResumenGeneral));
+                elemento("Resumen general", "Shortcut+0", this::mostrarResumenGeneral),
+                elemento("Informes", "Shortcut+9", this::mostrarInformes));
     }
 
     private Menu crearMenuAprender() {
@@ -473,6 +483,7 @@ public class MainApp extends Application {
     private record Vista(Parent raiz, Object controlador) { }
 
     public static void main(String[] args) {
+        ConfiguracionLogs.aplicar();
         launch(args);
     }
 }

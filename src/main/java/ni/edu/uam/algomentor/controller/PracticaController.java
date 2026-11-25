@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.dao.EjercicioDAO;
@@ -45,6 +46,15 @@ public class PracticaController {
     @FXML private TextField txtDestino;
     @FXML private TextField txtOrigen;
     @FXML private TextField txtFactor;
+    @FXML private Label lblAyudaOperacion;
+    @FXML private Label lblDestino;
+    @FXML private Label lblOrigen;
+    @FXML private Label lblFactor;
+    @FXML private Label lblFormula;
+    @FXML private Region campoDestino;
+    @FXML private Region campoOrigen;
+    @FXML private Region campoFactor;
+    @FXML private Button btnRestablecer;
     @FXML private VBox entradaMatrizEscrita;
     @FXML private Label lblEnunciado;
     @FXML private Label lblResultado;
@@ -52,6 +62,7 @@ public class PracticaController {
 
     private long inicioNanos;
     private EntradaMatrizVisual matrizVisual;
+    private int filasMatriz;
 
     @FXML
     private void initialize() {
@@ -85,6 +96,7 @@ public class PracticaController {
             if (matriz) {
                 try {
                     Fraccion[][] datos = EntradaAprendizaje.leerMatrizGuardada(actual.getDatos());
+                    filasMatriz = datos.length;
                     matrizVisual.cargar(datos);
                 } catch (IllegalArgumentException e) {
                     matrizVisual.limpiar();
@@ -93,17 +105,32 @@ public class PracticaController {
                             Animaciones.Estado.ERROR);
                 }
             } else {
+                filasMatriz = 0;
                 matrizVisual.limpiar();
             }
+            actualizarOperacion();
             lblEnunciado.setText(actual == null ? "Selecciona un ejercicio de la biblioteca."
                     : "Algoritmo: " + TextoInterfaz.algoritmo(actual.getAlgoritmo().getNombre())
                     + "\n" + TextoInterfaz.datos(actual));
         });
         txtRespuesta.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
-        txtDestino.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
-        txtOrigen.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
-        txtFactor.textProperty().addListener((obs, anterior, actual) -> limpiarResultado());
-        cmbOperacion.valueProperty().addListener((obs, anterior, actual) -> limpiarResultado());
+        txtDestino.textProperty().addListener((obs, anterior, actual) -> {
+            limpiarResultado();
+            actualizarFormula();
+        });
+        txtOrigen.textProperty().addListener((obs, anterior, actual) -> {
+            limpiarResultado();
+            actualizarFormula();
+        });
+        txtFactor.textProperty().addListener((obs, anterior, actual) -> {
+            limpiarResultado();
+            actualizarFormula();
+        });
+        cmbOperacion.valueProperty().addListener((obs, anterior, actual) -> {
+            limpiarResultado();
+            actualizarOperacion();
+        });
+        actualizarOperacion();
         recargar();
     }
 
@@ -143,6 +170,10 @@ public class PracticaController {
                         txtOrigen.getText(), txtFactor.getText(), matrizVisual.texto());
                 errores = verificacion.errores();
                 correcto = verificacion.correcto();
+                matrizVisual.marcarResultado(correcto, errores.stream()
+                        .filter(error -> error.fila() >= 0 && error.columna() >= 0)
+                        .map(error -> new int[] {error.fila(), error.columna()})
+                        .toList());
                 mensaje = correcto ? "Operación correcta." : describirErrores(errores);
             } else {
                 EvaluadorPractica.Resultado evaluacion = EvaluadorPractica.evaluar(
@@ -179,8 +210,131 @@ public class PracticaController {
                 () -> btnVerificar.setDisable(false));
     }
 
+    @FXML
+    private void restablecerMatriz() {
+        matrizVisual.restablecer();
+        limpiarResultado();
+    }
+
     private void limpiarResultado() {
         lblResultado.setText("");
+    }
+
+    private static void mostrarCampo(Region campo, boolean visible) {
+        campo.setVisible(visible);
+        campo.setManaged(visible);
+    }
+
+    /** Muestra solo los datos que necesita la operación elegida y explica qué hace. */
+    private void actualizarOperacion() {
+        String operacion = cmbOperacion.getValue();
+        boolean intercambiar = "Intercambiar filas".equals(operacion);
+        boolean escalar = "Escalar fila".equals(operacion);
+        boolean eliminar = "Eliminar fila".equals(operacion);
+        mostrarCampo(campoDestino, intercambiar || escalar || eliminar);
+        mostrarCampo(campoOrigen, intercambiar || eliminar);
+        mostrarCampo(campoFactor, escalar || eliminar);
+        if (!intercambiar && !eliminar) {
+            txtOrigen.clear();
+        }
+        if (!escalar && !eliminar) {
+            txtFactor.clear();
+        }
+        if (intercambiar) {
+            lblAyudaOperacion.setText("Cambia de lugar dos filas de la matriz.");
+            lblDestino.setText("Fila A");
+            lblOrigen.setText("Fila B");
+        } else if (escalar) {
+            lblAyudaOperacion.setText("Multiplica toda una fila por un número distinto de cero.");
+            lblDestino.setText("Fila");
+            lblFactor.setText("Se multiplica por");
+        } else if (eliminar) {
+            lblAyudaOperacion.setText("Resta a una fila un múltiplo de otra para hacer ceros: "
+                    + "la fila destino cambia y la fila origen queda igual.");
+            lblDestino.setText("Fila destino");
+            lblOrigen.setText("Fila origen");
+            lblFactor.setText("Factor k");
+        } else {
+            lblAyudaOperacion.setText("Elige una operación para ver los datos que necesita.");
+        }
+        actualizarFormula();
+    }
+
+    /** Escribe la operación con las filas y el factor tecleados y avisa de datos imposibles. */
+    private void actualizarFormula() {
+        String operacion = cmbOperacion.getValue();
+        String a = valorOInterrogacion(txtDestino, "?");
+        String b = valorOInterrogacion(txtOrigen, "?");
+        String k = valorOInterrogacion(txtFactor, "k");
+        String formula;
+        if ("Intercambiar filas".equals(operacion)) {
+            formula = "F" + a + " ↔ F" + b;
+        } else if ("Escalar fila".equals(operacion)) {
+            formula = "F" + a + " ← (" + k + ") · F" + a;
+        } else if ("Eliminar fila".equals(operacion)) {
+            formula = "F" + a + " ← F" + a + " − (" + k + ") · F" + b;
+        } else {
+            lblFormula.setText("");
+            mostrarCampo(lblFormula, false);
+            return;
+        }
+        String problema = problemaDeOperacion(operacion);
+        mostrarCampo(lblFormula, true);
+        lblFormula.getStyleClass().remove("formula-invalida");
+        if (problema == null) {
+            lblFormula.setText(formula);
+        } else {
+            lblFormula.setText(formula + "\n" + problema);
+            lblFormula.getStyleClass().add("formula-invalida");
+        }
+    }
+
+    private static String valorOInterrogacion(TextField campo, String porDefecto) {
+        String texto = campo.getText() == null ? "" : campo.getText().strip();
+        return texto.isEmpty() ? porDefecto : texto;
+    }
+
+    /** Devuelve el motivo si lo tecleado ya no puede ser válido, o {@code null} si todo va bien por ahora. */
+    private String problemaDeOperacion(String operacion) {
+        Integer destino = leerFilaTecleada(txtDestino);
+        Integer origen = leerFilaTecleada(txtOrigen);
+        if (!txtDestino.getText().isBlank() && destino == null) {
+            return "La fila debe ser un entero positivo.";
+        }
+        if (!txtOrigen.getText().isBlank() && origen == null
+                && !"Escalar fila".equals(operacion)) {
+            return "La fila origen debe ser un entero positivo.";
+        }
+        if (filasMatriz > 0) {
+            if (destino != null && destino > filasMatriz) {
+                return "La fila " + destino + " no existe: la matriz tiene " + filasMatriz + " filas.";
+            }
+            if (origen != null && origen > filasMatriz && !"Escalar fila".equals(operacion)) {
+                return "La fila " + origen + " no existe: la matriz tiene " + filasMatriz + " filas.";
+            }
+        }
+        if (destino != null && destino.equals(origen) && !"Escalar fila".equals(operacion)) {
+            return "Las dos filas deben ser distintas.";
+        }
+        if (!"Intercambiar filas".equals(operacion) && !txtFactor.getText().isBlank()) {
+            try {
+                if (Fraccion.leer(txtFactor.getText()).esCero() && "Escalar fila".equals(operacion)) {
+                    return "No se puede multiplicar una fila por cero.";
+                }
+            } catch (IllegalArgumentException | ArithmeticException e) {
+                return "El factor debe ser un entero o una fracción, por ejemplo 3/4.";
+            }
+        }
+        return null;
+    }
+
+    private static Integer leerFilaTecleada(TextField campo) {
+        try {
+            int fila = Integer.parseInt(campo.getText().strip());
+            return fila >= 1 ? fila : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private boolean esMatriz(Ejercicio ejercicio) {
