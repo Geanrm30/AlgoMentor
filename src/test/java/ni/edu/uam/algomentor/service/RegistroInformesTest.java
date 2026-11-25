@@ -12,6 +12,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RegistroInformesTest {
 
     @Test
+    void elPanelIncluyeLosCuatroInformesEsperados() {
+        List<InformeAdministrativo> informes = RegistroInformes.todos();
+
+        assertEquals(4, informes.size());
+        assertEquals(List.of("catalogo", "constancia-dominio", "dificultad-real", "mapa-calor-errores"),
+                informes.stream().map(InformeAdministrativo::id).toList());
+    }
+
+    @Test
     void elPanelIncluyeDificultadRealSinReemplazarElCatalogo() {
         var informe = RegistroInformes.todos().stream().filter(i -> "dificultad-real".equals(i.id()))
                 .findFirst().orElseThrow();
