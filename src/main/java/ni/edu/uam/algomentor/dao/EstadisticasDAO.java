@@ -103,6 +103,19 @@ public class EstadisticasDAO {
         }
     }
 
+    public record DominioAlgoritmo(long intentosCalificados, long correctos) {
+
+        public DominioAlgoritmo {
+            if (intentosCalificados < 0 || correctos < 0 || correctos > intentosCalificados) {
+                throw new IllegalArgumentException("Los contadores de dominio no son válidos.");
+            }
+        }
+
+        public double porcentajeAciertos() {
+            return intentosCalificados == 0 ? 0.0 : correctos * 100.0 / intentosCalificados;
+        }
+    }
+
     public record ResumenPerfil(Long id, String nombre, ResumenIntentos intentos) { }
 
     /** Un intento del historial; {@code correcto} es null cuando no se calificó (por ejemplo, una simulación). */
@@ -352,6 +365,33 @@ public class EstadisticasDAO {
                     total,
                     correctos,
                     incorrectos
+            );
+        }
+    }
+
+    public DominioAlgoritmo obtenerDominioAlgoritmo(Long perfilId, Long algoritmoId) {
+        validarPerfilId(perfilId);
+        if (algoritmoId == null || algoritmoId <= 0) {
+            throw new IllegalArgumentException("El ID del algoritmo debe ser positivo.");
+        }
+
+        try (Session session = factory.openSession()) {
+            Object[] fila = session.createQuery("""
+                    SELECT COUNT(i),
+                           COALESCE(SUM(CASE WHEN i.correcto = true THEN 1 ELSE 0 END), 0)
+                    FROM Intento i
+                    JOIN i.ejercicio e
+                    JOIN e.algoritmo a
+                    WHERE i.perfil.id = :perfilId
+                      AND a.id = :algoritmoId
+                      AND i.correcto IS NOT NULL
+                    """, Object[].class)
+                    .setParameter("perfilId", perfilId)
+                    .setParameter("algoritmoId", algoritmoId)
+                    .getSingleResult();
+            return new DominioAlgoritmo(
+                    ((Number) fila[0]).longValue(),
+                    ((Number) fila[1]).longValue()
             );
         }
     }

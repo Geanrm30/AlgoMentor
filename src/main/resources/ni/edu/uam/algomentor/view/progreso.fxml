@@ -45,6 +45,12 @@
         <Label text="Aún no hay actividad" styleClass="aviso-vacio-titulo" />
         <Label fx:id="lblBienvenida" wrapText="true" />
     </VBox>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Constancia de dominio:" />
+        <ComboBox fx:id="cmbAlgoritmoDominio" promptText="Selecciona un algoritmo" prefWidth="220" />
+        <Button fx:id="btnGenerarConstancia" text="Generar PDF" onAction="#generarConstanciaDominio" />
+        <Label text="Se otorga con 80 % o más de aciertos." wrapText="true" />
+    </HBox>
     <Label fx:id="lblResumen" text="Cargando progreso…" wrapText="true" />
     <TabPane VBox.vgrow="ALWAYS" minHeight="460" styleClass="content-tabs">
         <tabs>

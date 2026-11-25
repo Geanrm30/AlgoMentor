@@ -129,6 +129,23 @@ class EstadisticasDAOTest {
     }
 
     @Test
+    void debeCalcularDominioPorAlgoritmoYManejarCeroIntentos() {
+        var conIntentos = new EstadisticasDAO.DominioAlgoritmo(5, 4);
+        var sinIntentos = new EstadisticasDAO.DominioAlgoritmo(0, 0);
+
+        assertEquals(80.0, conIntentos.porcentajeAciertos());
+        assertEquals(0.0, sinIntentos.porcentajeAciertos());
+    }
+
+    @Test
+    void debeRechazarContadoresInvalidosDeDominio() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new EstadisticasDAO.DominioAlgoritmo(-1, 0));
+        assertThrows(IllegalArgumentException.class,
+                () -> new EstadisticasDAO.DominioAlgoritmo(2, 3));
+    }
+
+    @Test
     void debeRechazarTotalNegativo() {
         assertThrows(IllegalArgumentException.class, () ->
                 new EstadisticasDAO.ResumenIntentos(
