@@ -17,6 +17,7 @@ public final class RegistroInformes {
     public static List<InformeAdministrativo> todos() {
         List<InformeAdministrativo> informes = new ArrayList<>();
         informes.add(new ReporteCatalogoService());
+        informes.add(new ReporteDificultadRealService());
         // Agrega aquí los informes nuevos: informes.add(new MiInforme());
         return List.copyOf(informes);
     }

@@ -12,6 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RegistroInformesTest {
 
     @Test
+    void elPanelIncluyeDificultadRealSinReemplazarElCatalogo() {
+        var informe = RegistroInformes.todos().stream().filter(i -> "dificultad-real".equals(i.id()))
+                .findFirst().orElseThrow();
+
+        assertTrue(informe instanceof ReporteDificultadRealService);
+        assertEquals("Dificultad real de los ejercicios", informe.titulo());
+        assertFalse(informe.secciones().isEmpty());
+        assertEquals("catalogo", RegistroInformes.todos().getFirst().id());
+    }
+
+    @Test
     void elPanelIncluyeElInformeDelCatalogo() {
         List<InformeAdministrativo> informes = RegistroInformes.todos();
 

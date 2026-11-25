@@ -380,6 +380,19 @@ acierto global, intentos totales, dificultad media y algoritmos sin ejercicios) 
 sus ejercicios, intentos y porcentaje de acierto, ejercicios por dificultad, ejercicios por origen y los diez
 ejercicios más usados. Usa la plantilla `catalogo.jrxml`, `CatalogoDAO` y `ReporteCatalogoService`.
 
+**Dificultad real de los ejercicios** compara el nivel asignado (1–5) con el porcentaje de acierto de
+todos los ejercicios; cuenta únicamente intentos `PRACTICA` con `correcto` distinto de `null`.
+Incluye resumen general y tabla por ejercicio, con los mal calibrados resaltados en rojo.
+Con menos de 10 intentos evaluados indica **DATOS INSUFICIENTES**; sin intentos muestra «—» como porcentaje.
+Desde 10 intentos, indica **BIEN CALIBRADO** dentro de estos rangos inclusivos y **MAL CALIBRADO** fuera:
+nivel 1: 70–100 %, nivel 2: 55–85 %, nivel 3: 35–65 %, nivel 4: 15–45 %, nivel 5: 0–30 %.
+Son **reglas heurísticas provisionales y ajustables, no criterios científicos**, centralizadas en
+`CalibracionDificultad`; el diagnóstico usa el porcentaje sin redondear. Cada intento cuenta (no se
+deduplican estudiantes). El acierto global se calcula sobre la suma de intentos evaluados, no promediando
+porcentajes por ejercicio. El informe es de solo lectura: no cambia niveles ni tablas de PostgreSQL.
+Usa `DificultadRealDAO`, `ReporteDificultadRealService` y `dificultad-real.jrxml`, con los mismos permisos,
+vista previa y exportación del panel. Sus pruebas de consulta usan H2 en memoria, únicamente en tests.
+
 Para agregar otro informe se crea una clase que implemente `InformeAdministrativo` (título, descripción,
 apartados, nombre de archivo y `prepararReporte`) y se suma en `RegistroInformes` con `informes.add(...)`; la lista,
 la vista previa y la exportación funcionan sin tocar la interfaz.
@@ -719,7 +732,7 @@ Ejecución conjunta de pruebas unitarias e integración JavaFX:
 Pruebas específicas del informe PDF:
 
 ```powershell
-.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest,ReporteCatalogoTemplateTest,ReporteCatalogoServiceTest,RegistroInformesTest" test
+.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest,ReporteCatalogoTemplateTest,ReporteCatalogoServiceTest,ReporteDificultadRealTemplateTest,ReporteDificultadRealServiceTest,CalibracionDificultadTest,DificultadRealDAOTest,RegistroInformesTest" test
 ```
 
 Pruebas de integración con PostgreSQL real (requieren conexión configurada y esquema actualizado):
