@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.InformesController">
+    <left>
+        <VBox spacing="10" styleClass="card, panel-informes" prefWidth="330" minWidth="260" maxHeight="-Infinity" BorderPane.alignment="TOP_LEFT">
+            <Label text="Informes" styleClass="section-title" />
+            <Label text="Elige un informe para ver su detalle, abrir la vista previa o guardarlo en PDF." wrapText="true" styleClass="subtitle" />
+            <ListView fx:id="listaInformes" styleClass="lista-informes" />
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="12" styleClass="card, detalle-informe" maxHeight="-Infinity" BorderPane.alignment="TOP_LEFT">
+            <BorderPane.margin>
+                <Insets left="18" />
+            </BorderPane.margin>
+            <Label fx:id="lblTitulo" styleClass="titulo-informe" wrapText="true" />
+            <Label fx:id="lblDescripcion" wrapText="true" />
+            <Label text="El PDF incluye" styleClass="subtitulo-informe" />
+            <Label fx:id="lblIncluye" wrapText="true" styleClass="lista-contenido-informe" />
+            <HBox spacing="10">
+                <Button fx:id="btnVistaPrevia" text="Vista previa" onAction="#vistaPrevia" />
+                <Button fx:id="btnExportar" text="Exportar PDF" onAction="#exportar" styleClass="primary-button" />
+            </HBox>
+            <Label fx:id="lblEstado" wrapText="true" styleClass="subtitle" />
+            <Label text="Los datos se leen de la base de datos al abrir la vista previa o al guardar el PDF, y el informe indica con qué perfil se pidió."
+                   wrapText="true" styleClass="nota-informe" />
+        </VBox>
+    </center>
+</BorderPane>

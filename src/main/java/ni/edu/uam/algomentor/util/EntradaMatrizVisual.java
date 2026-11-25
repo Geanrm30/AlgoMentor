@@ -8,9 +8,12 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.Fraccion;
+
+import java.util.List;
 
 public final class EntradaMatrizVisual extends VBox {
 
@@ -19,12 +22,14 @@ public final class EntradaMatrizVisual extends VBox {
     private final Spinner<Integer> variables = new Spinner<>(
             new SpinnerValueFactory.IntegerSpinnerValueFactory(1, FormatoDatos.MAX_COLUMNAS - 1, 2));
     private final GridPane cuadricula = new GridPane();
+    private final HBox dimensiones;
+    private String[][] referencia;
     private TextField[][] celdas = new TextField[0][0];
     private Runnable alCambiar = () -> { };
 
     public EntradaMatrizVisual() {
         setSpacing(10);
-        HBox dimensiones = new HBox(10, new Label("Ecuaciones / filas"), filas,
+        dimensiones = new HBox(10, new Label("Ecuaciones / filas"), filas,
                 new Label("Incógnitas / columnas"), variables);
         dimensiones.setAlignment(Pos.CENTER_LEFT);
         dimensiones.getStyleClass().add("dimensiones-matriz");
@@ -40,9 +45,10 @@ public final class EntradaMatrizVisual extends VBox {
         desplazamiento.setPannable(true);
         desplazamiento.setMaxHeight(265);
         desplazamiento.setMinWidth(0);
-        desplazamiento.setPrefWidth(480);
-        desplazamiento.setMaxWidth(Double.MAX_VALUE);
-        desplazamiento.setPrefViewportHeight(145);
+        // El recuadro se ajusta a la matriz en vez de ocupar todo el ancho de la tarjeta.
+        desplazamiento.prefWidthProperty().bind(cuadricula.widthProperty().add(34));
+        desplazamiento.setMaxWidth(Region.USE_PREF_SIZE);
+        desplazamiento.prefViewportHeightProperty().bind(cuadricula.heightProperty().add(4));
         desplazamiento.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         desplazamiento.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         desplazamiento.getStyleClass().add("desplazamiento-matriz");
@@ -57,9 +63,12 @@ public final class EntradaMatrizVisual extends VBox {
         alCambiar = accion == null ? () -> { } : accion;
     }
 
+    /** Con dimensiones fijas se ocultan los selectores: la forma la dicta el ejercicio. */
     public void fijarDimensiones(boolean fijas) {
         filas.setDisable(fijas);
         variables.setDisable(fijas);
+        dimensiones.setVisible(!fijas);
+        dimensiones.setManaged(!fijas);
     }
 
     public void cargar(Fraccion[][] matriz) {
@@ -71,7 +80,82 @@ public final class EntradaMatrizVisual extends VBox {
                 celdas[i][j].setText(matriz[i][j].toString());
             }
         }
+        referencia = new String[matriz.length][matriz[0].length];
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                referencia[i][j] = matriz[i][j].toString();
+            }
+        }
+        actualizarMarcas();
         alCambiar.run();
+    }
+
+    /** Vuelve a escribir la matriz inicial cargada con {@link #cargar}, si la hay. */
+    public void restablecer() {
+        if (referencia == null || celdas.length != referencia.length
+                || celdas[0].length != referencia[0].length) {
+            return;
+        }
+        for (int i = 0; i < celdas.length; i++) {
+            for (int j = 0; j < celdas[i].length; j++) {
+                celdas[i][j].setText(referencia[i][j]);
+            }
+        }
+        alCambiar.run();
+    }
+
+    /**
+     * Señala el resultado de una verificación: en verde las celdas que el estudiante cambió si acertó, o en rojo
+     * las celdas con error (pares fila y columna, base 0). Las marcas se quitan al editar cualquier celda.
+     */
+    public void marcarResultado(boolean correcto, List<int[]> celdasConError) {
+        quitarMarcasDeResultado();
+        if (correcto) {
+            for (int i = 0; i < celdas.length; i++) {
+                for (int j = 0; j < celdas[i].length; j++) {
+                    if (estaModificada(i, j)) {
+                        celdas[i][j].getStyleClass().add("celda-correcta");
+                    }
+                }
+            }
+            return;
+        }
+        for (int[] par : celdasConError) {
+            if (par[0] >= 0 && par[0] < celdas.length && par[1] >= 0 && par[1] < celdas[par[0]].length) {
+                celdas[par[0]][par[1]].getStyleClass().add("celda-error");
+            }
+        }
+    }
+
+    private boolean estaModificada(int i, int j) {
+        return referencia != null && i < referencia.length && j < referencia[i].length
+                && !celdas[i][j].getText().strip().equals(referencia[i][j]);
+    }
+
+    private void actualizarMarcas() {
+        for (int i = 0; i < celdas.length; i++) {
+            for (int j = 0; j < celdas[i].length; j++) {
+                actualizarMarca(i, j);
+            }
+        }
+    }
+
+    private void actualizarMarca(int i, int j) {
+        var clases = celdas[i][j].getStyleClass();
+        boolean modificada = estaModificada(i, j);
+        if (modificada && !clases.contains("celda-modificada")) {
+            clases.add("celda-modificada");
+        } else if (!modificada) {
+            clases.remove("celda-modificada");
+        }
+    }
+
+    private void quitarMarcasDeResultado() {
+        for (TextField[] fila : celdas) {
+            for (TextField celda : fila) {
+                celda.getStyleClass().removeAll("celda-correcta", "celda-error");
+            }
+        }
     }
 
     public void limpiar() {
@@ -80,6 +164,8 @@ public final class EntradaMatrizVisual extends VBox {
                 celda.clear();
             }
         }
+        referencia = null;
+        actualizarMarcas();
         alCambiar.run();
     }
 
@@ -125,7 +211,13 @@ public final class EntradaMatrizVisual extends VBox {
                         celda.setText(anteriores[i][indiceAnterior].getText());
                     }
                 }
-                celda.textProperty().addListener((obs, anterior, actual) -> alCambiar.run());
+                int fila = i;
+                int columna = j;
+                celda.textProperty().addListener((obs, anterior, actual) -> {
+                    quitarMarcasDeResultado();
+                    actualizarMarca(fila, columna);
+                    alCambiar.run();
+                });
                 celdas[i][j] = celda;
                 cuadricula.add(celda, j + 1, i + 1);
             }

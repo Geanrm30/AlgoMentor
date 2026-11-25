@@ -25,6 +25,10 @@ public final class HibernateUtil {
     private static final String MIGRACION_CUENTAS = "/ni/edu/uam/algomentor/db/actualizar-cuentas.sql";
     private static SessionFactory sessionFactory;
 
+    static {
+        ConfiguracionLogs.aplicar();
+    }
+
     private HibernateUtil() { }
 
     public static synchronized SessionFactory getSessionFactory() {
@@ -113,4 +117,4 @@ public final class HibernateUtil {
         }
         return value;
     }
-}
+}

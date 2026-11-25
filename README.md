@@ -187,7 +187,7 @@ Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a 
 |---|---|
 | **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF; un administrador elige primero el perfil), Cambiar contraseña, Cerrar sesión y Salir. |
 | **Inicio** | Mi progreso. |
-| **Administración** | Resumen general. Solo aparece para cuentas administradoras. |
+| **Administración** | Resumen general e Informes (vista previa y PDF de cada informe global). Solo aparece para cuentas administradoras. |
 | **Aprender** | Simular, Práctica y Comandos. |
 | **Herramientas** | Comparar algoritmos, Comprobar sistema (math.js) y Biblioteca de contenido. |
 | **Ver** | Tema claro u oscuro. |
@@ -215,6 +215,7 @@ Atajos de teclado (en macOS, `Cmd` en lugar de `Ctrl`):
 | `Ctrl+2` | Práctica | `Ctrl+7` | Biblioteca de contenido |
 | `Ctrl+3` | Mi progreso | `Ctrl+E` | Exportar informe PDF |
 | `Ctrl+4` | Comandos | `Ctrl+Shift+E` / `Ctrl+I` | Exportar / importar ejercicios |
+| `Ctrl+9` | Informes (administradores) | | |
 | `Ctrl+T` | Tema claro u oscuro | `Ctrl+Shift+L` / `Ctrl+Q` | Cerrar sesión / salir |
 | `Ctrl+Shift+P` | Cambiar contraseña | | |
 | `F11` | Pantalla completa | | |
@@ -268,8 +269,12 @@ Inicia sesión con tu cuenta y selecciona un ejercicio guardado. La práctica us
 a la sesión; no permite elegir perfiles ajenos.
 
 - **Ordenamiento:** responde con el arreglo final para cualquiera de los siete métodos.
-- **Gauss y Gauss-Jordan:** selecciona una operación de filas (intercambiar, escalar o eliminar),
-  indica las filas con números desde 1 y el factor cuando corresponda, y escribe la matriz resultante completa.
+- **Gauss y Gauss-Jordan:** elige una operación de filas (intercambiar, escalar o eliminar). El formulario
+  muestra solo los datos que esa operación necesita (dos filas, una fila y un factor, o fila destino, fila origen
+  y factor k) y escribe en vivo la operación, por ejemplo `F2 ← F2 − (3) · F1`; si una fila no existe, se repite
+  o el factor no es válido, lo avisa antes de verificar. Después escribe la matriz resultante completa: las celdas
+  que cambiaste se resaltan, **Restablecer matriz inicial** vuelve a la matriz del ejercicio y, al verificar,
+  las celdas con error quedan marcadas en rojo (en verde si acertaste).
 
 Cada pulsación de **Verificar** registra automáticamente un intento, correcto o incorrecto, para
 el perfil autenticado. Las respuestas incompletas o mal escritas también cuentan como intentos
@@ -356,6 +361,22 @@ no necesita consultar una API externa.
 ![Progreso: historial de intentos](docs/capturas/progreso-historial.png)
 
 ![Informe PDF generado con JasperReports](docs/capturas/informe-pdf.png)
+
+#### Panel de informes (administradores)
+
+**Administración > Informes** (`Ctrl+9`, o clic derecho en una zona libre) abre una lista de informes globales.
+Al elegir uno se ve su descripción y lo que incluye, y se puede abrir la **Vista previa** o **Exportar PDF**.
+Cada informe vuelve a comprobar en el servicio, con una consulta a la base de datos, que quien lo pide sea
+administrador.
+
+El primero es el **informe del catálogo**: ocho tarjetas (algoritmos, de ordenamiento, matemáticos, ejercicios,
+acierto global, intentos totales, dificultad media y algoritmos sin ejercicios) y cuatro secciones: algoritmos con
+sus ejercicios, intentos y porcentaje de acierto, ejercicios por dificultad, ejercicios por origen y los diez
+ejercicios más usados. Usa la plantilla `catalogo.jrxml`, `CatalogoDAO` y `ReporteCatalogoService`.
+
+Para agregar otro informe se crea una clase que implemente `InformeAdministrativo` (título, descripción,
+apartados, nombre de archivo y `prepararReporte`) y se suma en `RegistroInformes` con `informes.add(...)`; la lista,
+la vista previa y la exportación funcionan sin tocar la interfaz.
 
 ![Vista previa del informe en el visor](docs/capturas/vista-previa-informe.png)
 
@@ -692,7 +713,7 @@ Ejecución conjunta de pruebas unitarias e integración JavaFX:
 Pruebas específicas del informe PDF:
 
 ```powershell
-.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest" test
+.\mvnw.cmd "-Dtest=ReporteProgresoTemplateTest,ReporteProgresoServiceTest,ReporteCatalogoTemplateTest,ReporteCatalogoServiceTest,RegistroInformesTest" test
 ```
 
 Pruebas de integración con PostgreSQL real (requieren conexión configurada y esquema actualizado):
@@ -716,7 +737,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Persistencia y servicios | `IntentoServiceTest`, `RegistroPracticaServiceTest`, `ProgresoHabilidadServiceTest`, `PerfilServiceTest`, `HabilidadErrorResolverTest`, `CalculoProgresoTest` |
 | Terminal y comparador | `ComandosTerminalTest`, `ComparadorOrdenamientosTest` |
 | Estadísticas | `EstadisticasDAOTest` |
-| Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest` |
+| Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |
 | Utilidades | `CsvHistorialTest`, `UsuarioRecordadoTest` |
 | Intercambio JSON | `EjerciciosApiServerTest`, `PaqueteNuevosAlgoritmosTest` |
@@ -766,6 +787,7 @@ La rama `main` debe compilar y ejecutarse después de cada integración.
 
 ## 11. Limitaciones y notas de uso
 
+- La consola no muestra mensajes de registro (avisos de JavaFX, información de Hibernate ni errores controlados): se guardan, solo avisos y errores, en `~/.algomentor/algomentor-0.log`. Si algo falla, ese archivo dice por qué. `ConfiguracionLogs` lo configura al iniciar la aplicación y las pruebas.
 - Simular no impone un máximo fijo de enteros al introducir el arreglo manualmente. La fila se centra cuando cabe y se desplaza hasta el elemento activo durante los pasos. Biblioteca, Práctica y Comparar conservan su límite visual de 20, y el formato de almacenamiento mantiene el límite de 30 por compatibilidad. Los arreglos muy grandes requieren más tiempo y memoria porque se conserva el estado de cada paso.
 - Práctica reconoce los nueve algoritmos del catálogo. Los ejercicios deben usar los nombres registrados, como `Quick Sort` o `Gauss-Jordan`.
 - Ejecuta `schema.sql` en una instalación nueva. En una existente, la aplicación completa automáticamente los algoritmos faltantes sin modificar los registros ya presentes; `actualizar-nuevos-algoritmos.sql` sigue disponible para una migración manual. Las cuatro habilidades iniciales deben estar disponibles antes de registrar intentos.
