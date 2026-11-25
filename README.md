@@ -358,6 +358,12 @@ no necesita consultar una API externa.
 
 ![Progreso con el selector de gráficos](docs/capturas/progreso-graficos.png)
 
+Desde esta misma pantalla también puedes seleccionar un algoritmo y generar una **constancia de
+dominio** para el perfil mostrado. Se otorga con al menos 80 % de aciertos sobre los intentos
+calificados de ese algoritmo; los intentos sin calificar no entran en el cálculo. Si no se alcanza el
+umbral o aún no hay intentos, el PDF de una página muestra el progreso y recomienda practicar cinco
+ejercicios de dificultad 1 o 2.
+
 ![Progreso: historial de intentos](docs/capturas/progreso-historial.png)
 
 ![Informe PDF generado con JasperReports](docs/capturas/informe-pdf.png)
@@ -511,7 +517,7 @@ src/main/resources/ni/edu/uam/algomentor/
 ├── db/
 │   ├── schema.sql                    Esquema PostgreSQL y datos iniciales
 │   └── actualizar-nuevos-algoritmos.sql   Migración idempotente
-└── report/progreso.jrxml            Plantilla JasperReports
+└── report/                          Plantillas JasperReports
 
 src/test/java/                      Pruebas JUnit e integración
 ```
@@ -740,6 +746,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |
 | Utilidades | `CsvHistorialTest`, `UsuarioRecordadoTest` |
+| Constancia de dominio | `ReporteDominioTemplateTest`, `ReporteDominioServiceTest` |
 | Intercambio JSON | `EjerciciosApiServerTest`, `PaqueteNuevosAlgoritmosTest` |
 | Animaciones y validación | `MovimientoCeldasTest`, `ValidacionesFormularioTest` |
 | Integración JavaFX | `InterfazAlgoritmosIT` |
@@ -762,6 +769,7 @@ los pasos. `Arrays.sort` sirve como referencia de prueba, no como implementació
 | Práctica | Iniciar sesión, elegir un ejercicio y verificar que cada intento se registra en el perfil propio. |
 | Progreso | Consultar gráfico y detalle de habilidades del perfil autenticado. |
 | Informe PDF | Abrir **Vista previa** o usar **Exportar** y revisar el PDF generado. |
+| Constancia de dominio | Elegir un algoritmo; verificar el diploma con 80 % o más y el plan de práctica por debajo del umbral o sin intentos. |
 | Intercambio API | Exportar JSON e importar un paquete válido; verificar que los duplicados se omiten. |
 | Verificación externa | Resolver las filas `2,1,5` y `1,-1,1` y comparar la respuesta de math.js con Gauss. |
 

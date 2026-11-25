@@ -27,12 +27,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.StringConverter;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import ni.edu.uam.algomentor.dao.AlgoritmoDAO;
 import ni.edu.uam.algomentor.dao.EstadisticasDAO;
+import ni.edu.uam.algomentor.model.Algoritmo;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.AutorizacionService;
+import ni.edu.uam.algomentor.service.ReporteDominioService;
 import ni.edu.uam.algomentor.service.ReporteProgresoService;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.Animaciones;
@@ -48,6 +52,7 @@ import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
@@ -92,6 +97,8 @@ public class ProgresoController implements Actualizable {
     @FXML private VBox panelVacio;
     @FXML private Label lblBienvenida;
     @FXML private Button btnVistaPrevia;
+    @FXML private ComboBox<Algoritmo> cmbAlgoritmoDominio;
+    @FXML private Button btnGenerarConstancia;
     @FXML private Label lblIntentos;
     @FXML private Label lblCorrectos;
     @FXML private Label lblIncorrectos;
@@ -134,6 +141,20 @@ public class ProgresoController implements Actualizable {
     @FXML
     private void initialize() {
         actualizarEtiquetaPerfil();
+        cmbAlgoritmoDominio.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Algoritmo algoritmo) {
+                return algoritmo == null ? "" : TextoInterfaz.algoritmo(algoritmo.getNombre());
+            }
+
+            @Override
+            public Algoritmo fromString(String texto) {
+                return null;
+            }
+        });
+        cmbAlgoritmoDominio.valueProperty().addListener((obs, anterior, actual) ->
+                btnGenerarConstancia.setDisable(actual == null));
+        btnGenerarConstancia.setDisable(true);
         colHabilidad.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().nombre()));
         colAciertos.setCellValueFactory(c ->
@@ -274,6 +295,8 @@ public class ProgresoController implements Actualizable {
     private void cargarProgreso(boolean automatico) {
         Perfil perfil = perfilActivo();
         boolean propio = esPerfilPropio();
+        Algoritmo algoritmoActual = cmbAlgoritmoDominio.getValue();
+        Long algoritmoSeleccionadoId = algoritmoActual == null ? null : algoritmoActual.getId();
         int solicitud = ++ultimaSolicitud;
         if (!automatico) {
             lblResumen.setText("Cargando progreso…");
@@ -291,8 +314,12 @@ public class ProgresoController implements Actualizable {
             List<EstadisticasDAO.IntentoReciente> recientes =
                     dao.listarIntentosRecientes(perfilId, INTENTOS_CONSULTADOS);
             OptionalDouble duracionPromedio = dao.obtenerDuracionPromedioSegundos(perfilId);
+            List<Algoritmo> algoritmos = new AlgoritmoDAO().listar().stream()
+                    .sorted(Comparator.comparing(Algoritmo::getNombre,
+                            String.CASE_INSENSITIVE_ORDER))
+                    .toList();
             int huella = Objects.hash(resumen, habilidades, rendimiento, errores, recientes,
-                    duracionPromedio);
+                    duracionPromedio, algoritmos.stream().map(Algoritmo::getId).toList());
             Platform.runLater(() -> {
                 if (solicitud != ultimaSolicitud) {
                     return;
@@ -303,6 +330,18 @@ public class ProgresoController implements Actualizable {
                 huellaMostrada = huella;
                 hayDatosMostrados = true;
                 tabla.setItems(FXCollections.observableArrayList(habilidades));
+                cmbAlgoritmoDominio.setItems(FXCollections.observableArrayList(algoritmos));
+                Algoritmo algoritmoPreferido = algoritmos.stream()
+                        .filter(a -> Objects.equals(a.getId(), algoritmoSeleccionadoId))
+                        .findFirst()
+                        .orElse(null);
+                if (algoritmoPreferido != null) {
+                    cmbAlgoritmoDominio.setValue(algoritmoPreferido);
+                } else if (!algoritmos.isEmpty()) {
+                    cmbAlgoritmoDominio.getSelectionModel().selectFirst();
+                } else {
+                    cmbAlgoritmoDominio.getSelectionModel().clearSelection();
+                }
                 actualizarGrafico(habilidades);
                 tablaRendimiento.setItems(FXCollections.observableArrayList(rendimiento));
                 actualizarGraficoAlgoritmos(rendimiento);
@@ -390,6 +429,63 @@ public class ProgresoController implements Actualizable {
         }
         graficoErrores.setTitle(errores.isEmpty() ? "Sin errores registrados" : "Errores por tipo");
         graficoErrores.setData(FXCollections.observableArrayList(serie));
+    }
+
+    @FXML
+    private void generarConstanciaDominio() {
+        Algoritmo algoritmo = cmbAlgoritmoDominio.getValue();
+        if (algoritmo == null) {
+            return;
+        }
+
+        Perfil perfil = perfilActivo();
+        Long solicitanteId = SesionUsuario.obtenerPerfil().getId();
+        String nombreAlgoritmo = TextoInterfaz.algoritmo(algoritmo.getNombre());
+        FileChooser selector = new FileChooser();
+        selector.setTitle("Guardar constancia de dominio");
+        selector.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Documento PDF", "*.pdf"));
+        String nombreSeguro = nombreAlgoritmo.replaceAll("[\\\\/:*?\"<>|]", "_");
+        String perfilSeguro = perfil.getNombre().replaceAll("[\\\\/:*?\"<>|]", "_");
+        selector.setInitialFileName("constancia-" + nombreSeguro + "-" + perfilSeguro + ".pdf");
+        Window ventana = cmbAlgoritmoDominio.getScene() == null
+                ? null : cmbAlgoritmoDominio.getScene().getWindow();
+        java.io.File archivo = selector.showSaveDialog(ventana);
+        if (archivo == null) {
+            return;
+        }
+
+        Path elegido = archivo.toPath();
+        Path destino = elegido.getFileName().toString()
+                .toLowerCase(java.util.Locale.ROOT).endsWith(".pdf")
+                ? elegido : elegido.resolveSibling(elegido.getFileName() + ".pdf");
+        Long perfilId = perfil.getId();
+        Long algoritmoId = algoritmo.getId();
+        btnGenerarConstancia.setDisable(true);
+        lblResumen.setText("Generando constancia de " + nombreAlgoritmo + "…");
+        Thread hilo = new Thread(() -> {
+            try {
+                Path generado = new ReporteDominioService()
+                        .generarReporte(solicitanteId, perfilId, algoritmoId, destino);
+                Platform.runLater(() -> {
+                    lblResumen.setText("Constancia guardada: " + generado.getFileName());
+                    mostrarAlerta(Alert.AlertType.INFORMATION, "Documento generado",
+                            "La constancia o plan de estudio se guardó en:\n" + generado);
+                });
+            } catch (JRException | IOException | RuntimeException e) {
+                LOG.log(Level.SEVERE, "No se pudo generar la constancia de dominio", e);
+                Platform.runLater(() -> {
+                    lblResumen.setText("No se pudo generar la constancia.");
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error al generar documento",
+                            "No se pudo generar el PDF. Revisa la conexión con PostgreSQL y el destino seleccionado.");
+                });
+            } finally {
+                Platform.runLater(() ->
+                        btnGenerarConstancia.setDisable(cmbAlgoritmoDominio.getValue() == null));
+            }
+        }, "algomentor-constancia-dominio");
+        hilo.setDaemon(true);
+        hilo.start();
     }
 
     private void actualizarGrafico(List<EstadisticasDAO.EstadisticaHabilidad> habilidades) {
