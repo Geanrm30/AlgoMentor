@@ -11,14 +11,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.stage.FileChooser;
-import javafx.util.Duration;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
+import ni.edu.uam.algomentor.engine.FichaAlgoritmo;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
@@ -35,7 +32,6 @@ import ni.edu.uam.algomentor.util.TextoInterfaz;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +43,7 @@ public class SimuladorController {
     @FXML private TextField txtArreglo;
     @FXML private VBox entradaMatriz;
     @FXML private Label lblFormato;
+    @FXML private Label lblMecanica;
     @FXML private HBox contenedorArreglo;
     @FXML private ScrollPane scrollArreglo;
     @FXML private VBox contenedorMatriz;
@@ -54,17 +51,12 @@ public class SimuladorController {
     @FXML private Label lblExplicacion;
     @FXML private Button btnAnterior;
     @FXML private Button btnSiguiente;
-    @FXML private Button btnCargarAudio;
-    @FXML private Button btnAudio;
-    @FXML private Label lblAudio;
 
     private ResultadoEjecucion resultado;
     private int indice = -1;
     private int indiceMostrado = -1;
     private boolean matricial;
     private String conclusion = "";
-    private MediaPlayer reproductor;
-    private int pasoConAudio = -1;
     private String[] celdasPrevias;
     private EntradaMatrizVisual matrizVisual;
 
@@ -82,7 +74,12 @@ public class SimuladorController {
             if (actual == null) {
                 return;
             }
-            matricial = !CatalogoAlgoritmos.porNombre(actual).esOrdenamiento();
+            CatalogoAlgoritmos elegido = CatalogoAlgoritmos.porNombre(actual);
+            matricial = !elegido.esOrdenamiento();
+            String mecanica = FichaAlgoritmo.de(elegido).map(FichaAlgoritmo::mecanica).orElse("");
+            lblMecanica.setText(mecanica);
+            lblMecanica.setVisible(!mecanica.isEmpty());
+            lblMecanica.setManaged(!mecanica.isEmpty());
             txtArreglo.setVisible(!matricial);
             txtArreglo.setManaged(!matricial);
             entradaMatriz.setVisible(matricial);
@@ -152,9 +149,6 @@ public class SimuladorController {
     }
 
     private void actualizar() {
-        if (pasoConAudio != indice) {
-            liberarAudio();
-        }
         Paso paso = indice < 0 ? null : resultado.pasos().get(indice);
         TipoOperacion movimiento = paso == null ? null : paso.tipo();
         if (indiceMostrado >= 0 && indice == indiceMostrado - 1) {
@@ -175,71 +169,6 @@ public class SimuladorController {
         Animaciones.entrar(lblExplicacion, 0, 6);
         btnAnterior.setDisable(indice < 0);
         btnSiguiente.setDisable(indice + 1 >= resultado.pasos().size());
-        btnCargarAudio.setDisable(indice < 0);
-    }
-
-    @FXML
-    private void cargarAudio() {
-        if (resultado == null || indice < 0) {
-            return;
-        }
-        FileChooser selector = new FileChooser();
-        selector.setTitle("Audio del paso " + (indice + 1));
-        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio MP3 o WAV", "*.mp3", "*.wav"));
-        File archivo = selector.showOpenDialog(btnCargarAudio.getScene().getWindow());
-        if (archivo == null) {
-            return;
-        }
-        try {
-            liberarAudio();
-            reproductor = new MediaPlayer(new Media(archivo.toURI().toString()));
-            MediaPlayer actual = reproductor;
-            pasoConAudio = indice;
-            reproductor.setOnError(() -> {
-                LOG.log(Level.WARNING, "No se pudo reproducir el audio", actual.getError());
-                lblAudio.setText("El audio no se pudo reproducir. La explicación escrita sigue disponible.");
-                btnAudio.setDisable(true);
-            });
-            reproductor.setOnEndOfMedia(() -> {
-                actual.stop();
-                btnAudio.setText("Reproducir");
-            });
-            lblAudio.setText("Audio del paso " + (indice + 1) + ": " + archivo.getName());
-            btnAudio.setDisable(false);
-        } catch (RuntimeException e) {
-            LOG.log(Level.WARNING, "Archivo de audio no válido", e);
-            liberarAudio();
-            mostrarAlerta(Alert.AlertType.WARNING, "Audio no disponible", "No se pudo abrir el archivo seleccionado.");
-        }
-    }
-
-    @FXML
-    private void reproducirAudio() {
-        if (reproductor == null) {
-            return;
-        }
-        if (reproductor.getStatus() == MediaPlayer.Status.PLAYING) {
-            reproductor.pause();
-            btnAudio.setText("Reproducir");
-        } else {
-            if (reproductor.getStatus() == MediaPlayer.Status.STOPPED) {
-                reproductor.seek(Duration.ZERO);
-            }
-            reproductor.play();
-            btnAudio.setText("Pausar");
-        }
-    }
-
-    private void liberarAudio() {
-        if (reproductor != null) {
-            reproductor.stop();
-            reproductor.dispose();
-            reproductor = null;
-        }
-        pasoConAudio = -1;
-        btnAudio.setDisable(true);
-        btnAudio.setText("Reproducir");
-        lblAudio.setText("La explicación escrita está disponible para cada paso. Puedes adjuntar un audio MP3 o WAV.");
     }
 
     private void mostrarArreglo(int[] valores, List<Integer> destacados, int pivote, TipoOperacion movimiento) {
@@ -357,7 +286,6 @@ public class SimuladorController {
     }
 
     private void limpiarResultado() {
-        liberarAudio();
         resultado = null;
         indice = -1;
         indiceMostrado = -1;
@@ -368,7 +296,6 @@ public class SimuladorController {
         lblExplicacion.setText("");
         btnAnterior.setDisable(true);
         btnSiguiente.setDisable(true);
-        btnCargarAudio.setDisable(true);
     }
 
     public void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {

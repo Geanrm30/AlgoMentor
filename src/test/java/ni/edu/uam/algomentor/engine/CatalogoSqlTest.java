@@ -18,7 +18,9 @@ class CatalogoSqlTest {
         assertTrue(sql.contains("ON CONFLICT (nombre) DO NOTHING"));
         assertFalse(sql.matches("(?is).*\\b(DROP|TRUNCATE|DELETE|UPDATE)\\s+.*"));
         for (var algoritmo : new CatalogoAlgoritmos[]{CatalogoAlgoritmos.QUICK, CatalogoAlgoritmos.MERGE,
-                CatalogoAlgoritmos.COUNTING, CatalogoAlgoritmos.RADIX, CatalogoAlgoritmos.BUCKET}) {
+                CatalogoAlgoritmos.COUNTING, CatalogoAlgoritmos.RADIX, CatalogoAlgoritmos.BUCKET,
+                CatalogoAlgoritmos.SELECTION, CatalogoAlgoritmos.SHELL, CatalogoAlgoritmos.HEAP,
+                CatalogoAlgoritmos.COCKTAIL, CatalogoAlgoritmos.COMB, CatalogoAlgoritmos.GNOME}) {
             assertTrue(sql.contains("('" + algoritmo.nombre() + "'"));
         }
     }

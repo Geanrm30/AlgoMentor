@@ -2,7 +2,7 @@
 
 # AlgoMentor
 
-**Nueve algoritmos interactivos, práctica con detección de errores por habilidad, intercambio de ejercicios e informes PDF de progreso.**
+**Quince algoritmos interactivos, práctica con detección de errores por habilidad, intercambio de ejercicios e informes PDF de progreso.**
 
 Programación de Aplicaciones de Escritorio · Universidad Americana (UAM) · Ingeniería de Sistemas
 
@@ -39,7 +39,7 @@ Programación de Aplicaciones de Escritorio · Universidad Americana (UAM) · In
 
 ## 1. Descripción general
 
-AlgoMentor es una aplicación de escritorio para aprender algoritmos paso a paso. Cuenta con siete
+AlgoMentor es una aplicación de escritorio para aprender algoritmos paso a paso. Cuenta con trece
 algoritmos de ordenamiento y dos métodos de álgebra lineal. **Explica cada operación**, verifica
 las respuestas del estudiante, clasifica sus errores por habilidad y guarda el historial en PostgreSQL
 mediante Hibernate.
@@ -48,17 +48,19 @@ mediante Hibernate.
 
 | Categoría | Algoritmos |
 |---|---|
-| Ordenamiento (7) | Bubble Sort, Insertion Sort, Quick Sort, Merge Sort, Counting Sort, Radix Sort y Bucket Sort. |
+| Ordenamiento (13) | Bubble Sort, Insertion Sort, Selection Sort, Shell Sort, Quick Sort, Merge Sort, Heap Sort, Cocktail Sort, Comb Sort, Gnome Sort, Counting Sort, Radix Sort y Bucket Sort. |
 | Álgebra lineal (2) | Gauss y Gauss-Jordan. |
 
 ### Características principales
 
 | Área | Capacidad |
 |---|---|
-| Simulación | Nueve algoritmos con recorrido paso a paso, generación de entradas, animaciones y audio opcional. |
+| Simulación | Quince algoritmos con recorrido paso a paso, descripción de la mecánica de cada ordenamiento, generación de entradas y animaciones. |
+| Guía de algoritmos | Tabla que compara los trece ordenamientos (técnica, mejor, promedio y peor caso, memoria extra, estabilidad) y explica cómo ordena cada uno. |
+| Tutorial | Recorrido guiado que ilumina cada parte de la interfaz; se muestra la primera vez y se repite desde Ayuda, Tutorial de uso (F1). |
 | Aritmética | Fracciones exactas con `BigInteger` (`Fraccion`), sin errores de redondeo en matrices. |
 | Práctica | Evaluación de arreglos ordenados y operaciones de fila, con detección de errores. |
-| Comparación | Métricas de ejecución de los siete algoritmos de ordenamiento. |
+| Comparación | Métricas de ejecución de los trece algoritmos de ordenamiento. |
 | Habilidades | Clasificación de errores en Signos, Fracciones, Aritmetica y Procedimiento. |
 | Persistencia | Perfiles, intentos, pasos, errores y progreso mediante Hibernate ORM y PostgreSQL. |
 | Informes | Exportación de informes PDF de progreso con JasperReports y consultas HQL. |
@@ -108,7 +110,7 @@ desde la raíz del proyecto, archivo incluido en `.gitignore`.
 
 Ejecuta en la base `algomentor` el archivo `src/main/resources/ni/edu/uam/algomentor/db/schema.sql`.
 El script define las tablas y sus relaciones, incluyendo `cuenta`, crea las cuatro habilidades
-iniciales (Signos, Fracciones, Aritmetica y Procedimiento) y registra los nueve algoritmos del catálogo.
+iniciales (Signos, Fracciones, Aritmetica y Procedimiento) y registra los quince algoritmos del catálogo.
 
 **Bases existentes:** al abrir la aplicación se crea la tabla de cuentas si falta, sin recrear ni
 borrar datos (también puedes ejecutar manualmente
@@ -232,14 +234,14 @@ datos cambiaron, así que no pierden la selección ni parpadean; **Actualizar** 
 
 La aplicación inicia con el tema oscuro; usa **Ver > Tema claro** para alternar su apariencia; la elección se recuerda al cerrar y volver a abrir la aplicación, y también se aplica en la pantalla de inicio de sesión. La ventana se abre maximizada; **Ver > Pantalla completa** (`F11`) la lleva a pantalla completa real.
 
-1. **Entrada.** Selecciona uno de los nueve algoritmos. En Simular puedes introducir enteros
+1. **Entrada.** Selecciona uno de los quince algoritmos. En Simular puedes introducir enteros
    separados por comas sin un límite fijo de elementos; para Gauss y Gauss-Jordan completa una matriz ampliada. **Generar entrada**
    crea un ejemplo para el método seleccionado.
 2. **Recorrido.** Pulsa **Anterior** o **Siguiente** para recorrer las operaciones, sus estados y
    explicaciones en español. Se distinguen las comparaciones, los intercambios, las escrituras,
    las particiones, las mezclas, los conteos y las distribuciones según el algoritmo.
-3. **Audio.** Puedes cargar y reproducir un MP3 o WAV local por paso; el texto permanece visible.
-   Los audios no se guardan en PostgreSQL ni se incluyen en el repositorio.
+3. **Mecánica.** Al elegir un ordenamiento aparece una descripción breve de cómo ordena; la sección
+   **Aprender, Guía de algoritmos** (Ctrl+8) la amplía y compara todos los métodos en una tabla.
 
 Quick Sort identifica el pivote en violeta. Los arreglos anchos tienen desplazamiento horizontal.
 Las operaciones matriciales usan fracciones exactas; `Clasificador` determina si el sistema tiene
@@ -268,7 +270,7 @@ una solución única, infinitas soluciones o ninguna solución.
 Inicia sesión con tu cuenta y selecciona un ejercicio guardado. La práctica usa el perfil asociado
 a la sesión; no permite elegir perfiles ajenos.
 
-- **Ordenamiento:** responde con el arreglo final para cualquiera de los siete métodos.
+- **Ordenamiento:** responde con el arreglo final para cualquiera de los trece métodos.
 - **Gauss y Gauss-Jordan:** elige una operación de filas (intercambiar, escalar o eliminar). El formulario
   muestra solo los datos que esa operación necesita (dos filas, una fila y un factor, o fila destino, fila origen
   y factor k) y escribe en vivo la operación, por ejemplo `F2 ← F2 − (3) · F1`; si una fila no existe, se repite
@@ -314,7 +316,7 @@ ordenar radix 2147483647,-2147483648,0
 
 </details>
 
-**Comparar.** Utiliza el mismo arreglo para analizar los siete ordenamientos. La tabla distingue
+**Comparar.** Utiliza el mismo arreglo para analizar los trece ordenamientos. La tabla distingue
 comparaciones, intercambios, escrituras en el arreglo, escrituras internas de cubetas, conteos,
 distribuciones y pasos educativos. Las métricas describen la traza del método, no un tiempo de ejecución.
 
@@ -482,7 +484,7 @@ v1;ARREGLO;8,3,6,1
 v1;MATRIZ;2x3;2,1,5|1,-1,1
 ```
 
-Después de actualizar el esquema, selecciona cualquiera de los nueve algoritmos, elige la dificultad,
+Después de actualizar el esquema, selecciona cualquiera de los quince algoritmos, elige la dificultad,
 pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda disponible para Práctica.
 
 ![Biblioteca: algoritmos](docs/capturas/biblioteca-algoritmos.png)
@@ -508,6 +510,9 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
 - **Contadores y tarjetas:** las cifras de Resumen y Progreso cuentan hasta su valor (solo animan si
   cambian, para no reiniciarse con la actualización automática) y las tarjetas se elevan con un brillo
   al pasar el cursor. Al entrar a la aplicación la pantalla se funde suavemente.
+- **Tutorial:** `Tutorial` oscurece la ventana, ilumina un elemento a la vez con un hueco animado y
+  coloca una tarjeta explicativa al lado (Siguiente, Anterior, Omitir; también flechas y Esc). Se muestra
+  la primera vez y se repite desde Ayuda. Está inspirado en el recorrido de la calculadora de matrices.
 - **Progreso:** las barras por habilidad se animan hasta su porcentaje y no se reinician al reutilizar celdas de la tabla.
 
 ---
@@ -519,7 +524,7 @@ src/main/java/ni/edu/uam/algomentor/
 ├── Launcher.java, MainApp.java       Punto de entrada y navegación principal
 ├── controller/                      Controladores JavaFX de los módulos de Aprender y Biblioteca
 ├── engine/                          Motor independiente de JavaFX y PostgreSQL
-│   ├── AlgoritmoOrdenamiento         Contrato de los siete ordenamientos
+│   ├── AlgoritmoOrdenamiento         Contrato de los ordenamientos
 │   ├── BubbleSort, InsertionSort      Ordenamientos por comparación
 │   ├── QuickSort, MergeSort          División y conquista
 │   ├── CountingSort, RadixSort       Ordenamiento por frecuencias y dígitos
@@ -584,7 +589,7 @@ en el orden de `1e-17`. `Fraccion` usa `BigInteger`, compara con cero sin tolera
 fracciones irreducibles.
 
 **Pasos como contrato del motor.** Cada algoritmo devuelve una lista de pasos con su estado y su
-explicación. El simulador solo los recorre, y el audio y la práctica se apoyan en el mismo contrato.
+explicación. El simulador solo los recorre, y la práctica se apoya en el mismo contrato.
 
 **Formato versionado de datos de ejercicios.** `v1;ARREGLO;…` y `v1;MATRIZ;…` permiten cambiar el
 formato sin romper los ejercicios ya guardados; también se aceptan datos simples escritos a mano.
@@ -602,7 +607,7 @@ rebote necesita sobrepasar el valor final.
 **Barras de progreso sin repetir animación.** Las celdas de la tabla se reutilizan al desplazarse;
 la celda recuerda el último porcentaje animado para no reiniciar la barra.
 
-**Catálogo y trazas reutilizables.** `CatalogoAlgoritmos` centraliza los nueve métodos; `TrazaOrdenamiento`
+**Catálogo y trazas reutilizables.** `CatalogoAlgoritmos` centraliza los quince métodos; `TrazaOrdenamiento`
 registra estados anteriores y posteriores, índices y explicaciones. El pivote es un dato opcional de
 `Paso`, y `TipoOperacion` distingue escrituras, comparaciones y distribuciones reales.
 
@@ -762,7 +767,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 
 | Área | Clases de prueba |
 |---|---|
-| Ordenamiento | `BubbleSortTest`, `InsertionSortTest`, `QuickSortTest`, `MergeSortTest`, `CountingSortTest`, `RadixSortTest`, `BucketSortTest` |
+| Ordenamiento | `BubbleSortTest`, `InsertionSortTest`, `QuickSortTest`, `MergeSortTest`, `CountingSortTest`, `RadixSortTest`, `BucketSortTest`, `SelectionSortTest`, `ShellSortTest`, `HeapSortTest`, `CocktailSortTest`, `CombSortTest`, `GnomeSortTest`, `FichaAlgoritmoTest` |
 | Álgebra lineal | `GaussTest`, `GaussJordanTest`, `FraccionTest`, `FormatoMatrizTest`, `VerificadorOperacionesTest` |
 | Catálogo y ejercicios | `CatalogoAlgoritmosTest`, `CatalogoSqlTest`, `GeneradorEjerciciosTest`, `EvaluadorPracticaTest`, `EvaluadorPasoMatrizTest`, `EntradaAprendizajeTest` |
 | Persistencia y servicios | `IntentoServiceTest`, `RegistroPracticaServiceTest`, `ProgresoHabilidadServiceTest`, `PerfilServiceTest`, `HabilidadErrorResolverTest`, `CalculoProgresoTest` |
@@ -788,7 +793,7 @@ los pasos. `Arrays.sort` sirve como referencia de prueba, no como implementació
 |---|---|
 | Simulación | Seleccionar cada algoritmo; generar una entrada y recorrer los pasos en ambos sentidos. |
 | Quick Sort | Comprobar el marcado del pivote y las particiones. |
-| Comparación | Introducir `8,3,6,1,5` y verificar las siete filas de resultados. |
+| Comparación | Introducir `8,3,6,1,5` y verificar las trece filas de resultados. |
 | Persistencia de algoritmos y ejercicios | Crear, consultar y actualizar registros desde Biblioteca; verificar restricciones de eliminación. |
 | Generación de ejercicios | Elegir el algoritmo y dificultad, generar y guardar el ejercicio. |
 | Práctica | Iniciar sesión, elegir un ejercicio y verificar que cada intento se registra en el perfil propio. |
@@ -822,12 +827,11 @@ La rama `main` debe compilar y ejecutarse después de cada integración.
 
 - La consola no muestra mensajes de registro (avisos de JavaFX, información de Hibernate ni errores controlados): se guardan, solo avisos y errores, en `~/.algomentor/algomentor-0.log`. Si algo falla, ese archivo dice por qué. `ConfiguracionLogs` lo configura al iniciar la aplicación y las pruebas.
 - Simular no impone un máximo fijo de enteros al introducir el arreglo manualmente. La fila se centra cuando cabe y se desplaza hasta el elemento activo durante los pasos. Biblioteca, Práctica y Comparar conservan su límite visual de 20, y el formato de almacenamiento mantiene el límite de 30 por compatibilidad. Los arreglos muy grandes requieren más tiempo y memoria porque se conserva el estado de cada paso.
-- Práctica reconoce los nueve algoritmos del catálogo. Los ejercicios deben usar los nombres registrados, como `Quick Sort` o `Gauss-Jordan`.
+- Práctica reconoce los quince algoritmos del catálogo. Los ejercicios deben usar los nombres registrados, como `Quick Sort` o `Gauss-Jordan`.
 - Ejecuta `schema.sql` en una instalación nueva. En una existente, la aplicación completa automáticamente los algoritmos faltantes sin modificar los registros ya presentes; `actualizar-nuevos-algoritmos.sql` sigue disponible para una migración manual. Las cuatro habilidades iniciales deben estar disponibles antes de registrar intentos.
 - La API externa math.js requiere Internet y verifica únicamente sistemas cuadrados con solución única; la solución local sigue disponible ante fallos del servicio.
 - El intercambio es local y está limitado a 500 ejercicios y 1 MB por lote. Ambos equipos deben disponer de los algoritmos correspondientes.
 - Las trazas guardan instantáneas de los estados: las métricas educativas no representan una medición directa de tiempo ni memoria real de ejecución.
-- Los audios del simulador son archivos locales y no se guardan en la base de datos.
 - Hibernate valida el esquema al iniciar (`hbm2ddl.auto=validate`); no lo crea ni lo migra. La única excepción es la tabla `cuenta`, que la aplicación crea si falta antes de validar.
 - El inicio de sesión protege el acceso desde la aplicación, no la base de datos: quien abra PostgreSQL directamente puede ver los datos. Las contraseñas se guardan con PBKDF2-HMAC-SHA256 y sal, nunca en texto plano. Tras 5 intentos fallidos seguidos con un usuario, ese usuario queda bloqueado 30 segundos; el contador se guarda en memoria y se reinicia al cerrar la aplicación.
 - La carpeta `target/` se genera al compilar y no forma parte del repositorio.
@@ -842,6 +846,6 @@ La rama `main` debe compilar y ejecutarse después de cada integración.
 | Geanfranco Alexander Rodriguez Mendieta | [Geanrm30](https://github.com/Geanrm30) | Estructura del proyecto y configuración de la base, esquema PostgreSQL, mapeo de las ocho entidades, `SessionFactory`, motor de algoritmos (Bubble Sort, Insertion Sort, Gauss y Gauss-Jordan, fracciones exactas, verificador de operaciones y generador de ejercicios), tema visual y animaciones. |
 | Anthony Sying Gonzalez Chow | [AnthonySGC](https://github.com/AnthonySGC) | DAO base e interfaz CRUD genérica, persistencia de algoritmos y ejercicios, consultas HQL y estadísticas, gestión y validación de perfiles, registro transaccional de intentos, errores por habilidad, progreso y prueba de integración con rollback. Ampliación de los cinco algoritmos (Quick Sort, Merge Sort, Counting Sort, Radix Sort y Bucket Sort), catálogo, integración con los módulos, migración y pruebas. |
 | Jeremy Josue Gradiz Noguera | [JJGradiz](https://github.com/JJGradiz) | Consumo de la API de repaso en la etapa inicial del proyecto; plantilla JasperReports, generación y exportación del informe PDF y sus pruebas. |
-| Claudio Antonio De La Rocha Acevedo | [Def-Claudingo](https://github.com/Def-Claudingo) | Experiencia JavaFX: navegación, simulador, práctica con evaluación de operaciones y errores por habilidad, terminal, comparador, progreso, audio por paso e integración de la gestión con Hibernate. Intercambio de ejercicios por API, verificación externa con math.js y mejoras de navegación y entrada de matrices. |
+| Claudio Antonio De La Rocha Acevedo | [Def-Claudingo](https://github.com/Def-Claudingo) | Experiencia JavaFX: navegación, simulador, práctica con evaluación de operaciones y errores por habilidad, terminal, comparador, progreso e integración de la gestión con Hibernate. Intercambio de ejercicios por API, verificación externa con math.js y mejoras de navegación y entrada de matrices. |
 
 Docente: José A. Durán García · Noviembre 2026

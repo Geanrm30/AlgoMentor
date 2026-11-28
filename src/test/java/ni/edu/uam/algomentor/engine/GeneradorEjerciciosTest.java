@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GeneradorEjerciciosTest {
 
-    @Test void generaEjerciciosUtilizablesParaLosNueveAlgoritmos() {
+    @Test void generaEjerciciosUtilizablesParaTodosLosAlgoritmos() {
         for (var algoritmo : CatalogoAlgoritmos.values()) {
             for (int dificultad = 1; dificultad <= 5; dificultad++) {
                 String datos = new GeneradorEjercicios(42).datosPara(algoritmo.nombre(), dificultad);

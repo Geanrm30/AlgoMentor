@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.GuiaAlgoritmosController">
+    <content>
+        <VBox spacing="18" styleClass="tab-content">
+            <VBox spacing="10" styleClass="card">
+                <Label text="Guía de algoritmos de ordenamiento" styleClass="section-title" />
+                <Label text="Compara de un vistazo la técnica, la complejidad y las propiedades de cada método. Selecciona una fila para ver cómo ordena." wrapText="true" styleClass="subtitle" />
+                <TableView fx:id="tabla" prefHeight="620" minHeight="620">
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="colAlgoritmo" text="Algoritmo" prefWidth="140" />
+                        <TableColumn fx:id="colTecnica" text="Técnica" prefWidth="240" />
+                        <TableColumn fx:id="colMejor" text="Mejor caso" prefWidth="110" />
+                        <TableColumn fx:id="colPromedio" text="Promedio" prefWidth="115" />
+                        <TableColumn fx:id="colPeor" text="Peor caso" prefWidth="110" />
+                        <TableColumn fx:id="colEspacio" text="Memoria extra" prefWidth="125" />
+                        <TableColumn fx:id="colEstable" text="Estable" prefWidth="90" />
+                        <TableColumn fx:id="colEnSitio" text="En el sitio" prefWidth="100" />
+                    </columns>
+                </TableView>
+                <Label text="Estable: mantiene el orden de los valores repetidos. En el sitio: no necesita un arreglo auxiliar del tamaño de la entrada. n = elementos, k = rango de valores, d = dígitos, b = base." wrapText="true" styleClass="subtitle" />
+            </VBox>
+            <VBox spacing="10" styleClass="card">
+                <Label fx:id="lblNombre" text="Selecciona un algoritmo" styleClass="section-title" />
+                <Label text="Cómo ordena" styleClass="subtitle" />
+                <Label fx:id="lblMecanica" wrapText="true" />
+                <Label text="Cuándo conviene" styleClass="subtitle" />
+                <Label fx:id="lblCuando" wrapText="true" />
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

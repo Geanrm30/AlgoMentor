@@ -1150,3 +1150,53 @@
 .table-row-cell:hover {
     -fx-background-color: rgba(34, 211, 238, 0.10);
 }
+
+/* ---------- Tutorial guiado ---------- */
+
+.tutorial-card {
+    -fx-border-color: -ac-accent;
+    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.45), 30, 0.2, 0, 8);
+}
+
+.tutorial-numero {
+    -fx-text-fill: -ac-accent;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.tutorial-titulo {
+    -fx-text-fill: -ac-text;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+
+.tutorial-texto {
+    -fx-text-fill: -ac-text-soft;
+    -fx-font-size: 13.5px;
+}
+
+.app-root.light-theme .tutorial-card {
+    -fx-background-color: #ffffff;
+}
+
+.app-root.light-theme .tutorial-titulo {
+    -fx-text-fill: #111827;
+}
+
+.app-root.light-theme .tutorial-texto {
+    -fx-text-fill: #374151;
+}
+
+.mecanica-algoritmo {
+    -fx-text-fill: -ac-text-soft;
+    -fx-padding: 8 12;
+    -fx-background-color: rgba(34, 211, 238, 0.08);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(34, 211, 238, 0.35);
+    -fx-border-radius: 10;
+}
+
+.app-root.light-theme .mecanica-algoritmo {
+    -fx-text-fill: #1f2937;
+    -fx-background-color: #e0f2fe;
+}

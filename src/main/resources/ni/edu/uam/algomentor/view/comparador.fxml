@@ -4,7 +4,7 @@
 
 <VBox spacing="16" styleClass="tab-content" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ComparadorController">
     <Label text="Comparar ordenamientos" styleClass="section-title" />
-    <Label text="Compara los siete métodos: comparaciones, intercambios, escrituras, conteos y distribuciones." wrapText="true" minHeight="-Infinity" />
+    <Label text="Compara todos los métodos de ordenamiento: comparaciones, intercambios, escrituras, conteos y distribuciones." wrapText="true" minHeight="-Infinity" />
     <HBox spacing="10">
         <TextField fx:id="txtDatos" promptText="Ej. 5, 1, 4, 2" accessibleText="Números enteros separados por coma" HBox.hgrow="ALWAYS" />
         <Button text="Comparar" onAction="#comparar" styleClass="primary-button" />

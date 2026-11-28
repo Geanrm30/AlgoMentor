@@ -317,8 +317,8 @@ public final class Animaciones {
     }
 
     private static Node tarjetaDe(Object objetivo) {
-        if (objetivo instanceof Node nodo && (nodo.getStyleClass().contains("card")
-                || nodo.getStyleClass().contains("summary-card"))) {
+        if (objetivo instanceof Node nodo && !nodo.getStyleClass().contains("tutorial-card")
+                && (nodo.getStyleClass().contains("card") || nodo.getStyleClass().contains("summary-card"))) {
             return nodo;
         }
         return null;

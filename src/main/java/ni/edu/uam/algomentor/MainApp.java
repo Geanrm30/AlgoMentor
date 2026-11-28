@@ -2,15 +2,18 @@ package ni.edu.uam.algomentor;
 
 import javafx.application.Application;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -43,6 +46,7 @@ import ni.edu.uam.algomentor.util.ConfiguracionLogs;
 import ni.edu.uam.algomentor.util.HibernateUtil;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.util.Tema;
+import ni.edu.uam.algomentor.util.Tutorial;
 
 import java.io.IOException;
 import java.net.URL;
@@ -59,6 +63,10 @@ public class MainApp extends Application {
     private Stage stage;
     private StackPane contenido;
     private static final String CLAVE_TEMA_CLARO = "tema.claro";
+    private static final String CLAVE_TUTORIAL_VISTO = "tutorial.visto";
+    private StackPane envoltura;
+    private MenuBar barraMenus;
+    private Tutorial tutorial;
     private boolean temaClaro = leerTemaClaro();
     private static final int SEGUNDOS_ACTUALIZACION_AUTOMATICA = 10;
     private final Map<String, Vista> vistas = new HashMap<>();
@@ -138,7 +146,8 @@ public class MainApp extends Application {
         raiz.setCenter(contenido);
         instalarMenuContextual();
 
-        stage.getScene().setRoot(raiz);
+        envoltura = new StackPane(raiz);
+        stage.getScene().setRoot(envoltura);
         Animaciones.fundirEntrada(raiz);
         Animaciones.instalarEfectosBoton(stage.getScene());
         precargarIntercambio();
@@ -148,6 +157,11 @@ public class MainApp extends Application {
             mostrar("progreso", "progreso.fxml", true);
         }
         iniciarActualizacionAutomatica();
+        if (!leerTutorialVisto()) {
+            PauseTransition espera = new PauseTransition(Duration.millis(1100));
+            espera.setOnFinished(evento -> iniciarTutorial());
+            espera.play();
+        }
     }
 
     private void mostrarResumenGeneral() {
@@ -215,6 +229,7 @@ public class MainApp extends Application {
                     elemento("Simular", () -> mostrar("simulador", "simulador.fxml", false)),
                     elemento("Práctica", () -> mostrar("practica", "practica.fxml", true)),
                     elemento("Comparar algoritmos", () -> mostrar("comparador", "comparador.fxml", false)),
+                    elemento("Guía de algoritmos", () -> mostrar("guia", "guia-algoritmos.fxml", false)),
                     new SeparatorMenuItem(),
                     elemento("Exportar informe de progreso (PDF)…", this::exportarInformeConEleccion),
                     elemento("Cambiar tema", () -> {
@@ -280,6 +295,7 @@ public class MainApp extends Application {
         marca.getStyleClass().add("brand");
 
         MenuBar menu = new MenuBar(crearMenuArchivo(), crearMenuInicio());
+        barraMenus = menu;
         if (administrador) {
             menu.getMenus().add(crearMenuAdministracion());
         }
@@ -338,7 +354,9 @@ public class MainApp extends Application {
         return new Menu("Aprender", null,
                 elemento("Simular", "Shortcut+1", () -> mostrar("simulador", "simulador.fxml", false)),
                 elemento("Práctica", "Shortcut+2", () -> mostrar("practica", "practica.fxml", true)),
-                elemento("Comandos", "Shortcut+4", () -> mostrar("terminal", "terminal.fxml", false)));
+                elemento("Comandos", "Shortcut+4", () -> mostrar("terminal", "terminal.fxml", false)),
+                new SeparatorMenuItem(),
+                elemento("Guía de algoritmos", "Shortcut+8", () -> mostrar("guia", "guia-algoritmos.fxml", false)));
     }
 
     private Menu crearMenuHerramientas() {
@@ -373,7 +391,8 @@ public class MainApp extends Application {
     }
 
     private Menu crearMenuAyuda() {
-        return new Menu("Ayuda", null, elemento("Acerca de AlgoMentor", () -> {
+        return new Menu("Ayuda", null, elemento("Tutorial de uso", "F1", this::iniciarTutorial),
+                elemento("Acerca de AlgoMentor", () -> {
             Alert acerca = new Alert(Alert.AlertType.INFORMATION);
             acerca.setTitle("Acerca de AlgoMentor");
             acerca.setHeaderText("AlgoMentor");
@@ -396,6 +415,80 @@ public class MainApp extends Application {
         return elemento;
     }
 
+    private void iniciarTutorial() {
+        if (envoltura == null || !SesionUsuario.haySesion() || (tutorial != null && tutorial.activo())) {
+            return;
+        }
+        ocultarMenuContextual();
+        List<Tutorial.Paso> pasos = new java.util.ArrayList<>();
+        pasos.add(new Tutorial.Paso("Bienvenido a AlgoMentor",
+                "Aprende algoritmos viéndolos paso a paso, practica con corrección automática y sigue tu progreso. "
+                        + "Este recorrido dura un minuto. Usa Siguiente, o las flechas del teclado; Esc lo cierra.",
+                () -> barraMenus));
+        pasos.add(new Tutorial.Paso("Menús y atajos",
+                "Todo está en la barra superior. Los atajos Ctrl+1 a Ctrl+8 abren las secciones principales y "
+                        + "Ctrl+T cambia entre tema oscuro y claro. También funciona clic derecho en cualquier zona libre.",
+                () -> nodoMenu("Aprender")));
+        pasos.add(new Tutorial.Paso("Simulador: configura la entrada",
+                "Elige un algoritmo, escribe números separados por coma (o pulsa Generar entrada) y presiona Simular. "
+                        + "Debajo aparece una descripción de cómo ordena ese método.",
+                () -> tarjeta(0), () -> mostrar("simulador", "simulador.fxml", false)));
+        pasos.add(new Tutorial.Paso("Simulador: recorre los pasos",
+                "Con Siguiente y Anterior avanzas o retrocedes. Las celdas en cian son las que participan en el paso, "
+                        + "el violeta marca el pivote y la explicación escrita dice qué pasó y por qué.",
+                () -> tarjeta(1)));
+        pasos.add(new Tutorial.Paso("Guía de algoritmos",
+                "Una tabla compara los trece métodos de ordenamiento: técnica, mejor, promedio y peor caso, memoria "
+                        + "extra y estabilidad. Al seleccionar una fila se explica su mecánica y cuándo conviene.",
+                () -> tarjeta(0), () -> mostrar("guia", "guia-algoritmos.fxml", false)));
+        pasos.add(new Tutorial.Paso("Práctica",
+                "Elige un ejercicio y escribe tu respuesta. AlgoMentor la corrige, detecta el tipo de error (signos, "
+                        + "fracciones, aritmética o procedimiento) y lo suma a tu progreso.",
+                () -> tarjeta(0), () -> mostrar("practica", "practica.fxml", true)));
+        pasos.add(new Tutorial.Paso("Comparar algoritmos",
+                "Escribe una lista de números y compara cuántas comparaciones, intercambios y escrituras hace cada "
+                        + "método con esos mismos datos.",
+                () -> contenido, () -> mostrar("comparador", "comparador.fxml", false)));
+        pasos.add(new Tutorial.Paso("Mi progreso",
+                "Aquí ves tus aciertos, tu racha, el avance por habilidad y el historial. Puedes exportar un informe "
+                        + "en PDF desde Archivo.",
+                () -> contenido, () -> mostrar("progreso", "progreso.fxml", true)));
+        pasos.add(new Tutorial.Paso("Cuando necesites ayuda",
+                "Puedes repetir este recorrido cuando quieras desde Ayuda, Tutorial de uso (F1).",
+                () -> nodoMenu("Ayuda")));
+        tutorial = new Tutorial(envoltura, pasos, () -> guardarTutorialVisto(true));
+        tutorial.iniciar();
+    }
+
+    private Node nodoMenu(String texto) {
+        return barraMenus.lookupAll(".menu").stream()
+                .filter(nodo -> nodo instanceof Labeled etiqueta && texto.equals(etiqueta.getText()))
+                .findFirst().orElse(barraMenus);
+    }
+
+    private Node tarjeta(int posicion) {
+        List<Node> tarjetas = contenido.lookupAll(".card").stream()
+                .filter(nodo -> !nodo.getStyleClass().contains("tutorial-card")).toList();
+        return posicion < tarjetas.size() ? tarjetas.get(posicion) : contenido;
+    }
+
+    private static boolean leerTutorialVisto() {
+        try {
+            return Preferences.userNodeForPackage(MainApp.class).getBoolean(CLAVE_TUTORIAL_VISTO, false);
+        } catch (RuntimeException e) {
+            LOG.log(Level.WARNING, "No se pudo leer si el tutorial ya se mostró", e);
+            return true;
+        }
+    }
+
+    private static void guardarTutorialVisto(boolean visto) {
+        try {
+            Preferences.userNodeForPackage(MainApp.class).putBoolean(CLAVE_TUTORIAL_VISTO, visto);
+        } catch (RuntimeException e) {
+            LOG.log(Level.WARNING, "No se pudo guardar que el tutorial ya se mostró", e);
+        }
+    }
+
     /** El tema elegido se recuerda entre ejecuciones; si las preferencias no están disponibles, se usa el oscuro. */
     private static boolean leerTemaClaro() {
         try {
@@ -415,6 +508,9 @@ public class MainApp extends Application {
     }
 
     private void cerrarSesion() {
+        if (tutorial != null) {
+            tutorial.terminar();
+        }
         detenerActualizacionAutomatica();
         SesionUsuario.cerrar();
         vistas.clear();

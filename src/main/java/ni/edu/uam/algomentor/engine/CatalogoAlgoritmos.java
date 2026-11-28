@@ -13,6 +13,12 @@ public enum CatalogoAlgoritmos {
     COUNTING("Counting Sort", "Counting Sort (conteo)", "counting", CountingSort::new, null),
     RADIX("Radix Sort", "Radix Sort (dígitos)", "radix", RadixSort::new, null),
     BUCKET("Bucket Sort", "Bucket Sort (cubetas)", "bucket", BucketSort::new, null),
+    SELECTION("Selection Sort", "Ordenamiento por selección", "selection", SelectionSort::new, null),
+    SHELL("Shell Sort", "Shell Sort (saltos)", "shell", ShellSort::new, null),
+    HEAP("Heap Sort", "Heap Sort (montículo)", "heap", HeapSort::new, null),
+    COCKTAIL("Cocktail Sort", "Cocktail Sort (bidireccional)", "cocktail", CocktailSort::new, null),
+    COMB("Comb Sort", "Comb Sort (peine)", "comb", CombSort::new, null),
+    GNOME("Gnome Sort", "Gnome Sort (gnomo)", "gnome", GnomeSort::new, null),
     GAUSS("Gauss", "Eliminación de Gauss", "gauss", null, Gauss::new),
     JORDAN("Gauss-Jordan", "Eliminación de Gauss-Jordan", "jordan", null, GaussJordan::new);
 

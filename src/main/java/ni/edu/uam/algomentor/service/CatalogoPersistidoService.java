@@ -18,6 +18,12 @@ public final class CatalogoPersistidoService {
             new Definicion(CatalogoAlgoritmos.COUNTING, "O(n+k); disperso O(n log u)", "Cuenta frecuencias con desplazamiento; usa conteo disperso para rangos grandes"),
             new Definicion(CatalogoAlgoritmos.RADIX, "O(d(n+b))", "Diez pasadas decimales estables sobre claves long desplazadas"),
             new Definicion(CatalogoAlgoritmos.BUCKET, "Prom. O(n+k); peor O(n^2)", "Distribuye en cubetas, ordena por insercion y concatena"),
+            new Definicion(CatalogoAlgoritmos.SELECTION, "O(n^2)", "Busca el minimo y lo coloca al inicio del tramo sin ordenar"),
+            new Definicion(CatalogoAlgoritmos.SHELL, "O(n log n) a O(n^2)", "Insercion con saltos decrecientes"),
+            new Definicion(CatalogoAlgoritmos.HEAP, "O(n log n)", "Monticulo maximo; extrae la raiz hacia el final"),
+            new Definicion(CatalogoAlgoritmos.COCKTAIL, "O(n^2)", "Burbuja bidireccional"),
+            new Definicion(CatalogoAlgoritmos.COMB, "O(n^2); promedio mejor", "Burbuja con brecha decreciente (factor 1.3)"),
+            new Definicion(CatalogoAlgoritmos.GNOME, "O(n^2)", "Avanza si el par esta en orden; si no, intercambia y retrocede"),
             new Definicion(CatalogoAlgoritmos.GAUSS, "O(n^3)", "Eliminacion hacia adelante y sustitucion"),
             new Definicion(CatalogoAlgoritmos.JORDAN, "O(n^3)", "Reduce la matriz a la identidad")
     );

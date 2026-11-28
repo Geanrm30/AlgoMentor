@@ -1,5 +1,6 @@
 package ni.edu.uam.algomentor.service;
 
+import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import org.junit.jupiter.api.Test;
 
@@ -7,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ComparadorOrdenamientosTest {
 
-    @Test void comparaSieteAlgoritmosConMetricasPropias() {
+    @Test void comparaTodosLosOrdenamientosConMetricasPropias() {
         var metricas = ComparadorOrdenamientos.comparar(new int[]{4, -1, 0, 4, -3});
-        assertEquals(7, metricas.size());
+        assertEquals(CatalogoAlgoritmos.ordenamientos().size(), metricas.size());
         assertTrue(metricas.stream().allMatch(m -> m.resultado().equals("[-3, -1, 0, 4, 4]")));
         var counting = metricas.stream().filter(m -> m.algoritmo().equals("Counting Sort")).findFirst().orElseThrow();
         assertEquals(0, counting.comparaciones());
@@ -31,7 +32,7 @@ class ComparadorOrdenamientosTest {
                 .stream().allMatch(m -> m.resultado().equals("[-2147483648, 2147483647]")));
         assertThrows(IllegalArgumentException.class, () -> ComparadorOrdenamientos.comparar(null));
         assertThrows(IllegalArgumentException.class, () -> ComparadorOrdenamientos.comparar(new int[0]));
-        assertEquals(7, ComparadorOrdenamientos.comparar(new int[FormatoDatos.MAX_ELEMENTOS_VISUALES]).size());
+        assertEquals(CatalogoAlgoritmos.ordenamientos().size(), ComparadorOrdenamientos.comparar(new int[FormatoDatos.MAX_ELEMENTOS_VISUALES]).size());
         assertThrows(IllegalArgumentException.class, () -> ComparadorOrdenamientos.comparar(new int[FormatoDatos.MAX_ELEMENTOS_VISUALES + 1]));
     }
 
