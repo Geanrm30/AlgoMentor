@@ -508,6 +508,11 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
   vuelven a salir y la tarjeta se sacude. Cambiar entre iniciar sesión y crear cuenta encoge la tarjeta a un
   mosaico con el logo de AlgoMentor (`LogoMarca`) y un anillo de luz, y la expande con el otro formulario, que
   pone contraseña y confirmación en dos columnas. Con un usuario recordado, la pastilla dice "Continuar como ...".
+  La parte superior de la tarjeta queda anclada, de modo que crece hacia abajo sin saltar, y el cuello líquido solo
+  puentea los huecos entre campos, nunca cruza uno.
+- **Del login a la aplicación:** el login se disuelve con un leve acercamiento mientras la aplicación aparece debajo,
+  la barra lateral se desliza desde la izquierda, la barra superior baja y el contenido de la primera sección entra
+  al final (`MainApp.entrarEnLaAplicacion`). Al cerrar sesión, el login entra con un fundido.
 - **Contadores y tarjetas:** las cifras de Resumen y Progreso cuentan hasta su valor (solo animan si
   cambian, para no reiniciarse con la actualización automática) y las tarjetas pequeñas de resumen se elevan
   un poco al pasar el cursor. Al entrar a la aplicación la pantalla se funde suavemente.
@@ -733,7 +738,7 @@ y límites visuales con la importación JSON. Los nuevos motores rechazan arregl
 ## 9. Pruebas
 
 La última ejecución local (`mvn test` más las pruebas de interfaz JavaFX bajo un display virtual) obtuvo
-**351 pruebas aprobadas**, sin fallos ni omisiones. Las pruebas que usan PostgreSQL real
+**352 pruebas aprobadas**, sin fallos ni omisiones. Las pruebas que usan PostgreSQL real
 (`PersistenciaAprendizajeIT` y `NuevosAlgoritmosPostgresIT`) necesitan la base de datos y no se declaran
 aprobadas en esa ejecución.
 

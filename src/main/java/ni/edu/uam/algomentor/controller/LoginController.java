@@ -11,6 +11,9 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -93,6 +96,8 @@ public class LoginController {
     private String recordado;
     private boolean registro;
     private boolean ocupado;
+    /** 1: la tarjeta mantiene fija su parte superior; 0: queda centrada (el mosaico del cambio de modo). */
+    private final DoubleProperty ancla = new SimpleDoubleProperty(1);
 
     @FXML
     private void initialize() {
@@ -104,6 +109,7 @@ public class LoginController {
         contenedorFormulario.getChildren().add(formulario);
         construirFilas();
         formulario.definir(filasInicio);
+        anclarTarjeta();
 
         recordado = usuarioRecordado.leer().orElse(null);
         if (recordado != null) {
@@ -115,6 +121,22 @@ public class LoginController {
         aplicarTextos();
         pastilla.setText(textoReposo());
         Platform.runLater(() -> Animaciones.entrarTarjetaLogin(tarjeta));
+    }
+
+    /**
+     * La tarjeta crece al abrirse el formulario; si estuviera centrada, saltaría hacia arriba. Se envuelve en un
+     * contenedor que se desplaza la mitad de lo que le falta por crecer, y así la parte superior no se mueve.
+     */
+    private void anclarTarjeta() {
+        StackPane anclaje = new StackPane();
+        anclaje.setPickOnBounds(false);
+        int posicion = raiz.getChildren().indexOf(tarjeta);
+        raiz.getChildren().remove(tarjeta);
+        anclaje.getChildren().add(tarjeta);
+        raiz.getChildren().add(posicion, anclaje);
+        anclaje.translateYProperty().bind(Bindings.createDoubleBinding(
+                () -> ancla.get() * (formulario.getPrefHeight() - formulario.alturaTotalProperty().get()) / 2,
+                ancla, formulario.prefHeightProperty(), formulario.alturaTotalProperty()));
     }
 
     public void setAlAutenticar(Consumer<Perfil> accion) {
@@ -369,6 +391,7 @@ public class LoginController {
         FadeTransition ocultar = new FadeTransition(Duration.millis(200), contenido);
         ocultar.setToValue(0);
         Timeline encoger = new Timeline(new KeyFrame(Duration.millis(440),
+                new KeyValue(ancla, 0, Interpolator.EASE_BOTH),
                 new KeyValue(tarjeta.minWidthProperty(), LADO_MOSAICO, Interpolator.EASE_BOTH),
                 new KeyValue(tarjeta.prefWidthProperty(), LADO_MOSAICO, Interpolator.EASE_BOTH),
                 new KeyValue(tarjeta.maxWidthProperty(), LADO_MOSAICO, Interpolator.EASE_BOTH),
@@ -392,6 +415,7 @@ public class LoginController {
         FadeTransition quitarMosaico = new FadeTransition(Duration.millis(220), mosaico);
         quitarMosaico.setToValue(0);
         Timeline expandir = new Timeline(new KeyFrame(Duration.millis(520),
+                new KeyValue(ancla, 1, Interpolator.EASE_BOTH),
                 new KeyValue(tarjeta.minWidthProperty(), destino[0], Interpolator.EASE_BOTH),
                 new KeyValue(tarjeta.prefWidthProperty(), destino[0], Interpolator.EASE_BOTH),
                 new KeyValue(tarjeta.maxWidthProperty(), destino[0], Interpolator.EASE_BOTH),

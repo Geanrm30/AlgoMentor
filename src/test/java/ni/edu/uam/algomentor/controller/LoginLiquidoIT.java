@@ -80,6 +80,30 @@ class LoginLiquidoIT {
         });
     }
 
+    @Test void laParteSuperiorDeLaTarjetaNoSeMueveAlAbrirElFormulario() throws Exception {
+        Vista vista = cargar();
+        Thread.sleep(1500);   // deja terminar la animación de entrada de la tarjeta antes de medir
+        double[] antes = new double[1];
+        enHiloFx(() -> {
+            vista.raiz().applyCss();
+            vista.raiz().layout();
+            javafx.scene.layout.Region tarjeta = campo(vista.controlador(), "tarjeta");
+            antes[0] = tarjeta.localToScene(0, 0).getY();
+            ((Button) campo(vista.controlador(), "pastilla")).fire();
+            return null;
+        });
+        Thread.sleep(1600);
+        enHiloFx(() -> {
+            vista.raiz().applyCss();
+            vista.raiz().layout();
+            javafx.scene.layout.Region tarjeta = campo(vista.controlador(), "tarjeta");
+            assertEquals(antes[0], tarjeta.localToScene(0, 0).getY(), 2.0,
+                    "La tarjeta no debe saltar: su parte superior queda fija mientras crece hacia abajo");
+            assertTrue(tarjeta.getHeight() > 450, "La tarjeta sí debe haber crecido: " + tarjeta.getHeight());
+            return null;
+        });
+    }
+
     @Test void cambiarDeModoMuestraElRegistroYDejaLaTarjetaLibre() throws Exception {
         Vista vista = cargar();
         enHiloFx(() -> {

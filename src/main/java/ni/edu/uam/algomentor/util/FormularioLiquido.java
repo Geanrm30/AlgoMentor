@@ -39,6 +39,7 @@ public final class FormularioLiquido extends Pane {
     private final Button pastilla;
     private final DoubleProperty progreso = new SimpleDoubleProperty(0);
     private final DoubleProperty anchoPastilla = new SimpleDoubleProperty();
+    private final DoubleProperty alturaTotal = new SimpleDoubleProperty(ALTO_PASTILLA);
     private final List<Region> filas = new ArrayList<>();
     private final List<Region> cuellos = new ArrayList<>();
     private Disposicion disposicion = disponer(new double[0]);
@@ -113,7 +114,13 @@ public final class FormularioLiquido extends Pane {
         getChildren().addAll(filas);
         getChildren().add(pastilla);
         disposicion = disponer(alturas);
+        alturaTotal.set(disposicion.total());
         aplicar(progreso.get());
+    }
+
+    /** Alto que tiene el formulario con todos los campos abiertos; sirve para anclar lo que lo contiene. */
+    public DoubleProperty alturaTotalProperty() {
+        return alturaTotal;
     }
 
     public boolean abierto() {
@@ -160,7 +167,6 @@ public final class FormularioLiquido extends Pane {
         setPrefHeight(alto);
         setMaxHeight(alto);
         pastilla.setLayoutY(disposicion.yPastilla() * p);
-        double centroPastilla = pastilla.getLayoutY() + ALTO_PASTILLA / 2;
         for (int i = 0; i < filas.size(); i++) {
             Region fila = filas.get(i);
             double altoFila = fila.getPrefHeight();
@@ -172,17 +178,32 @@ public final class FormularioLiquido extends Pane {
             fila.setScaleX(0.82 + 0.18 * Math.max(0, Math.min(1.1, p)));
             fila.setScaleY(0.35 + 0.65 * Math.max(0, Math.min(1.1, p)));
             fila.setVisible(p > 0.002);
-
+        }
+        // Segunda pasada: ya están todas las filas colocadas, así que se puede medir el hueco entre cada par.
+        for (int i = 0; i < filas.size(); i++) {
+            Region fila = filas.get(i);
+            double altoFila = fila.getPrefHeight();
+            // El cuello solo puentea el hueco entre esta fila y la siguiente (o la pastilla), nunca cruza un campo.
+            double mitad = altoFila * fila.getScaleY() / 2;
+            double centro = fila.getLayoutY() + altoFila / 2 + fila.getTranslateY();
+            double base = centro + mitad;
+            double siguienteTop;
+            if (i + 1 < filas.size()) {
+                Region sig = filas.get(i + 1);
+                siguienteTop = sig.getLayoutY() + sig.getPrefHeight() / 2 + sig.getTranslateY()
+                        - sig.getPrefHeight() * sig.getScaleY() / 2;
+            } else {
+                siguienteTop = pastilla.getLayoutY();
+            }
             Region cuello = cuellos.get(i);
-            double centroFila = fila.getLayoutY() + altoFila / 2 + fila.getTranslateY();
-            double ancho = this.ancho * 0.28 * Math.sin(Math.PI * pc);
-            double alto2 = Math.abs(centroPastilla - centroFila);
-            cuello.setVisible(ancho > 1 && alto2 > 1);
-            cuello.setLayoutX((this.ancho - ancho) / 2);
-            cuello.setLayoutY(Math.min(centroPastilla, centroFila));
-            cuello.setMinSize(ancho, alto2);
-            cuello.setPrefSize(ancho, alto2);
-            cuello.setMaxSize(ancho, alto2);
+            double grosor = this.ancho * 0.28 * Math.sin(Math.PI * pc);
+            double hueco = siguienteTop - base;
+            cuello.setVisible(grosor > 1 && hueco > 1 && fila.isVisible());
+            cuello.setLayoutX((this.ancho - grosor) / 2);
+            cuello.setLayoutY(base);
+            cuello.setMinSize(grosor, Math.max(0, hueco));
+            cuello.setPrefSize(grosor, Math.max(0, hueco));
+            cuello.setMaxSize(grosor, Math.max(0, hueco));
         }
     }
 
@@ -255,7 +276,7 @@ public final class FormularioLiquido extends Pane {
         pastilla.setContentDisplay(ContentDisplay.LEFT);
         pastilla.setGraphicTextGap(10);
         animarAncho(ancho, 360, () -> {
-            PauseTransition espera = new PauseTransition(Duration.millis(800));
+            PauseTransition espera = new PauseTransition(Duration.millis(450));
             espera.setOnFinished(evento -> {
                 if (alTerminar != null) {
                     alTerminar.run();

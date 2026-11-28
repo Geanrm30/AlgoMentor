@@ -2,6 +2,11 @@ package ni.edu.uam.algomentor;
 
 import javafx.application.Application;
 import javafx.animation.KeyFrame;
+import javafx.animation.TranslateTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -174,8 +179,7 @@ public class MainApp extends Application {
         raizActual = raiz;
         instalarAtajos(stage.getScene());
         aplicarAccesibilidad();
-        stage.getScene().setRoot(envoltura);
-        Animaciones.fundirEntrada(raiz);
+        Parent loginSaliente = stage.getScene().getRoot();
         Animaciones.instalarEfectosBoton(stage.getScene());
         precargarIntercambio();
         if (administrador) {
@@ -184,11 +188,78 @@ public class MainApp extends Application {
             mostrar("progreso", "progreso.fxml", true);
         }
         iniciarActualizacionAutomatica();
+        entrarEnLaAplicacion(loginSaliente, envoltura, raiz);
         if (!leerTutorialVisto()) {
             PauseTransition espera = new PauseTransition(Duration.millis(1100));
             espera.setOnFinished(evento -> iniciarTutorial());
             espera.play();
         }
+    }
+
+    /**
+     * Pasa del inicio de sesión a la aplicación sin corte: el login se disuelve con un leve acercamiento mientras la
+     * aplicación aparece debajo, la barra lateral se desliza desde la izquierda y la barra superior baja un poco.
+     */
+    private void entrarEnLaAplicacion(Parent loginSaliente, StackPane nueva, BorderPane raiz) {
+        Scene escena = stage.getScene();
+        if (loginSaliente == null || loginSaliente == nueva) {
+            escena.setRoot(nueva);
+            return;
+        }
+        escena.setRoot(new StackPane());           // libera el login para poder reutilizarlo como capa
+        StackPane transicion = new StackPane(nueva, loginSaliente);
+        escena.setRoot(transicion);
+        nueva.setOpacity(0);
+        Node lateral = raiz.getLeft();
+        Node superior = raiz.getTop();
+        lateral.setTranslateX(-48);
+        lateral.setOpacity(0);
+        superior.setTranslateY(-16);
+        superior.setOpacity(0);
+
+        Interpolator suave = Interpolator.SPLINE(0.16, 1, 0.3, 1);
+        FadeTransition disolverLogin = new FadeTransition(Duration.millis(480), loginSaliente);
+        disolverLogin.setToValue(0);
+        disolverLogin.setInterpolator(Interpolator.EASE_IN);
+        ScaleTransition acercarLogin = new ScaleTransition(Duration.millis(520), loginSaliente);
+        acercarLogin.setToX(1.04);
+        acercarLogin.setToY(1.04);
+        acercarLogin.setInterpolator(Interpolator.EASE_IN);
+        FadeTransition aparecer = new FadeTransition(Duration.millis(520), nueva);
+        aparecer.setToValue(1);
+        aparecer.setDelay(Duration.millis(140));
+        TranslateTransition entrarLateral = new TranslateTransition(Duration.millis(640), lateral);
+        entrarLateral.setToX(0);
+        entrarLateral.setInterpolator(suave);
+        entrarLateral.setDelay(Duration.millis(220));
+        FadeTransition lateralVisible = new FadeTransition(Duration.millis(420), lateral);
+        lateralVisible.setToValue(1);
+        lateralVisible.setDelay(Duration.millis(220));
+        TranslateTransition bajarSuperior = new TranslateTransition(Duration.millis(560), superior);
+        bajarSuperior.setToY(0);
+        bajarSuperior.setInterpolator(suave);
+        bajarSuperior.setDelay(Duration.millis(300));
+        FadeTransition superiorVisible = new FadeTransition(Duration.millis(420), superior);
+        superiorVisible.setToValue(1);
+        superiorVisible.setDelay(Duration.millis(300));
+
+        ParallelTransition total = new ParallelTransition(disolverLogin, acercarLogin, aparecer, entrarLateral,
+                lateralVisible, bajarSuperior, superiorVisible);
+        total.setOnFinished(evento -> {
+            transicion.getChildren().clear();       // la aplicación vuelve a ser la raíz de la escena
+            escena.setRoot(nueva);
+            nueva.setOpacity(1);
+            lateral.setTranslateX(0);
+            lateral.setOpacity(1);
+            superior.setTranslateY(0);
+            superior.setOpacity(1);
+        });
+        total.play();
+        // La entrada del contenido de la primera sección se repite cuando la aplicación ya es visible.
+        PauseTransition contenidoVisible = new PauseTransition(Duration.millis(420));
+        contenidoVisible.setOnFinished(evento -> contenido.getChildren().stream().findFirst()
+                .ifPresent(Animaciones::entrarContenido));
+        contenidoVisible.play();
     }
 
     private void mostrarResumenGeneral() {
@@ -627,7 +698,9 @@ public class MainApp extends Application {
         barraLateral = null;
         stage.getScene().getAccelerators().clear();
         try {
-            stage.getScene().setRoot(cargarLogin());
+            Parent login = cargarLogin();
+            stage.getScene().setRoot(login);
+            Animaciones.fundirEntrada(login);
             Animaciones.instalarEfectosBoton(stage.getScene());
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "No se pudo volver al inicio de sesión", e);
