@@ -96,6 +96,7 @@ public class ProgresoController implements Actualizable {
     @FXML private Button btnVolver;
     @FXML private VBox panelVacio;
     @FXML private Label lblBienvenida;
+    @FXML private Label lblSaludo;
     @FXML private Button btnVistaPrevia;
     @FXML private ComboBox<Algoritmo> cmbAlgoritmoDominio;
     @FXML private Button btnGenerarConstancia;
@@ -256,6 +257,8 @@ public class ProgresoController implements Actualizable {
     }
 
     private void actualizarEtiquetaPerfil() {
+        lblSaludo.setText(esPerfilPropio() ? "Hola, " + perfilActivo().getNombre()
+                : "Progreso de " + perfilActivo().getNombre());
         lblPerfilActual.setText("Perfil: " + perfilActivo().getNombre()
                 + (esPerfilPropio() ? "" : " (vista de administrador)"));
         btnVolver.setVisible(!esPerfilPropio());

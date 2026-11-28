@@ -17,6 +17,7 @@ import ni.edu.uam.algomentor.service.CuestionarioService;
 import ni.edu.uam.algomentor.service.DesafioService;
 import ni.edu.uam.algomentor.service.LogrosService;
 import ni.edu.uam.algomentor.util.Animaciones;
+import ni.edu.uam.algomentor.util.EfectosBoton;
 import ni.edu.uam.algomentor.util.PuntajesLocales;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 
@@ -117,6 +118,7 @@ public class RetosController {
                         ? "¡Correcto! Racha de " + partida.racha() + "."
                         : "Incorrecto. Era " + preguntaActual.esperada() + ".",
                 correcta ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
+        EfectosBoton.resultado(btnResponderDesafio, correcta);
         ronda++;
         actualizarMarcador();
         siguienteDesafio();

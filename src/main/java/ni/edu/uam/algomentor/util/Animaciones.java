@@ -152,24 +152,24 @@ public final class Animaciones {
 
     public static void instalarEfectosBoton(Scene escena) {
         escena.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, evento -> {
-            if (evento.getTarget() instanceof Button boton && !boton.isDisabled()) {
+            if (evento.getTarget() instanceof Button boton && !boton.isDisabled() && !esNavegacion(boton)) {
                 escalarBoton(boton, 1.04, 140);
             }
         });
         escena.addEventFilter(MouseEvent.MOUSE_EXITED_TARGET, evento -> {
-            if (evento.getTarget() instanceof Button boton) {
+            if (evento.getTarget() instanceof Button boton && !esNavegacion(boton)) {
                 escalarBoton(boton, 1, 180);
             }
         });
         escena.addEventFilter(MouseEvent.MOUSE_PRESSED, evento -> {
             Button boton = botonDe(evento.getTarget());
-            if (boton != null && !boton.isDisabled()) {
+            if (boton != null && !boton.isDisabled() && !esNavegacion(boton)) {
                 escalarBoton(boton, 0.95, 90);
             }
         });
         escena.addEventFilter(MouseEvent.MOUSE_RELEASED, evento -> {
             Button boton = botonDe(evento.getTarget());
-            if (boton != null) {
+            if (boton != null && !esNavegacion(boton)) {
                 escalarBoton(boton, boton.isHover() ? 1.04 : 1, 140);
             }
         });
@@ -195,55 +195,9 @@ public final class Animaciones {
         reproducir(etiqueta, conteo);
     }
 
-    /** Orbes de luz que flotan lentamente detrás del contenido de un {@link StackPane}. */
+    /** Fondo de malla animado detrás del contenido de un {@link StackPane} (inicio de sesión). */
     public static void fondoAnimado(StackPane raiz) {
-        Pane capa = new Pane();
-        capa.setMouseTransparent(true);
-        capa.setPickOnBounds(false);
-        capa.setManaged(false);
-        raiz.getChildren().add(0, capa);
-        capa.prefWidthProperty().bind(raiz.widthProperty());
-        capa.prefHeightProperty().bind(raiz.heightProperty());
-        capa.resize(raiz.getWidth(), raiz.getHeight());
-        capa.setClip(clip(capa));
-
-        Color[] colores = {Color.web("#22d3ee"), Color.web("#8b5cf6"), Color.web("#34d399"), Color.web("#6366f1")};
-        double[][] posicion = {{0.18, 0.25}, {0.82, 0.30}, {0.30, 0.80}, {0.75, 0.78}};
-        double[] radios = {170, 210, 140, 190};
-        for (int i = 0; i < colores.length; i++) {
-            Circle orbe = new Circle(radios[i]);
-            orbe.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE,
-                    new Stop(0, colores[i].deriveColor(0, 1, 1, 0.20)),
-                    new Stop(1, colores[i].deriveColor(0, 1, 1, 0))));
-            orbe.setEffect(new BoxBlur(40, 40, 2));
-            orbe.centerXProperty().bind(capa.widthProperty().multiply(posicion[i][0]));
-            orbe.centerYProperty().bind(capa.heightProperty().multiply(posicion[i][1]));
-            capa.getChildren().add(orbe);
-
-            TranslateTransition flotar = new TranslateTransition(Duration.seconds(7 + i * 1.7), orbe);
-            flotar.setByX(i % 2 == 0 ? 90 : -90);
-            flotar.setByY(i < 2 ? 60 : -60);
-            flotar.setAutoReverse(true);
-            flotar.setCycleCount(Animation.INDEFINITE);
-            flotar.setInterpolator(Interpolator.EASE_BOTH);
-            flotar.play();
-
-            ScaleTransition respirar = new ScaleTransition(Duration.seconds(4 + i), orbe);
-            respirar.setToX(1.25);
-            respirar.setToY(1.25);
-            respirar.setAutoReverse(true);
-            respirar.setCycleCount(Animation.INDEFINITE);
-            respirar.setInterpolator(Interpolator.EASE_BOTH);
-            respirar.play();
-        }
-        StackPane.setAlignment(capa, Pos.TOP_LEFT);
-    }
-
-    private static Rectangle clip(Pane capa) {
-        Rectangle recorte = new Rectangle();
-        recorte.widthProperty().bind(capa.widthProperty());
-        recorte.heightProperty().bind(capa.heightProperty());
-        return recorte;
+        Fondo.instalar(raiz, false, true);
     }
 
     /** Entrada del cuadro de inicio de sesión: escala, desvanece y revela sus hijos en cascada. */
@@ -349,6 +303,7 @@ public final class Animaciones {
     }
 
     public static void entrarContenido(Node raiz) {
+        EfectosBoton.decorar(raiz);
         if (raiz.getScene() != null && raiz instanceof Parent padre) {
             padre.applyCss();
         }
@@ -364,6 +319,10 @@ public final class Animaciones {
 
     private static List<Node> buscar(Node raiz, String selector) {
         return new ArrayList<>(raiz.lookupAll(selector));
+    }
+
+    private static boolean esNavegacion(Button boton) {
+        return boton.getStyleClass().contains("item-nav");
     }
 
     private static Button botonDe(Object objetivo) {

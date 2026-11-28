@@ -94,10 +94,10 @@
                                     <VBox fx:id="entradaMatrizEjercicio" GridPane.rowIndex="3" GridPane.columnSpan="2" />
                                 </GridPane>
                                 <HBox spacing="10" styleClass="actions">
-                                    <Button text="Guardar" onAction="#guardarEjercicio" styleClass="primary-button" />
+                                    <Button fx:id="btnGuardarEjercicio" text="Guardar" onAction="#guardarEjercicio" styleClass="primary-button" />
                                     <Button text="Generar ejercicio" onAction="#generarEjercicio" />
-                                    <Button text="Actualizar" onAction="#actualizarEjercicio" />
-                                    <Button text="Eliminar" onAction="#eliminarEjercicio" />
+                                    <Button fx:id="btnActualizarEjercicio" text="Actualizar" onAction="#actualizarEjercicio" />
+                                    <Button fx:id="btnEliminarEjercicio" text="Eliminar" onAction="#eliminarEjercicio" />
                                     <Button text="Limpiar" onAction="#limpiarEjercicio" />
                                 </HBox>
                                 <TableView fx:id="tblEjercicios" prefHeight="260" VBox.vgrow="ALWAYS">

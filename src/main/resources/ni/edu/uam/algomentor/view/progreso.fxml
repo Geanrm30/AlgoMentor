@@ -6,7 +6,7 @@
 <ScrollPane fx:id="raiz" fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="pagina-desplazable" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.ProgresoController">
     <content>
     <VBox spacing="16" styleClass="tab-content">
-    <Label text="Progreso de aprendizaje" styleClass="section-title" />
+    <Label fx:id="lblSaludo" text="Tu progreso" styleClass="saludo" />
     <HBox spacing="10">
         <Label fx:id="lblPerfilActual" text="Perfil de la cuenta" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
         <Button fx:id="btnVolver" text="Volver al resumen" onAction="#volver" visible="false" managed="false" />
@@ -16,30 +16,48 @@
         <Button text="Exportar CSV" onAction="#exportarHistorialCsv" />
     </HBox>
     <FlowPane hgap="12" vgap="12">
-        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
-            <Label text="Intentos" styleClass="summary-label" />
-            <Label fx:id="lblIntentos" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
-            <Label text="Correctos" styleClass="summary-label" />
-            <Label fx:id="lblCorrectos" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
-            <Label text="Incorrectos" styleClass="summary-label" />
-            <Label fx:id="lblIncorrectos" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
-            <Label text="Acierto" styleClass="summary-label" />
-            <Label fx:id="lblPorcentajeGeneral" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
-            <Label text="Racha de aciertos" styleClass="summary-label" />
-            <Label fx:id="lblRacha" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" prefWidth="150">
-            <Label text="Tiempo promedio" styleClass="summary-label" />
-            <Label fx:id="lblTiempoPromedio" text="—" styleClass="summary-value" />
-        </VBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" prefWidth="245">
+            <StackPane styleClass="chip-icono, chip-violeta"><Region styleClass="ico, ico-lapiz" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblIntentos" text="—" styleClass="summary-value" />
+                <Label text="Intentos" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" prefWidth="245">
+            <StackPane styleClass="chip-icono, chip-verde"><Region styleClass="ico, ico-check" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblCorrectos" text="—" styleClass="summary-value" />
+                <Label text="Correctos" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" prefWidth="245">
+            <StackPane styleClass="chip-icono, chip-rojo"><Region styleClass="ico, ico-cerrar" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblIncorrectos" text="—" styleClass="summary-value" />
+                <Label text="Incorrectos" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" prefWidth="245">
+            <StackPane styleClass="chip-icono, chip-azul"><Region styleClass="ico, ico-tendencia" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblPorcentajeGeneral" text="—" styleClass="summary-value" />
+                <Label text="Acierto" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" prefWidth="245">
+            <StackPane styleClass="chip-icono, chip-ambar"><Region styleClass="ico, ico-rayo" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblRacha" text="—" styleClass="summary-value" />
+                <Label text="Racha de aciertos" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" prefWidth="245">
+            <StackPane styleClass="chip-icono, chip-violeta"><Region styleClass="ico, ico-reloj" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblTiempoPromedio" text="—" styleClass="summary-value" />
+                <Label text="Tiempo promedio" styleClass="summary-label" />
+            </VBox>
+        </HBox>
     </FlowPane>
     <VBox fx:id="panelVacio" spacing="4" styleClass="aviso-vacio" visible="false" managed="false">
         <Label text="Aún no hay actividad" styleClass="aviso-vacio-titulo" />

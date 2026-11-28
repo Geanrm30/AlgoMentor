@@ -43,11 +43,11 @@ class InterfazAlgoritmosIT {
         SesionUsuario.cerrar();
     }
 
-    @Test void simulaSieteOrdenamientosYRetrocedeHastaElEstadoInicial() throws Exception {
+    @Test void simulaTodosLosOrdenamientosYRetrocedeHastaElEstadoInicial() throws Exception {
         enJavaFx(() -> {
             FXMLLoader vista = cargar("simulador.fxml");
             ComboBox<String> algoritmos = control(vista, "cmbAlgoritmo");
-            assertEquals(9, algoritmos.getItems().size());
+            assertEquals(ni.edu.uam.algomentor.engine.CatalogoAlgoritmos.values().length, algoritmos.getItems().size());
             for (var algoritmo : CatalogoAlgoritmos.ordenamientos()) {
                 algoritmos.setValue(algoritmo.nombre());
                 ((TextField) control(vista, "txtArreglo")).setText("3,-1,0,3");
@@ -77,13 +77,13 @@ class InterfazAlgoritmosIT {
         });
     }
 
-    @Test void comparadorPresentaSieteResultadosYColumnasDeMetricas() throws Exception {
+    @Test void comparadorPresentaUnResultadoPorOrdenamientoYColumnasDeMetricas() throws Exception {
         enJavaFx(() -> {
             FXMLLoader vista = cargar("comparador.fxml");
             ((TextField) control(vista, "txtDatos")).setText("3,-1,0,3");
             boton(vista.getRoot(), "Comparar").fire();
             TableView<ComparadorOrdenamientos.Metrica> tabla = control(vista, "tabla");
-            assertEquals(7, tabla.getItems().size());
+            assertEquals(ni.edu.uam.algomentor.engine.CatalogoAlgoritmos.ordenamientos().size(), tabla.getItems().size());
             assertEquals(9, tabla.getColumns().size());
             assertTrue(tabla.getItems().stream().allMatch(m -> m.resultado().equals("[-1, 0, 3, 3]")));
         });

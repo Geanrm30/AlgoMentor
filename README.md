@@ -188,17 +188,22 @@ el detalle técnico en consola.
 
 ## 3. Módulos de la aplicación
 
-Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a cada sección:
+Tras iniciar sesión, la ventana principal tiene una **barra lateral** con las secciones y una barra superior con
+tres menús. El indicador de color se desliza hasta la sección activa; el botón de las tres rayas contrae la barra
+a solo íconos (se recuerda entre ejecuciones) y, contraída, cada ícono muestra su nombre y su atajo al pasar el cursor.
 
-| Menú | Opciones |
+| Grupo de la barra lateral | Secciones |
+|---|---|
+| **Mi avance** | Mi progreso y Retos y logros. |
+| **Aprender** | Simular, Práctica, Guía de algoritmos y Búsqueda y grafos. |
+| **Herramientas** | Comparar, Comprobar sistema (math.js) y Biblioteca. |
+| **Administración** | Resumen general e Informes. Solo aparece para cuentas administradoras. |
+
+| Menú superior | Opciones |
 |---|---|
 | **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF; un administrador elige primero el perfil), Cambiar contraseña, Cerrar sesión y Salir. |
-| **Inicio** | Mi progreso. |
-| **Administración** | Resumen general e Informes (vista previa y PDF de cada informe global). Solo aparece para cuentas administradoras. |
-| **Aprender** | Simular, Práctica, Guía de algoritmos, Búsqueda, grafos y recursividad, y Retos y logros. |
-| **Herramientas** | Comparar algoritmos, Comprobar sistema (math.js) y Biblioteca de contenido. |
-| **Ver** | Tema claro u oscuro. |
-| **Ayuda** | Acerca de AlgoMentor. |
+| **Ver** | Tema claro u oscuro, alto contraste, tamaño de letra y pantalla completa. |
+| **Ayuda** | Tutorial de uso y Acerca de AlgoMentor. |
 
 **Clic derecho:** además del menú, casi todas las pantallas tienen un menú contextual.
 
@@ -475,8 +480,18 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
 
 ## 4. Interfaz y animaciones
 
-- **Tema oscuro:** `algomentor.css` define la paleta (cian y violeta), las tarjetas, los botones, las
-  tablas y los diálogos. `Tema` aplica la misma hoja de estilos a los cuadros de alerta.
+- **Tema de vidrio:** `algomentor.css` define la paleta, las tarjetas translúcidas, los botones, las tablas y los
+  diálogos, en versión oscura y clara. Detrás de todo hay un fondo de malla de gradiente (`Fondo`: manchas de color
+  difuminadas y, en el oscuro, partículas tenues), que en la aplicación es estático y se guarda en caché para no
+  gastar procesador. `Tema` aplica la misma hoja de estilos a los cuadros de alerta.
+- **Barra lateral:** `BarraLateral` construye la navegación con íconos vectoriales (`Iconos`, formas SVG en el CSS) y
+  un indicador que se desliza con la animación de la sección elegida. Los atajos de teclado se registran en la
+  escena, de modo que siguen funcionando sin menús.
+- **Efectos de botón:** `EfectosBoton` pone un ícono a cada botón según su texto y le da su animación: Actualizar
+  gira, Exportar e Importar sacan y meten la flecha, Generar y Limpiar giran, Simular y Ver pulsan. Guardar y
+  Verificar cambian el ícono por un check verde (o una cruz roja si falla) y Eliminar encoge el botón hasta un
+  círculo y abre y cierra la tapa de una papelera. Las que pueden fallar o cancelarse (guardar, eliminar, verificar)
+  las lanza el controlador cuando la acción termina bien, no al hacer clic.
 - **Animaciones:** `Animaciones` reúne las transiciones de JavaFX. Las pestañas y las tarjetas aparecen
   de forma escalonada, los botones reaccionan al pasar el cursor y al pulsarlos, y la retroalimentación
   de Práctica e Intercambio API aparece con un estado correcto o de error.
@@ -711,9 +726,10 @@ y límites visuales con la importación JSON. Los nuevos motores rechazan arregl
 
 ## 9. Pruebas
 
-La última ejecución local de `mvn test` obtuvo **327 pruebas unitarias aprobadas**, sin fallos ni omisiones.
-Las pruebas de integración JavaFX (`*IT`) y las que usan PostgreSQL real necesitan pantalla y base de datos,
-y no se declaran aprobadas en esa ejecución.
+La última ejecución local (`mvn test` más las pruebas de interfaz JavaFX bajo un display virtual) obtuvo
+**345 pruebas aprobadas**, sin fallos ni omisiones. Las pruebas que usan PostgreSQL real
+(`PersistenciaAprendizajeIT` y `NuevosAlgoritmosPostgresIT`) necesitan la base de datos y no se declaran
+aprobadas en esa ejecución.
 
 ### Ejecución
 
@@ -763,6 +779,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Búsqueda, grafos y recursividad | `AlgoritmosExtraTest` |
 | Retos, logros y tutor | `RetosServiceTest`, `TutorServiceTest`, `TutorialTest` |
 | Comparador | `ComparadorOrdenamientosTest` |
+| Barra lateral y efectos de botón | `EfectosBotonTest`, `InterfazLateralIT` |
 | Estadísticas | `EstadisticasDAOTest` |
 | Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `ReporteMapaCalorTemplateTest`, `ReporteMapaCalorServiceTest`, `MapaCalorErroresDAOTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |

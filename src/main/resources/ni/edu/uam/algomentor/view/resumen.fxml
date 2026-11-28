@@ -12,22 +12,34 @@
         <Button fx:id="btnActualizar" text="Actualizar" onAction="#cargarResumen" />
     </HBox>
     <HBox spacing="12">
-        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
-            <Label text="Algoritmos" styleClass="summary-label" />
-            <Label fx:id="lblCantidadAlgoritmos" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
-            <Label text="Ejercicios" styleClass="summary-label" />
-            <Label fx:id="lblCantidadEjercicios" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
-            <Label text="Perfiles" styleClass="summary-label" />
-            <Label fx:id="lblCantidadPerfiles" text="—" styleClass="summary-value" />
-        </VBox>
-        <VBox spacing="5" styleClass="summary-card" HBox.hgrow="ALWAYS">
-            <Label text="Intentos" styleClass="summary-label" />
-            <Label fx:id="lblCantidadIntentos" text="—" styleClass="summary-value" />
-        </VBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="chip-icono, chip-violeta"><Region styleClass="ico, ico-lista" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblCantidadAlgoritmos" text="—" styleClass="summary-value" />
+                <Label text="Algoritmos" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="chip-icono, chip-azul"><Region styleClass="ico, ico-lapiz" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblCantidadEjercicios" text="—" styleClass="summary-value" />
+                <Label text="Ejercicios" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="chip-icono, chip-verde"><Region styleClass="ico, ico-usuario" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblCantidadPerfiles" text="—" styleClass="summary-value" />
+                <Label text="Perfiles" styleClass="summary-label" />
+            </VBox>
+        </HBox>
+        <HBox spacing="14" alignment="CENTER_LEFT" styleClass="summary-card" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="chip-icono, chip-violeta"><Region styleClass="ico, ico-lapiz" /></StackPane>
+            <VBox spacing="2">
+                <Label fx:id="lblCantidadIntentos" text="—" styleClass="summary-value" />
+                <Label text="Intentos" styleClass="summary-label" />
+            </VBox>
+        </HBox>
     </HBox>
     <TabPane VBox.vgrow="ALWAYS" styleClass="content-tabs">
         <tabs>

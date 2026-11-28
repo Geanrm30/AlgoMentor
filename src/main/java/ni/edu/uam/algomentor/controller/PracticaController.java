@@ -25,6 +25,7 @@ import ni.edu.uam.algomentor.service.RegistroPracticaService;
 import ni.edu.uam.algomentor.service.TutorService;
 import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.util.Animaciones;
+import ni.edu.uam.algomentor.util.EfectosBoton;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
 import ni.edu.uam.algomentor.util.EntradaMatrizVisual;
 import ni.edu.uam.algomentor.util.SesionUsuario;
@@ -271,6 +272,7 @@ public class PracticaController {
                         mensajeResultado + "\nIntento registrado.",
                         resultado ? Animaciones.Estado.CORRECTO : Animaciones.Estado.ERROR);
                 btnVerificar.setDisable(false);
+                EfectosBoton.resultado(btnVerificar, resultado);
             });
         }, "No se pudo registrar el intento. Revisa la conexión y el esquema.",
                 () -> btnVerificar.setDisable(false));

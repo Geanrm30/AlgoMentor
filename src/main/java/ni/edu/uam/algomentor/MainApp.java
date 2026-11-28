@@ -6,6 +6,7 @@ import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -27,6 +28,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -43,6 +45,9 @@ import ni.edu.uam.algomentor.service.AutorizacionService;
 import ni.edu.uam.algomentor.service.CatalogoPersistidoService;
 import ni.edu.uam.algomentor.service.ResumenAdministracionService;
 import ni.edu.uam.algomentor.util.Actualizable;
+import ni.edu.uam.algomentor.util.BarraLateral;
+import ni.edu.uam.algomentor.util.Fondo;
+import ni.edu.uam.algomentor.util.Iconos;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.ConfiguracionLogs;
 import ni.edu.uam.algomentor.util.HibernateUtil;
@@ -73,6 +78,8 @@ public class MainApp extends Application {
     private int tamanoLetra = Math.max(0, Math.min(3, leerEntero(CLAVE_TAMANO_LETRA, 1)));
     private boolean altoContraste = leerEntero(CLAVE_ALTO_CONTRASTE, 0) == 1;
     private BorderPane raizActual;
+    private BarraLateral barraLateral;
+    private static final String CLAVE_NAV_CONTRAIDA = "nav.contraida";
     private StackPane envoltura;
     private MenuBar barraMenus;
     private Tutorial tutorial;
@@ -135,6 +142,9 @@ public class MainApp extends Application {
         controller.setAlAutenticar(this::mostrarAplicacion);
         if (temaClaro) {
             login.getStyleClass().addAll("app-root", "light-theme");
+            if (login instanceof StackPane panel) {
+                Fondo.instalar(panel, true, true);
+            }
         }
         return login;
     }
@@ -153,10 +163,16 @@ public class MainApp extends Application {
         administrador = esAdministrador(perfil);
         raiz.setTop(crearBarraSuperior(perfil, raiz, administrador));
         raiz.setCenter(contenido);
+        barraLateral = crearBarraLateral();
+        raiz.setLeft(barraLateral);
+        BorderPane.setMargin(barraLateral, new Insets(14, 0, 14, 14));
+        BorderPane.setMargin(raiz.getTop(), new Insets(0));
         instalarMenuContextual();
 
         envoltura = new StackPane(raiz);
+        Fondo.instalar(envoltura, temaClaro, false);
         raizActual = raiz;
+        instalarAtajos(stage.getScene());
         aplicarAccesibilidad();
         stage.getScene().setRoot(envoltura);
         Animaciones.fundirEntrada(raiz);
@@ -302,28 +318,83 @@ public class MainApp extends Application {
     }
 
     private HBox crearBarraSuperior(Perfil perfil, BorderPane raiz, boolean administrador) {
-        Label marca = new Label("AlgoMentor");
-        marca.getStyleClass().add("brand");
-
-        MenuBar menu = new MenuBar(crearMenuArchivo(), crearMenuInicio());
+        MenuBar menu = new MenuBar(crearMenuArchivo(), crearMenuVer(raiz), crearMenuAyuda());
         barraMenus = menu;
-        if (administrador) {
-            menu.getMenus().add(crearMenuAdministracion());
-        }
-        menu.getMenus().addAll(
-                crearMenuAprender(),
-                crearMenuHerramientas(),
-                crearMenuVer(raiz),
-                crearMenuAyuda());
         HBox.setHgrow(menu, Priority.ALWAYS);
 
-        Label usuario = new Label("Sesión: " + perfil.getNombre() + (administrador ? " (administrador)" : ""));
+        Region avatar = new Region();
+        avatar.getStyleClass().add("avatar");
+        avatar.setMinSize(28, 28);
+        avatar.setPrefSize(28, 28);
+        avatar.setMaxSize(28, 28);
+        Label usuario = new Label(perfil.getNombre() + (administrador ? " · administrador" : ""));
         usuario.getStyleClass().add("sesion-activa");
+        HBox chip = new HBox(8, avatar, usuario);
+        chip.setAlignment(Pos.CENTER_LEFT);
+        chip.getStyleClass().add("chip-usuario");
 
-        HBox barra = new HBox(14, marca, menu, usuario);
+        HBox barra = new HBox(14, menu, chip);
         barra.setAlignment(Pos.CENTER_LEFT);
-        barra.getStyleClass().add("app-menubar");
+        barra.getStyleClass().add("barra-superior");
         return barra;
+    }
+
+    private record Atajo(String combinacion, Runnable accion) { }
+
+    private BarraLateral crearBarraLateral() {
+        List<BarraLateral.Grupo> grupos = new java.util.ArrayList<>();
+        grupos.add(new BarraLateral.Grupo("Mi avance", List.of(
+                nav("progreso", "Mi progreso", "barras", "Ctrl+3", () -> mostrar("progreso", "progreso.fxml", true)),
+                nav("retos", "Retos y logros", "estrella", "Ctrl+Shift+R", () -> mostrar("retos", "retos.fxml", true)))));
+        grupos.add(new BarraLateral.Grupo("Aprender", List.of(
+                nav("simulador", "Simular", "play", "Ctrl+1", () -> mostrar("simulador", "simulador.fxml", false)),
+                nav("practica", "Práctica", "lapiz", "Ctrl+2", () -> mostrar("practica", "practica.fxml", true)),
+                nav("guia", "Guía de algoritmos", "libro", "Ctrl+8", () -> mostrar("guia", "guia-algoritmos.fxml", false)),
+                nav("otros", "Búsqueda y grafos", "grafo", "Ctrl+Shift+8", () -> mostrar("otros", "otros-algoritmos.fxml", false)))));
+        grupos.add(new BarraLateral.Grupo("Herramientas", List.of(
+                nav("comparador", "Comparar", "comparar", "Ctrl+5", () -> mostrar("comparador", "comparador.fxml", false)),
+                nav("verificar", "Comprobar sistema", "check", "Ctrl+6", () -> mostrar("verificar", "verificar-sistema-api.fxml", false)),
+                nav("biblioteca", "Biblioteca", "lista", "Ctrl+7", () -> mostrar("biblioteca", "gestion-contenido.fxml", true)))));
+        if (administrador) {
+            grupos.add(new BarraLateral.Grupo("Administración", List.of(
+                    nav("resumen", "Resumen general", "tendencia", "Ctrl+0", this::mostrarResumenGeneral),
+                    nav("informes", "Informes", "informe", "Ctrl+9", this::mostrarInformes))));
+        }
+        boolean contraida = leerEntero(CLAVE_NAV_CONTRAIDA, 0) == 1;
+        return new BarraLateral(grupos, contraida, c -> guardarEntero(CLAVE_NAV_CONTRAIDA, c ? 1 : 0));
+    }
+
+    private static BarraLateral.Elemento nav(String clave, String texto, String icono, String atajo, Runnable accion) {
+        return new BarraLateral.Elemento(clave, texto, icono, atajo, accion);
+    }
+
+    /** Los atajos de teclado de las secciones siguen funcionando aunque el menú superior ya no las liste. */
+    private void instalarAtajos(Scene escena) {
+        escena.getAccelerators().clear();
+        List<Atajo> atajos = new java.util.ArrayList<>(List.of(
+                new Atajo("Shortcut+1", () -> irA("simulador")),
+                new Atajo("Shortcut+2", () -> irA("practica")),
+                new Atajo("Shortcut+3", () -> irA("progreso")),
+                new Atajo("Shortcut+5", () -> irA("comparador")),
+                new Atajo("Shortcut+6", () -> irA("verificar")),
+                new Atajo("Shortcut+7", () -> irA("biblioteca")),
+                new Atajo("Shortcut+8", () -> irA("guia")),
+                new Atajo("Shortcut+Shift+8", () -> irA("otros")),
+                new Atajo("Shortcut+Shift+R", () -> irA("retos"))));
+        if (administrador) {
+            atajos.add(new Atajo("Shortcut+0", () -> irA("resumen")));
+            atajos.add(new Atajo("Shortcut+9", () -> irA("informes")));
+        }
+        for (Atajo atajo : atajos) {
+            escena.getAccelerators().put(KeyCombination.keyCombination(atajo.combinacion()), atajo.accion());
+        }
+    }
+
+    /** Equivale a pulsar la sección en la barra lateral. */
+    private void irA(String clave) {
+        if (barraLateral != null && barraLateral.contiene(clave)) {
+            barraLateral.boton(clave).fire();
+        }
     }
 
     private Menu crearMenuArchivo() {
@@ -350,39 +421,6 @@ public class MainApp extends Application {
                 new SeparatorMenuItem(), cambiarContrasena, cerrarSesion, salir);
     }
 
-    private Menu crearMenuInicio() {
-        return new Menu("Inicio", null,
-                elemento("Mi progreso", "Shortcut+3", () -> mostrar("progreso", "progreso.fxml", true)));
-    }
-
-    private Menu crearMenuAdministracion() {
-        return new Menu("Administración", null,
-                elemento("Resumen general", "Shortcut+0", this::mostrarResumenGeneral),
-                elemento("Informes", "Shortcut+9", this::mostrarInformes));
-    }
-
-    private Menu crearMenuAprender() {
-        return new Menu("Aprender", null,
-                elemento("Simular", "Shortcut+1", () -> mostrar("simulador", "simulador.fxml", false)),
-                elemento("Práctica", "Shortcut+2", () -> mostrar("practica", "practica.fxml", true)),
-                new SeparatorMenuItem(),
-                elemento("Guía de algoritmos", "Shortcut+8", () -> mostrar("guia", "guia-algoritmos.fxml", false)),
-                elemento("Búsqueda, grafos y recursividad", "Shortcut+Shift+8",
-                        () -> mostrar("otros", "otros-algoritmos.fxml", false)),
-                new SeparatorMenuItem(),
-                elemento("Retos y logros", "Shortcut+Shift+R", () -> mostrar("retos", "retos.fxml", true)));
-    }
-
-    private Menu crearMenuHerramientas() {
-        return new Menu("Herramientas", null,
-                elemento("Comparar algoritmos", "Shortcut+5", () -> mostrar("comparador", "comparador.fxml", false)),
-                elemento("Comprobar sistema (math.js)", "Shortcut+6",
-                        () -> mostrar("verificar", "verificar-sistema-api.fxml", false)),
-                new SeparatorMenuItem(),
-                elemento("Biblioteca de contenido", "Shortcut+7",
-                        () -> mostrar("biblioteca", "gestion-contenido.fxml", true)));
-    }
-
     private Menu crearMenuVer(BorderPane raiz) {
         CheckMenuItem tema = new CheckMenuItem("Tema claro");
         itemTema = tema;
@@ -395,6 +433,7 @@ public class MainApp extends Application {
             if (temaClaro) {
                 raiz.getStyleClass().add("light-theme");
             }
+            Fondo.instalar(envoltura, temaClaro, false);
         });
         CheckMenuItem pantallaCompleta = new CheckMenuItem("Pantalla completa");
         pantallaCompleta.setAccelerator(KeyCombination.keyCombination("F11"));
@@ -461,9 +500,9 @@ public class MainApp extends Application {
                         + "Este recorrido dura un minuto. Usa Siguiente, o las flechas del teclado; Esc lo cierra.",
                 () -> barraMenus));
         pasos.add(new Tutorial.Paso("Menús y atajos",
-                "Todo está en la barra superior. Los atajos Ctrl+1 a Ctrl+8 abren las secciones principales y "
-                        + "Ctrl+T cambia entre tema oscuro y claro. También funciona clic derecho en cualquier zona libre.",
-                () -> nodoMenu("Aprender")));
+                "Las secciones están en la barra lateral: el indicador te muestra dónde estás y el botón de las tres "
+                        + "rayas la contrae. Los atajos Ctrl+1 a Ctrl+8 abren las secciones y Ctrl+T cambia el tema.",
+                () -> barraLateral));
         pasos.add(new Tutorial.Paso("Simulador: configura la entrada",
                 "Elige un algoritmo, escribe números separados por coma (o pulsa Generar entrada) y presiona Simular. "
                         + "Debajo aparece una descripción de cómo ordena ese método.",
@@ -585,6 +624,8 @@ public class MainApp extends Application {
         SesionUsuario.cerrar();
         vistas.clear();
         vistaActual = null;
+        barraLateral = null;
+        stage.getScene().getAccelerators().clear();
         try {
             stage.getScene().setRoot(cargarLogin());
             Animaciones.instalarEfectosBoton(stage.getScene());
@@ -620,6 +661,9 @@ public class MainApp extends Application {
             vistaActual = clave;
             ocultarMenuContextual();
             contenido.getChildren().setAll(raiz);
+            if (barraLateral != null) {
+                barraLateral.seleccionar("progreso-perfil".equals(clave) ? "resumen" : clave);
+            }
             Platform.runLater(() -> Animaciones.entrarContenido(raiz));
             return (T) vista.controlador();
         } catch (IOException e) {

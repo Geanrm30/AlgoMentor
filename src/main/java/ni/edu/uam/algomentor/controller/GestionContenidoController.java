@@ -22,6 +22,7 @@ import ni.edu.uam.algomentor.model.Algoritmo;
 import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Intento;
 import ni.edu.uam.algomentor.model.Perfil;
+import ni.edu.uam.algomentor.util.EfectosBoton;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 import ni.edu.uam.algomentor.engine.FormatoDatos;
 import ni.edu.uam.algomentor.engine.GeneradorEjercicios;
@@ -40,6 +41,9 @@ public class GestionContenidoController {
 
     private static final Logger LOG = Logger.getLogger(GestionContenidoController.class.getName());
 
+    @FXML private javafx.scene.control.Button btnGuardarEjercicio;
+    @FXML private javafx.scene.control.Button btnEliminarEjercicio;
+    @FXML private javafx.scene.control.Button btnActualizarEjercicio;
     @FXML private TextField txtNombreAlgoritmo;
     @FXML private ComboBox<String> cmbCategoria;
     @FXML private TextField txtComplejidad;
@@ -233,6 +237,7 @@ public class GestionContenidoController {
             ejercicioDAO.guardar(leerEjercicio());
             recargar();
             limpiarEjercicio();
+            EfectosBoton.exito(btnGuardarEjercicio);
         });
     }
 
@@ -245,6 +250,7 @@ public class GestionContenidoController {
             ejercicioDAO.actualizar(e);
             recargar();
             limpiarEjercicio();
+            EfectosBoton.exito(btnActualizarEjercicio);
         });
     }
 
@@ -255,6 +261,7 @@ public class GestionContenidoController {
                 ejercicioDAO.eliminar(e.getId());
                 recargar();
                 limpiarEjercicio();
+                EfectosBoton.exito(btnEliminarEjercicio);
             }
         });
     }
