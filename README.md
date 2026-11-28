@@ -503,6 +503,11 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
   desplazamiento) y las celdas activas pulsan. Las escrituras se animan en su posición, sin simular
   intercambios inexistentes; el pivote de Quick Sort se resalta en violeta. En las matrices se resaltan
   las celdas que cambiaron.
+- **Inicio de sesión:** fondo con orbes de luz que flotan y respiran, tarjeta que entra con rebote y
+  campos que aparecen en cascada; si las credenciales fallan, la tarjeta se sacude.
+- **Contadores y tarjetas:** las cifras de Resumen y Progreso cuentan hasta su valor (solo animan si
+  cambian, para no reiniciarse con la actualización automática) y las tarjetas se elevan con un brillo
+  al pasar el cursor. Al entrar a la aplicación la pantalla se funde suavemente.
 - **Progreso:** las barras por habilidad se animan hasta su porcentaje y no se reinician al reutilizar celdas de la tabla.
 
 ---

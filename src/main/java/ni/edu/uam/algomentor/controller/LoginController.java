@@ -7,6 +7,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
+import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.AutenticacionService;
 import ni.edu.uam.algomentor.util.MostrarContrasena;
@@ -27,6 +29,8 @@ public class LoginController {
     @FXML private TextField txtNuevoUsuario;
     @FXML private PasswordField txtNuevaContrasena;
     @FXML private PasswordField txtConfirmarContrasena;
+    @FXML private StackPane raiz;
+    @FXML private javafx.scene.layout.VBox tarjeta;
     @FXML private Label lblEstado;
     @FXML private CheckBox chkRecordarUsuario;
     @FXML private CheckBox chkMostrarContrasena;
@@ -41,6 +45,8 @@ public class LoginController {
     private void initialize() {
         MostrarContrasena.vincular(chkMostrarContrasena, txtContrasena);
         MostrarContrasena.vincular(chkMostrarNuevaContrasena, txtNuevaContrasena, txtConfirmarContrasena);
+        Animaciones.fondoAnimado(raiz);
+        Platform.runLater(() -> Animaciones.entrarTarjetaLogin(tarjeta));
         usuarioRecordado.leer().ifPresent(usuario -> {
             txtUsuario.setText(usuario);
             chkRecordarUsuario.setSelected(true);
@@ -84,6 +90,7 @@ public class LoginController {
         char[] confirmacion = txtConfirmarContrasena.getText().toCharArray();
         if (!Arrays.equals(contrasena, confirmacion)) {
             lblEstado.setText("Las contraseñas no coinciden.");
+            Animaciones.sacudir(tarjeta);
             Arrays.fill(contrasena, '\0');
             Arrays.fill(confirmacion, '\0');
             return;
@@ -116,7 +123,10 @@ public class LoginController {
                     alAutenticar.accept(perfil);
                 });
             } catch (CredencialesInvalidasException e) {
-                Platform.runLater(() -> lblEstado.setText("Usuario o contraseña incorrectos."));
+                Platform.runLater(() -> {
+                    lblEstado.setText("Usuario o contraseña incorrectos.");
+                    Animaciones.sacudir(tarjeta);
+                });
             } catch (IllegalArgumentException e) {
                 Platform.runLater(() -> lblEstado.setText(e.getMessage()));
             } catch (RuntimeException e) {

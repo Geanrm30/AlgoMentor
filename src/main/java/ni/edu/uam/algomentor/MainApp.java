@@ -84,6 +84,7 @@ public class MainApp extends Application {
         }
         scene.getStylesheets().add(stylesheet.toExternalForm());
         Animaciones.instalarEfectosBoton(scene);
+        Animaciones.instalarEfectosTarjeta(scene);
         stage.setTitle("AlgoMentor");
         stage.setMinWidth(760);
         stage.setMinHeight(560);
@@ -138,6 +139,7 @@ public class MainApp extends Application {
         instalarMenuContextual();
 
         stage.getScene().setRoot(raiz);
+        Animaciones.fundirEntrada(raiz);
         Animaciones.instalarEfectosBoton(stage.getScene());
         precargarIntercambio();
         if (administrador) {

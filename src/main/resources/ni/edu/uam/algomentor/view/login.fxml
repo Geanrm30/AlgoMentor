@@ -2,8 +2,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane styleClass="login-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.LoginController">
-    <VBox maxWidth="430" maxHeight="-Infinity" spacing="18" styleClass="login-card">
+<StackPane fx:id="raiz" styleClass="login-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.LoginController">
+    <VBox fx:id="tarjeta" maxWidth="430" maxHeight="-Infinity" spacing="18" styleClass="login-card">
         <VBox spacing="5">
             <Label text="AlgoMentor" styleClass="brand" />
             <Label text="Accede a tu espacio de aprendizaje" styleClass="page-title" wrapText="true" />

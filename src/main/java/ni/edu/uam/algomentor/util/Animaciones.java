@@ -10,6 +10,18 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Pos;
+import javafx.scene.effect.BoxBlur;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -29,6 +41,7 @@ public final class Animaciones {
 
     private static final String CLAVE_ANIMACION = "algomentor.animacion";
     private static final String CLAVE_ESCALA_BOTON = "algomentor.escalaBoton";
+    private static final String CLAVE_ELEVACION = "algomentor.elevacion";
     private static final Interpolator SUAVE = Interpolator.SPLINE(0.16, 1, 0.3, 1);
     private static final Interpolator REBOTE = new Interpolator() {
         @Override
@@ -160,6 +173,171 @@ public final class Animaciones {
                 escalarBoton(boton, boton.isHover() ? 1.04 : 1, 140);
             }
         });
+    }
+
+    /** Cuenta desde el valor mostrado hasta el nuevo; si no cambió, no anima (evita reinicios al refrescar). */
+    public static void contar(Label etiqueta, long hasta) {
+        long desde = 0;
+        try {
+            desde = Long.parseLong(etiqueta.getText().trim());
+        } catch (NumberFormatException e) {
+            // Texto inicial (por ejemplo "—"): se cuenta desde cero.
+        }
+        if (desde == hasta && etiqueta.getText().trim().equals(Long.toString(hasta))) {
+            return;
+        }
+        reiniciar(etiqueta);
+        DoubleProperty valor = new SimpleDoubleProperty(desde);
+        valor.addListener((obs, antes, ahora) -> etiqueta.setText(Long.toString(Math.round(ahora.doubleValue()))));
+        etiqueta.setText(Long.toString(desde));
+        Timeline conteo = new Timeline(new KeyFrame(Duration.millis(900), new KeyValue(valor, hasta, SUAVE)));
+        conteo.setOnFinished(evento -> etiqueta.setText(Long.toString(hasta)));
+        reproducir(etiqueta, conteo);
+    }
+
+    /** Orbes de luz que flotan lentamente detrás del contenido de un {@link StackPane}. */
+    public static void fondoAnimado(StackPane raiz) {
+        Pane capa = new Pane();
+        capa.setMouseTransparent(true);
+        capa.setPickOnBounds(false);
+        capa.setManaged(false);
+        raiz.getChildren().add(0, capa);
+        capa.prefWidthProperty().bind(raiz.widthProperty());
+        capa.prefHeightProperty().bind(raiz.heightProperty());
+        capa.resize(raiz.getWidth(), raiz.getHeight());
+        capa.setClip(clip(capa));
+
+        Color[] colores = {Color.web("#22d3ee"), Color.web("#8b5cf6"), Color.web("#34d399"), Color.web("#6366f1")};
+        double[][] posicion = {{0.18, 0.25}, {0.82, 0.30}, {0.30, 0.80}, {0.75, 0.78}};
+        double[] radios = {170, 210, 140, 190};
+        for (int i = 0; i < colores.length; i++) {
+            Circle orbe = new Circle(radios[i]);
+            orbe.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, colores[i].deriveColor(0, 1, 1, 0.34)),
+                    new Stop(1, colores[i].deriveColor(0, 1, 1, 0))));
+            orbe.setEffect(new BoxBlur(40, 40, 2));
+            orbe.centerXProperty().bind(capa.widthProperty().multiply(posicion[i][0]));
+            orbe.centerYProperty().bind(capa.heightProperty().multiply(posicion[i][1]));
+            capa.getChildren().add(orbe);
+
+            TranslateTransition flotar = new TranslateTransition(Duration.seconds(7 + i * 1.7), orbe);
+            flotar.setByX(i % 2 == 0 ? 90 : -90);
+            flotar.setByY(i < 2 ? 60 : -60);
+            flotar.setAutoReverse(true);
+            flotar.setCycleCount(Animation.INDEFINITE);
+            flotar.setInterpolator(Interpolator.EASE_BOTH);
+            flotar.play();
+
+            ScaleTransition respirar = new ScaleTransition(Duration.seconds(4 + i), orbe);
+            respirar.setToX(1.25);
+            respirar.setToY(1.25);
+            respirar.setAutoReverse(true);
+            respirar.setCycleCount(Animation.INDEFINITE);
+            respirar.setInterpolator(Interpolator.EASE_BOTH);
+            respirar.play();
+        }
+        StackPane.setAlignment(capa, Pos.TOP_LEFT);
+    }
+
+    private static Rectangle clip(Pane capa) {
+        Rectangle recorte = new Rectangle();
+        recorte.widthProperty().bind(capa.widthProperty());
+        recorte.heightProperty().bind(capa.heightProperty());
+        return recorte;
+    }
+
+    /** Entrada del cuadro de inicio de sesión: escala, desvanece y revela sus hijos en cascada. */
+    public static void entrarTarjetaLogin(Node tarjeta) {
+        reiniciar(tarjeta);
+        tarjeta.setOpacity(0);
+        tarjeta.setScaleX(0.92);
+        tarjeta.setScaleY(0.92);
+        tarjeta.setTranslateY(28);
+        FadeTransition aparecer = new FadeTransition(Duration.millis(450), tarjeta);
+        aparecer.setToValue(1);
+        ScaleTransition crecer = new ScaleTransition(Duration.millis(650), tarjeta);
+        crecer.setToX(1);
+        crecer.setToY(1);
+        crecer.setInterpolator(REBOTE);
+        TranslateTransition subir = new TranslateTransition(Duration.millis(600), tarjeta);
+        subir.setToY(0);
+        subir.setInterpolator(SUAVE);
+        reproducir(tarjeta, new ParallelTransition(aparecer, crecer, subir));
+        if (tarjeta instanceof Parent padre) {
+            List<Node> hijos = new ArrayList<>(padre.getChildrenUnmodifiable());
+            for (int i = 0; i < hijos.size(); i++) {
+                Node hijo = hijos.get(i);
+                hijo.setOpacity(0);
+                hijo.setTranslateY(14);
+                FadeTransition f = new FadeTransition(Duration.millis(360), hijo);
+                f.setToValue(1);
+                TranslateTransition t = new TranslateTransition(Duration.millis(420), hijo);
+                t.setToY(0);
+                t.setInterpolator(SUAVE);
+                ParallelTransition par = new ParallelTransition(f, t);
+                par.setDelay(Duration.millis(220 + i * 110));
+                par.play();
+            }
+        }
+    }
+
+    /** Desvanecimiento suave al cambiar de pantalla completa (por ejemplo, tras iniciar sesión). */
+    public static void fundirEntrada(Node raiz) {
+        raiz.setOpacity(0);
+        FadeTransition aparecer = new FadeTransition(Duration.millis(450), raiz);
+        aparecer.setToValue(1);
+        aparecer.play();
+    }
+
+    /** Las tarjetas se elevan al pasar el cursor por encima. */
+    public static void instalarEfectosTarjeta(Scene escena) {
+        escena.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, evento -> {
+            Node tarjeta = tarjetaDe(evento.getTarget());
+            if (tarjeta != null && evento.getTarget() == tarjeta) {
+                elevar(tarjeta, -4, 1.012);
+            }
+        });
+        escena.addEventFilter(MouseEvent.MOUSE_EXITED_TARGET, evento -> {
+            Node tarjeta = tarjetaDe(evento.getTarget());
+            if (tarjeta != null && evento.getTarget() == tarjeta) {
+                elevar(tarjeta, 0, 1);
+            }
+        });
+    }
+
+    /** Latido de opacidad continuo, por ejemplo para etiquetas de carga. Devuelve la animación para poder detenerla. */
+    public static Animation parpadear(Node nodo) {
+        FadeTransition fundido = new FadeTransition(Duration.millis(700), nodo);
+        fundido.setFromValue(1);
+        fundido.setToValue(0.35);
+        fundido.setAutoReverse(true);
+        fundido.setCycleCount(Animation.INDEFINITE);
+        fundido.play();
+        return fundido;
+    }
+
+    private static Node tarjetaDe(Object objetivo) {
+        if (objetivo instanceof Node nodo && (nodo.getStyleClass().contains("card")
+                || nodo.getStyleClass().contains("summary-card"))) {
+            return nodo;
+        }
+        return null;
+    }
+
+    private static void elevar(Node tarjeta, double y, double escala) {
+        if (tarjeta.getProperties().get(CLAVE_ELEVACION) instanceof Animation previa) {
+            previa.stop();
+        }
+        TranslateTransition subir = new TranslateTransition(Duration.millis(220), tarjeta);
+        subir.setToY(y);
+        subir.setInterpolator(SUAVE);
+        ScaleTransition crecer = new ScaleTransition(Duration.millis(220), tarjeta);
+        crecer.setToX(escala);
+        crecer.setToY(escala);
+        crecer.setInterpolator(SUAVE);
+        ParallelTransition elevacion = new ParallelTransition(subir, crecer);
+        tarjeta.getProperties().put(CLAVE_ELEVACION, elevacion);
+        elevacion.play();
     }
 
     public static void animarPestanas(TabPane panel) {

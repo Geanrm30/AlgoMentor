@@ -411,9 +411,9 @@ public class ProgresoController implements Actualizable {
                                     List<EstadisticasDAO.IntentoReciente> recientes,
                                     OptionalDouble duracionPromedio) {
         long calificados = resumen.correctos() + resumen.incorrectos();
-        lblIntentos.setText(Long.toString(resumen.total()));
-        lblCorrectos.setText(Long.toString(resumen.correctos()));
-        lblIncorrectos.setText(Long.toString(resumen.incorrectos()));
+        Animaciones.contar(lblIntentos, resumen.total());
+        Animaciones.contar(lblCorrectos, resumen.correctos());
+        Animaciones.contar(lblIncorrectos, resumen.incorrectos());
         lblPorcentajeGeneral.setText(calificados == 0 ? "—"
                 : String.format("%.1f%%", (resumen.correctos() * 100.0) / calificados));
         lblRacha.setText(Integer.toString(EstadisticasDAO.rachaActual(recientes)));

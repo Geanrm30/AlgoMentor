@@ -19,6 +19,7 @@ import ni.edu.uam.algomentor.model.Algoritmo;
 import ni.edu.uam.algomentor.model.Ejercicio;
 import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.ResumenAdministracionService;
+import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.MenuContextual;
 import ni.edu.uam.algomentor.util.SesionUsuario;
@@ -248,10 +249,10 @@ public class ResumenController implements Actualizable {
                     }
                     perfilesCargados = perfiles;
                     tablaRanking.setItems(FXCollections.observableArrayList(ranking));
-                    lblCantidadAlgoritmos.setText(Integer.toString(algoritmos.size()));
-                    lblCantidadEjercicios.setText(Integer.toString(ejercicios.size()));
-                    lblCantidadPerfiles.setText(Integer.toString(perfiles.size()));
-                    lblCantidadIntentos.setText(Integer.toString(totalIntentos));
+                    Animaciones.contar(lblCantidadAlgoritmos, algoritmos.size());
+                    Animaciones.contar(lblCantidadEjercicios, ejercicios.size());
+                    Animaciones.contar(lblCantidadPerfiles, perfiles.size());
+                    Animaciones.contar(lblCantidadIntentos, totalIntentos);
                     actualizarGraficos(ejercicios);
                     lblEstado.setText("Resumen actualizado.");
                     btnActualizar.setDisable(false);
