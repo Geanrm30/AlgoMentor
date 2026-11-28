@@ -41,19 +41,19 @@
 
 .brand {
     -fx-text-fill: linear-gradient(to right, #22d3ee, #a78bfa);
-    -fx-font-size: 14px;
+    -fx-font-size: 1.037em;
     -fx-font-weight: bold;
 }
 
 .page-title {
     -fx-text-fill: -ac-text;
-    -fx-font-size: 30px;
+    -fx-font-size: 2.222em;
     -fx-font-weight: bold;
 }
 
 .subtitle {
     -fx-text-fill: -ac-muted;
-    -fx-font-size: 14px;
+    -fx-font-size: 1.037em;
 }
 
 .label {
@@ -137,7 +137,7 @@
 
 .section-title {
     -fx-text-fill: -ac-text;
-    -fx-font-size: 18px;
+    -fx-font-size: 1.333em;
     -fx-font-weight: bold;
 }
 
@@ -181,7 +181,7 @@
 
 .terminal-salida {
     -fx-font-family: "Consolas";
-    -fx-font-size: 14px;
+    -fx-font-size: 1.037em;
 }
 
 .terminal-salida .content {
@@ -535,7 +535,7 @@
     -fx-padding: 12 10;
     -fx-text-fill: -ac-text;
     -fx-font-family: "Consolas";
-    -fx-font-size: 19px;
+    -fx-font-size: 1.407em;
     -fx-font-weight: bold;
 }
 
@@ -589,7 +589,7 @@
 
 .dialog-pane > .content.label {
     -fx-text-fill: -ac-text;
-    -fx-font-size: 14px;
+    -fx-font-size: 1.037em;
     -fx-padding: 16 20;
 }
 
@@ -670,12 +670,12 @@
 
 .summary-label {
     -fx-text-fill: #9ca3af;
-    -fx-font-size: 13px;
+    -fx-font-size: 0.963em;
 }
 
 .summary-value {
     -fx-text-fill: #38bdf8;
-    -fx-font-size: 25px;
+    -fx-font-size: 1.852em;
     -fx-font-weight: bold;
 }
 
@@ -959,7 +959,7 @@
 
 .aviso-vacio-titulo {
     -fx-font-weight: bold;
-    -fx-font-size: 15px;
+    -fx-font-size: 1.111em;
 }
 
 .app-root.light-theme .aviso-vacio {
@@ -1041,7 +1041,7 @@
 
 .subtitulo-informe {
     -fx-text-fill: -ac-accent;
-    -fx-font-size: 12px;
+    -fx-font-size: 0.889em;
     -fx-font-weight: bold;
     -fx-padding: 8 0 0 0;
 }
@@ -1053,13 +1053,13 @@
 
 .nota-informe {
     -fx-text-fill: -ac-muted;
-    -fx-font-size: 12px;
+    -fx-font-size: 0.889em;
     -fx-padding: 6 0 0 0;
 }
 
 .titulo-informe {
     -fx-text-fill: -ac-text;
-    -fx-font-size: 22px;
+    -fx-font-size: 1.630em;
     -fx-font-weight: bold;
 }
 
@@ -1098,7 +1098,7 @@
     -fx-border-radius: 8;
     -fx-text-fill: -ac-accent;
     -fx-font-family: "Consolas", "Monospaced";
-    -fx-font-size: 14px;
+    -fx-font-size: 1.037em;
 }
 
 .formula-operacion.formula-invalida {
@@ -1137,7 +1137,7 @@
 }
 
 .summary-value {
-    -fx-font-size: 26px;
+    -fx-font-size: 1.926em;
     -fx-font-weight: bold;
 }
 
@@ -1160,19 +1160,19 @@
 
 .tutorial-numero {
     -fx-text-fill: -ac-accent;
-    -fx-font-size: 11px;
+    -fx-font-size: 0.815em;
     -fx-font-weight: bold;
 }
 
 .tutorial-titulo {
     -fx-text-fill: -ac-text;
-    -fx-font-size: 17px;
+    -fx-font-size: 1.259em;
     -fx-font-weight: bold;
 }
 
 .tutorial-texto {
     -fx-text-fill: -ac-text-soft;
-    -fx-font-size: 13.5px;
+    -fx-font-size: 1.000em;
 }
 
 .app-root.light-theme .tutorial-card {
@@ -1200,3 +1200,203 @@
     -fx-text-fill: #1f2937;
     -fx-background-color: #e0f2fe;
 }
+
+/* ---------- Pseudocódigo y barras del simulador ---------- */
+
+.pseudocodigo {
+    -fx-background-color: -ac-field;
+    -fx-background-radius: 10;
+    -fx-border-color: -ac-border;
+    -fx-border-radius: 10;
+    -fx-padding: 10 0;
+}
+
+.linea-pseudocodigo {
+    -fx-font-family: "Consolas", "DejaVu Sans Mono", monospace;
+    -fx-font-size: 1.000em;
+    -fx-text-fill: -ac-text-soft;
+    -fx-padding: 3 14;
+}
+
+.linea-pseudocodigo.linea-activa {
+    -fx-background-color: rgba(34, 211, 238, 0.20);
+    -fx-border-color: transparent transparent transparent -ac-accent;
+    -fx-border-width: 0 0 0 3;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.barra, .barra-activa, .barra-pivote {
+    -fx-background-radius: 6 6 0 0;
+}
+
+.barra {
+    -fx-background-color: linear-gradient(to bottom, #475a8c, #2a3556);
+}
+
+.barra-activa {
+    -fx-background-color: linear-gradient(to bottom, #22d3ee, #0e7490);
+    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.55), 12, 0.2, 0, 0);
+}
+
+.barra-pivote {
+    -fx-background-color: linear-gradient(to bottom, #a78bfa, #6d28d9);
+    -fx-effect: dropshadow(gaussian, rgba(139, 92, 246, 0.55), 12, 0.2, 0, 0);
+}
+
+.barra-valor {
+    -fx-font-size: 0.889em;
+    -fx-text-fill: -ac-text-soft;
+}
+
+.app-root.light-theme .pseudocodigo {
+    -fx-background-color: #ffffff;
+}
+
+.app-root.light-theme .linea-pseudocodigo {
+    -fx-text-fill: #374151;
+}
+
+.app-root.light-theme .linea-pseudocodigo.linea-activa {
+    -fx-background-color: #cffafe;
+    -fx-text-fill: #0f172a;
+}
+
+/* ---------- Búsqueda, grafos y recursividad ---------- */
+
+.valor-ok {
+    -fx-background-color: linear-gradient(to bottom, #34d399, #047857);
+    -fx-text-fill: #04130d;
+}
+
+.valor-descartado {
+    -fx-opacity: 0.35;
+}
+
+.scroll-pane.transparente, .scroll-pane.transparente > .viewport {
+    -fx-background-color: transparent;
+}
+
+.arista {
+    -fx-stroke: #3d4b78;
+    -fx-stroke-width: 2.5;
+}
+
+.arista-activa {
+    -fx-stroke: #22d3ee;
+    -fx-stroke-width: 4;
+}
+
+.arista-peso {
+    -fx-background-color: #0b1020;
+    -fx-text-fill: -ac-warn;
+    -fx-font-weight: bold;
+    -fx-padding: 0 4;
+    -fx-background-radius: 6;
+}
+
+.nodo-nuevo, .nodo-frontera, .nodo-actual, .nodo-visitado {
+    -fx-stroke: #0b1020;
+    -fx-stroke-width: 2;
+}
+
+.nodo-nuevo { -fx-fill: #2a3556; }
+.nodo-frontera { -fx-fill: #8b5cf6; }
+.nodo-actual { -fx-fill: #22d3ee; -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.8), 18, 0.3, 0, 0); }
+.nodo-visitado { -fx-fill: #34d399; }
+
+.nodo-nombre {
+    -fx-text-fill: #04130d;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.111em;
+}
+
+.nodo-dato {
+    -fx-text-fill: -ac-warn;
+    -fx-font-weight: bold;
+}
+
+.varilla {
+    -fx-border-color: transparent transparent #3d4b78 transparent;
+    -fx-border-width: 0 0 4 0;
+    -fx-padding: 0 0 4 0;
+}
+
+.disco { -fx-background-radius: 8; }
+.disco-0 { -fx-background-color: #22d3ee; }
+.disco-1 { -fx-background-color: #8b5cf6; }
+.disco-2 { -fx-background-color: #34d399; }
+.disco-3 { -fx-background-color: #fbbf24; }
+.disco-4 { -fx-background-color: #f87171; }
+.disco-5 { -fx-background-color: #60a5fa; }
+
+/* ---------- Retos y logros ---------- */
+
+.resumen-reto {
+    -fx-text-fill: -ac-accent;
+    -fx-font-size: 1.185em;
+    -fx-font-weight: bold;
+}
+
+.button.opcion-correcta {
+    -fx-background-color: rgba(52, 211, 153, 0.30);
+    -fx-border-color: -ac-ok;
+}
+
+.button.opcion-incorrecta {
+    -fx-background-color: rgba(248, 113, 113, 0.30);
+    -fx-border-color: -ac-bad;
+}
+
+.logro-ok {
+    -fx-border-color: -ac-ok;
+}
+
+.logro-bloqueado {
+    -fx-opacity: 0.75;
+}
+
+
+/* ---------- Alto contraste ---------- */
+
+.alto-contraste {
+    -ac-bg: #000000;
+    -ac-bg-deep: #000000;
+    -ac-surface: #0a0a0a;
+    -ac-surface-2: #141414;
+    -ac-field: #000000;
+    -ac-border: #ffffff;
+    -ac-text: #ffffff;
+    -ac-text-soft: #ffffff;
+    -ac-muted: #e5e5e5;
+    -ac-accent: #00e5ff;
+    -ac-accent-2: #ffd400;
+    -ac-ok: #3dff9a;
+    -ac-warn: #ffd400;
+    -ac-bad: #ff6b6b;
+}
+
+.alto-contraste .card, .alto-contraste .summary-card {
+    -fx-border-color: #ffffff;
+    -fx-border-width: 2;
+}
+
+.alto-contraste .label, .alto-contraste .subtitle, .alto-contraste .text-field, .alto-contraste .table-cell {
+    -fx-text-fill: #ffffff;
+}
+
+.alto-contraste .button {
+    -fx-border-color: #ffffff;
+    -fx-border-width: 2;
+}
+
+/* Colores propios para cada curva de la gráfica de complejidad */
+.grafico-complejidad .chart-series-line { -fx-stroke-width: 3; }
+.grafico-complejidad .chart-series-line.default-color0 { -fx-stroke: #34d399; }
+.grafico-complejidad .chart-series-line.default-color1 { -fx-stroke: #fbbf24; }
+.grafico-complejidad .chart-series-line.default-color2 { -fx-stroke: #8b5cf6; }
+.grafico-complejidad .chart-series-line.default-color3 { -fx-stroke: #f87171; }
+.grafico-complejidad .chart-legend-item-symbol.default-color0 { -fx-background-color: #34d399; }
+.grafico-complejidad .chart-legend-item-symbol.default-color1 { -fx-background-color: #fbbf24; }
+.grafico-complejidad .chart-legend-item-symbol.default-color2 { -fx-background-color: #8b5cf6; }
+.grafico-complejidad .chart-legend-item-symbol.default-color3 { -fx-background-color: #f87171; }

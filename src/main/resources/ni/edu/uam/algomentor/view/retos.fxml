@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-tabs" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.RetosController">
+    <tabs>
+        <Tab text="Desafío cronometrado">
+            <content>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                    <content>
+                        <VBox spacing="18" styleClass="tab-content">
+                            <VBox spacing="10" styleClass="card">
+                                <Label text="Desafío de 60 segundos" styleClass="section-title" />
+                                <Label text="Te mostramos un arreglo y un algoritmo: escribe cómo queda el arreglo después del cambio indicado. Cada acierto suma 10 puntos y 2 más por cada acierto seguido anterior (hasta 5)." wrapText="true" styleClass="subtitle" />
+                                <HBox spacing="14" alignment="CENTER_LEFT">
+                                    <Button fx:id="btnIniciarDesafio" text="Comenzar" onAction="#iniciarDesafio" styleClass="primary-button" />
+                                    <Label fx:id="lblTiempo" text="Tiempo: 60 s" styleClass="resumen-reto" />
+                                    <Label fx:id="lblPuntos" text="Puntos: 0" styleClass="resumen-reto" />
+                                    <Label fx:id="lblRacha" text="Racha: 0" styleClass="resumen-reto" />
+                                    <Label fx:id="lblMejorDesafio" text="" styleClass="subtitle" />
+                                </HBox>
+                                <ProgressBar fx:id="barraTiempo" progress="1" maxWidth="Infinity" />
+                            </VBox>
+                            <VBox spacing="10" styleClass="card">
+                                <Label fx:id="lblPreguntaDesafio" text="Pulsa Comenzar para recibir la primera pregunta." wrapText="true" />
+                                <HBox spacing="10">
+                                    <TextField fx:id="txtRespuestaDesafio" promptText="Ej. 3, 1, 5, 2" HBox.hgrow="ALWAYS" disable="true" onAction="#responderDesafio" accessibleText="Respuesta del desafío" />
+                                    <Button fx:id="btnResponderDesafio" text="Responder" onAction="#responderDesafio" disable="true" styleClass="primary-button" />
+                                </HBox>
+                                <Label fx:id="lblRetroDesafio" wrapText="true" />
+                            </VBox>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </content>
+        </Tab>
+        <Tab text="Cuestionario teórico">
+            <content>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                    <content>
+                        <VBox spacing="18" styleClass="tab-content">
+                            <VBox spacing="10" styleClass="card">
+                                <Label text="Cuestionario de 10 preguntas" styleClass="section-title" />
+                                <Label text="Preguntas de opción múltiple sobre complejidad, estabilidad y técnicas. Cada vez salen preguntas distintas." wrapText="true" styleClass="subtitle" />
+                                <HBox spacing="14" alignment="CENTER_LEFT">
+                                    <Button fx:id="btnIniciarCuestionario" text="Comenzar" onAction="#iniciarCuestionario" styleClass="primary-button" />
+                                    <Label fx:id="lblProgresoCuestionario" text="" styleClass="resumen-reto" />
+                                    <Label fx:id="lblMejorCuestionario" text="" styleClass="subtitle" />
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="tarjetaPregunta" spacing="10" styleClass="card" visible="false" managed="false">
+                                <Label fx:id="lblPreguntaCuestionario" wrapText="true" styleClass="section-title" />
+                                <VBox fx:id="panelOpciones" spacing="8" />
+                                <Label fx:id="lblRetroCuestionario" wrapText="true" />
+                                <Button fx:id="btnSiguientePregunta" text="Siguiente pregunta" onAction="#siguientePregunta" visible="false" managed="false" styleClass="primary-button" />
+                            </VBox>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </content>
+        </Tab>
+        <Tab text="Logros">
+            <content>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                    <content>
+                        <VBox spacing="18" styleClass="tab-content">
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                    <Label text="Tus logros" styleClass="section-title" />
+                                    <Label fx:id="lblResumenLogros" text="Cargando…" wrapText="true" styleClass="subtitle" />
+                                </VBox>
+                                <Button text="Actualizar" onAction="#cargarLogros" />
+                            </HBox>
+                            <FlowPane fx:id="panelLogros" hgap="14" vgap="14" />
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>

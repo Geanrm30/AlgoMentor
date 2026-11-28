@@ -22,6 +22,8 @@ import ni.edu.uam.algomentor.model.Perfil;
 import ni.edu.uam.algomentor.service.EvaluadorPasoMatriz;
 import ni.edu.uam.algomentor.service.EvaluadorPractica;
 import ni.edu.uam.algomentor.service.RegistroPracticaService;
+import ni.edu.uam.algomentor.service.TutorService;
+import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.EntradaAprendizaje;
 import ni.edu.uam.algomentor.util.EntradaMatrizVisual;
@@ -59,10 +61,16 @@ public class PracticaController {
     @FXML private Label lblEnunciado;
     @FXML private Label lblResultado;
     @FXML private Button btnVerificar;
+    @FXML private Button btnPista;
+    @FXML private Label lblContadorPistas;
+    @FXML private Label lblPista;
 
     private long inicioNanos;
     private EntradaMatrizVisual matrizVisual;
     private int filasMatriz;
+    private List<String> pistas = List.of();
+    private int pistasUsadas;
+    private String consejoPersonal = "";
 
     @FXML
     private void initialize() {
@@ -87,6 +95,7 @@ public class PracticaController {
                 "Intercambiar filas", "Escalar fila", "Eliminar fila"));
         cmbEjercicio.valueProperty().addListener((obs, anterior, actual) -> {
             limpiarResultado();
+            reiniciarPistas(actual != null);
             inicioNanos = System.nanoTime();
             boolean matriz = actual != null && actual.getAlgoritmo().getNombre().startsWith("Gauss");
             panelMatriz.setVisible(matriz);
@@ -132,6 +141,63 @@ public class PracticaController {
         });
         actualizarOperacion();
         recargar();
+        cargarConsejoPersonal();
+    }
+
+    @FXML
+    private void pedirPista() {
+        Ejercicio ejercicio = cmbEjercicio.getValue();
+        if (ejercicio == null) {
+            return;
+        }
+        try {
+            if (pistas.isEmpty()) {
+                pistas = TutorService.pistas(ejercicio.getAlgoritmo().getNombre(), ejercicio.getDatos());
+            }
+        } catch (RuntimeException e) {
+            lblPista.setText("No se pudo preparar una pista para este ejercicio: " + e.getMessage());
+            lblPista.setVisible(true);
+            lblPista.setManaged(true);
+            return;
+        }
+        pistasUsadas = Math.min(pistasUsadas + 1, pistas.size());
+        StringBuilder texto = new StringBuilder(String.join("\n\n", pistas.subList(0, pistasUsadas)));
+        if (!consejoPersonal.isEmpty()) {
+            texto.append("\n\n").append(consejoPersonal);
+        }
+        lblPista.setText(texto.toString());
+        lblPista.setVisible(true);
+        lblPista.setManaged(true);
+        Animaciones.entrar(lblPista, 0, 8);
+        lblContadorPistas.setText("Pistas usadas: " + pistasUsadas + " de " + pistas.size());
+        btnPista.setDisable(pistasUsadas >= pistas.size());
+    }
+
+    private void reiniciarPistas(boolean hayEjercicio) {
+        pistas = List.of();
+        pistasUsadas = 0;
+        lblPista.setText("");
+        lblPista.setVisible(false);
+        lblPista.setManaged(false);
+        lblContadorPistas.setText("");
+        btnPista.setDisable(!hayEjercicio);
+    }
+
+    /** Busca en segundo plano el tipo de error más frecuente del perfil para personalizar las pistas. */
+    private void cargarConsejoPersonal() {
+        long perfilId = SesionUsuario.obtenerPerfil().getId();
+        Thread hilo = new Thread(() -> {
+            try {
+                String consejo = new EstadisticasDAO().listarErroresPorTipo(perfilId).stream()
+                        .max(java.util.Comparator.comparingLong(EstadisticasDAO.ErrorPorTipo::cantidad))
+                        .map(error -> TutorService.consejoPorError(error.tipo())).orElse("");
+                Platform.runLater(() -> consejoPersonal = consejo);
+            } catch (RuntimeException e) {
+                LOG.log(Level.FINE, "No se pudo calcular el consejo personal", e);
+            }
+        }, "algomentor-consejo");
+        hilo.setDaemon(true);
+        hilo.start();
     }
 
     @FXML

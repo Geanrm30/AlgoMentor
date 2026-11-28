@@ -1,5 +1,8 @@
 package ni.edu.uam.algomentor.controller;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -7,12 +10,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 import ni.edu.uam.algomentor.engine.CatalogoAlgoritmos;
 import ni.edu.uam.algomentor.engine.FichaAlgoritmo;
@@ -21,6 +27,7 @@ import ni.edu.uam.algomentor.engine.Fraccion;
 import ni.edu.uam.algomentor.engine.TipoOperacion;
 import ni.edu.uam.algomentor.engine.GeneradorEjercicios;
 import ni.edu.uam.algomentor.engine.Paso;
+import ni.edu.uam.algomentor.engine.Pseudocodigo;
 import ni.edu.uam.algomentor.engine.ResultadoEjecucion;
 import ni.edu.uam.algomentor.engine.ResultadoMatriz;
 import ni.edu.uam.algomentor.util.Animaciones;
@@ -51,6 +58,13 @@ public class SimuladorController {
     @FXML private Label lblExplicacion;
     @FXML private Button btnAnterior;
     @FXML private Button btnSiguiente;
+    @FXML private Button btnReproducir;
+    @FXML private ComboBox<String> cmbVelocidad;
+    @FXML private CheckBox chkBarras;
+    @FXML private HBox contenedorBarras;
+    @FXML private ScrollPane scrollBarras;
+    @FXML private VBox panelPseudocodigo;
+    @FXML private VBox listaPseudocodigo;
 
     private ResultadoEjecucion resultado;
     private int indice = -1;
@@ -59,11 +73,35 @@ public class SimuladorController {
     private String conclusion = "";
     private String[] celdasPrevias;
     private EntradaMatrizVisual matrizVisual;
+    private Timeline reproduccion;
+    private Pseudocodigo pseudocodigo;
+
+    private static final List<String> VELOCIDADES = List.of(
+            "Lenta (1,6 s por paso)", "Normal (0,9 s por paso)", "Rápida (0,4 s por paso)", "Muy rápida (0,15 s)");
+    private static final int[] MILISEGUNDOS = {1600, 900, 400, 150};
 
     @FXML
     private void initialize() {
         matrizVisual = new EntradaMatrizVisual();
         entradaMatriz.getChildren().add(matrizVisual);
+        cmbVelocidad.setItems(FXCollections.observableArrayList(VELOCIDADES));
+        cmbVelocidad.getSelectionModel().select(1);
+        cmbVelocidad.valueProperty().addListener((obs, antes, ahora) -> {
+            if (reproduccion != null) {
+                detenerReproduccion();
+                alternarReproduccion();
+            }
+        });
+        chkBarras.selectedProperty().addListener((obs, antes, ahora) -> {
+            scrollArreglo.setVisible(!ahora);
+            scrollArreglo.setManaged(!ahora);
+            scrollBarras.setVisible(ahora);
+            scrollBarras.setManaged(ahora);
+            if (resultado != null && !matricial) {
+                celdasPrevias = null;
+                actualizar();
+            }
+        });
         cmbAlgoritmo.setItems(FXCollections.observableArrayList(CatalogoAlgoritmos.nombres()));
         cmbAlgoritmo.setConverter(new StringConverter<>() {
             @Override public String toString(String valor) { return valor == null ? "" : TextoInterfaz.algoritmo(valor); }
@@ -76,6 +114,9 @@ public class SimuladorController {
             }
             CatalogoAlgoritmos elegido = CatalogoAlgoritmos.porNombre(actual);
             matricial = !elegido.esOrdenamiento();
+            cargarPseudocodigo(elegido);
+            chkBarras.setVisible(!matricial);
+            chkBarras.setManaged(!matricial);
             String mecanica = FichaAlgoritmo.de(elegido).map(FichaAlgoritmo::mecanica).orElse("");
             lblMecanica.setText(mecanica);
             lblMecanica.setVisible(!mecanica.isEmpty());
@@ -106,6 +147,7 @@ public class SimuladorController {
 
     @FXML
     private void simular() {
+        detenerReproduccion();
         try {
             CatalogoAlgoritmos algoritmo = CatalogoAlgoritmos.porNombre(cmbAlgoritmo.getValue());
             if (matricial) {
@@ -134,6 +176,7 @@ public class SimuladorController {
 
     @FXML
     private void anterior() {
+        detenerReproduccion();
         if (resultado != null && indice >= 0) {
             indice--;
             actualizar();
@@ -142,9 +185,73 @@ public class SimuladorController {
 
     @FXML
     private void siguiente() {
+        detenerReproduccion();
+        avanzar();
+    }
+
+    private void avanzar() {
         if (resultado != null && indice + 1 < resultado.pasos().size()) {
             indice++;
             actualizar();
+        }
+    }
+
+    @FXML
+    private void alternarReproduccion() {
+        if (resultado == null) {
+            return;
+        }
+        if (reproduccion != null) {
+            detenerReproduccion();
+            return;
+        }
+        if (indice + 1 >= resultado.pasos().size()) {
+            indice = -1;
+            actualizar();
+        }
+        int posicion = Math.max(0, cmbVelocidad.getSelectionModel().getSelectedIndex());
+        reproduccion = new Timeline(new KeyFrame(Duration.millis(MILISEGUNDOS[posicion]), evento -> {
+            avanzar();
+            if (resultado == null || indice + 1 >= resultado.pasos().size()) {
+                detenerReproduccion();
+            }
+        }));
+        reproduccion.setCycleCount(Animation.INDEFINITE);
+        reproduccion.play();
+        btnReproducir.setText("Pausar");
+    }
+
+    private void detenerReproduccion() {
+        if (reproduccion != null) {
+            reproduccion.stop();
+            reproduccion = null;
+        }
+        btnReproducir.setText("Reproducir");
+    }
+
+    private void cargarPseudocodigo(CatalogoAlgoritmos algoritmo) {
+        pseudocodigo = Pseudocodigo.de(algoritmo).orElse(null);
+        listaPseudocodigo.getChildren().clear();
+        panelPseudocodigo.setVisible(pseudocodigo != null);
+        panelPseudocodigo.setManaged(pseudocodigo != null);
+        if (pseudocodigo == null) {
+            return;
+        }
+        for (String linea : pseudocodigo.lineas()) {
+            Label etiqueta = new Label(linea.isEmpty() ? " " : linea);
+            etiqueta.getStyleClass().add("linea-pseudocodigo");
+            etiqueta.setMaxWidth(Double.MAX_VALUE);
+            listaPseudocodigo.getChildren().add(etiqueta);
+        }
+    }
+
+    private void resaltarLinea(int linea) {
+        for (int i = 0; i < listaPseudocodigo.getChildren().size(); i++) {
+            Node etiqueta = listaPseudocodigo.getChildren().get(i);
+            etiqueta.getStyleClass().remove("linea-activa");
+            if (i == linea) {
+                etiqueta.getStyleClass().add("linea-activa");
+            }
         }
     }
 
@@ -167,57 +274,105 @@ public class SimuladorController {
         lblExplicacion.setText(paso == null ? "Pulsa Siguiente para recorrer los pasos." : paso.explicacion()
                 + (indice == resultado.pasos().size() - 1 ? "\n" + conclusion : ""));
         Animaciones.entrar(lblExplicacion, 0, 6);
+        resaltarLinea(pseudocodigo == null || paso == null ? -1 : pseudocodigo.lineaPara(paso.tipo()));
         btnAnterior.setDisable(indice < 0);
         btnSiguiente.setDisable(indice + 1 >= resultado.pasos().size());
+        btnReproducir.setDisable(false);
+    }
+
+    private HBox contenedorActivo() {
+        return chkBarras.isSelected() ? contenedorBarras : contenedorArreglo;
+    }
+
+    private ScrollPane scrollActivo() {
+        return chkBarras.isSelected() ? scrollBarras : scrollArreglo;
     }
 
     private void mostrarArreglo(int[] valores, List<Integer> destacados, int pivote, TipoOperacion movimiento) {
         contenedorMatriz.getChildren().clear();
-        double[] xPrevias = posicionesX(contenedorArreglo);
-        contenedorArreglo.getChildren().clear();
+        HBox contenedor = contenedorActivo();
+        (contenedor == contenedorBarras ? contenedorArreglo : contenedorBarras).getChildren().clear();
+        double[] xPrevias = posicionesX(contenedor);
+        contenedor.getChildren().clear();
         String[] textos = new String[valores.length];
+        int minimo = java.util.Arrays.stream(valores).min().orElse(0);
+        int maximo = java.util.Arrays.stream(valores).max().orElse(0);
         for (int i = 0; i < valores.length; i++) {
             textos[i] = Integer.toString(valores[i]);
-            Label valor = celda(textos[i], destacados.contains(i));
-            if (i == pivote) {
-                valor.getStyleClass().add("valor-pivote");
-                valor.setAccessibleText("Pivote: " + textos[i]);
+            boolean activo = destacados.contains(i);
+            Node elemento;
+            if (contenedor == contenedorBarras) {
+                elemento = barra(valores[i], minimo, maximo, valores.length, activo, i == pivote);
+            } else {
+                Label valor = celda(textos[i], activo);
+                if (i == pivote) {
+                    valor.getStyleClass().add("valor-pivote");
+                }
+                elemento = valor;
             }
-            contenedorArreglo.getChildren().add(valor);
+            if (i == pivote) {
+                elemento.setAccessibleText("Pivote: " + textos[i]);
+            }
+            contenedor.getChildren().add(elemento);
         }
-        animarArreglo(textos, destacados, xPrevias, movimiento);
+        animarArreglo(contenedor, textos, destacados, xPrevias, movimiento);
         seguirElemento(destacados, pivote);
         celdasPrevias = textos;
+    }
+
+    /** Barra con altura proporcional al valor, entre 24 y 150 píxeles. */
+    private Node barra(int valor, int minimo, int maximo, int cantidad, boolean activa, boolean pivote) {
+        double altura = maximo == minimo ? 90 : 24 + (valor - (double) minimo) / ((double) maximo - minimo) * 126;
+        Region cuerpo = new Region();
+        cuerpo.setMinHeight(altura);
+        cuerpo.setPrefHeight(altura);
+        cuerpo.setMaxHeight(altura);
+        double ancho = cantidad > 24 ? 16 : 38;
+        cuerpo.setMinWidth(ancho);
+        cuerpo.setPrefWidth(ancho);
+        cuerpo.getStyleClass().add(pivote ? "barra-pivote" : activa ? "barra-activa" : "barra");
+        VBox columna = new VBox(4);
+        columna.setAlignment(Pos.BOTTOM_CENTER);
+        if (cantidad <= 24) {
+            Label etiqueta = new Label(Integer.toString(valor));
+            etiqueta.getStyleClass().add("barra-valor");
+            columna.getChildren().add(etiqueta);
+        }
+        columna.getChildren().add(cuerpo);
+        return columna;
     }
 
     private void seguirElemento(List<Integer> destacados, int pivote) {
         int objetivo = destacados.isEmpty() ? pivote : destacados.get(destacados.size() - 1);
         int pasoActual = indice;
+        HBox contenedor = contenedorActivo();
+        ScrollPane desplazamiento = scrollActivo();
         Platform.runLater(() -> {
             if (indice != pasoActual) return;
-            scrollArreglo.applyCss();
-            scrollArreglo.layout();
-            double ancho = contenedorArreglo.getWidth();
-            double visible = scrollArreglo.getViewportBounds().getWidth();
-            if (objetivo < 0 || objetivo >= contenedorArreglo.getChildren().size() || ancho <= visible) {
-                scrollArreglo.setHvalue(0);
+            desplazamiento.applyCss();
+            desplazamiento.layout();
+            double ancho = contenedor.getWidth();
+            double visible = desplazamiento.getViewportBounds().getWidth();
+            if (objetivo < 0 || objetivo >= contenedor.getChildren().size() || ancho <= visible) {
+                desplazamiento.setHvalue(0);
                 return;
             }
-            Node celda = contenedorArreglo.getChildren().get(objetivo);
+            Node celda = contenedor.getChildren().get(objetivo);
             double centro = celda.getBoundsInParent().getMinX() + celda.getBoundsInParent().getWidth() / 2;
-            double desplazamiento = Math.max(0, Math.min(ancho - visible, centro - visible / 2));
-            scrollArreglo.setHvalue(desplazamiento / (ancho - visible));
+            double corrimiento = Math.max(0, Math.min(ancho - visible, centro - visible / 2));
+            desplazamiento.setHvalue(corrimiento / (ancho - visible));
         });
     }
 
-    private void animarArreglo(String[] textos, List<Integer> destacados, double[] xPrevias, TipoOperacion movimiento) {
-        List<Node> celdas = contenedorArreglo.getChildren();
+    private void animarArreglo(HBox contenedor, String[] textos, List<Integer> destacados, double[] xPrevias,
+                               TipoOperacion movimiento) {
+        List<Node> celdas = contenedor.getChildren();
         if (celdasPrevias == null || celdasPrevias.length != textos.length) {
             aparecerEscalonado(celdas);
             return;
         }
-        contenedorArreglo.applyCss();
-        contenedorArreglo.layout();
+        contenedor.applyCss();
+        contenedor.layout();
         int[] origen = MovimientoCeldas.origenes(celdasPrevias, textos, movimiento);
         for (int i = 0; i < celdas.size(); i++) {
             Node celda = celdas.get(i);
@@ -286,6 +441,10 @@ public class SimuladorController {
     }
 
     private void limpiarResultado() {
+        detenerReproduccion();
+        resaltarLinea(-1);
+        btnReproducir.setDisable(true);
+        contenedorBarras.getChildren().clear();
         resultado = null;
         indice = -1;
         indiceMostrado = -1;

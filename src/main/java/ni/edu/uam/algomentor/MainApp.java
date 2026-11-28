@@ -12,6 +12,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Label;
@@ -64,6 +66,13 @@ public class MainApp extends Application {
     private StackPane contenido;
     private static final String CLAVE_TEMA_CLARO = "tema.claro";
     private static final String CLAVE_TUTORIAL_VISTO = "tutorial.visto";
+    private static final String CLAVE_TAMANO_LETRA = "letra.tamano";
+    private static final String CLAVE_ALTO_CONTRASTE = "alto.contraste";
+    private static final String[] NOMBRES_LETRA = {"Pequeño", "Normal", "Grande", "Muy grande"};
+    private static final double[] TAMANOS_LETRA = {12, 13.5, 16, 18.5};
+    private int tamanoLetra = Math.max(0, Math.min(3, leerEntero(CLAVE_TAMANO_LETRA, 1)));
+    private boolean altoContraste = leerEntero(CLAVE_ALTO_CONTRASTE, 0) == 1;
+    private BorderPane raizActual;
     private StackPane envoltura;
     private MenuBar barraMenus;
     private Tutorial tutorial;
@@ -147,6 +156,8 @@ public class MainApp extends Application {
         instalarMenuContextual();
 
         envoltura = new StackPane(raiz);
+        raizActual = raiz;
+        aplicarAccesibilidad();
         stage.getScene().setRoot(envoltura);
         Animaciones.fundirEntrada(raiz);
         Animaciones.instalarEfectosBoton(stage.getScene());
@@ -356,7 +367,11 @@ public class MainApp extends Application {
                 elemento("Práctica", "Shortcut+2", () -> mostrar("practica", "practica.fxml", true)),
                 elemento("Comandos", "Shortcut+4", () -> mostrar("terminal", "terminal.fxml", false)),
                 new SeparatorMenuItem(),
-                elemento("Guía de algoritmos", "Shortcut+8", () -> mostrar("guia", "guia-algoritmos.fxml", false)));
+                elemento("Guía de algoritmos", "Shortcut+8", () -> mostrar("guia", "guia-algoritmos.fxml", false)),
+                elemento("Búsqueda, grafos y recursividad", "Shortcut+Shift+8",
+                        () -> mostrar("otros", "otros-algoritmos.fxml", false)),
+                new SeparatorMenuItem(),
+                elemento("Retos y logros", "Shortcut+Shift+R", () -> mostrar("retos", "retos.fxml", true)));
     }
 
     private Menu crearMenuHerramientas() {
@@ -387,7 +402,28 @@ public class MainApp extends Application {
         pantallaCompleta.setSelected(stage.isFullScreen());
         pantallaCompleta.setOnAction(event -> stage.setFullScreen(pantallaCompleta.isSelected()));
         stage.fullScreenProperty().addListener((obs, antes, ahora) -> pantallaCompleta.setSelected(ahora));
-        return new Menu("Ver", null, tema, pantallaCompleta);
+        Menu letra = new Menu("Tamaño de letra");
+        ToggleGroup grupo = new ToggleGroup();
+        for (int i = 0; i < NOMBRES_LETRA.length; i++) {
+            RadioMenuItem opcion = new RadioMenuItem(NOMBRES_LETRA[i]);
+            opcion.setToggleGroup(grupo);
+            opcion.setSelected(i == tamanoLetra);
+            int posicion = i;
+            opcion.setOnAction(evento -> {
+                tamanoLetra = posicion;
+                guardarEntero(CLAVE_TAMANO_LETRA, posicion);
+                aplicarAccesibilidad();
+            });
+            letra.getItems().add(opcion);
+        }
+        CheckMenuItem contraste = new CheckMenuItem("Alto contraste");
+        contraste.setSelected(altoContraste);
+        contraste.setOnAction(evento -> {
+            altoContraste = contraste.isSelected();
+            guardarEntero(CLAVE_ALTO_CONTRASTE, altoContraste ? 1 : 0);
+            aplicarAccesibilidad();
+        });
+        return new Menu("Ver", null, tema, contraste, letra, new SeparatorMenuItem(), pantallaCompleta);
     }
 
     private Menu crearMenuAyuda() {
@@ -434,12 +470,13 @@ public class MainApp extends Application {
                         + "Debajo aparece una descripción de cómo ordena ese método.",
                 () -> tarjeta(0), () -> mostrar("simulador", "simulador.fxml", false)));
         pasos.add(new Tutorial.Paso("Simulador: recorre los pasos",
-                "Con Siguiente y Anterior avanzas o retrocedes. Las celdas en cian son las que participan en el paso, "
-                        + "el violeta marca el pivote y la explicación escrita dice qué pasó y por qué.",
+                "Con Siguiente y Anterior avanzas o retrocedes, o pulsa Reproducir para verlo solo y elige la velocidad. "
+                        + "Puedes ver el arreglo como barras y, más abajo, el pseudocódigo con la línea que se ejecuta.",
                 () -> tarjeta(1)));
         pasos.add(new Tutorial.Paso("Guía de algoritmos",
                 "Una tabla compara los trece métodos de ordenamiento: técnica, mejor, promedio y peor caso, memoria "
-                        + "extra y estabilidad. Al seleccionar una fila se explica su mecánica y cuándo conviene.",
+                        + "extra y estabilidad. Al seleccionar una fila se explica su mecánica, y abajo hay una gráfica del "
+                        + "crecimiento de cada complejidad. Búsquedas, grafos y recursividad están en Aprender.",
                 () -> tarjeta(0), () -> mostrar("guia", "guia-algoritmos.fxml", false)));
         pasos.add(new Tutorial.Paso("Práctica",
                 "Elige un ejercicio y escribe tu respuesta. AlgoMentor la corrige, detecta el tipo de error (signos, "
@@ -453,8 +490,13 @@ public class MainApp extends Application {
                 "Aquí ves tus aciertos, tu racha, el avance por habilidad y el historial. Puedes exportar un informe "
                         + "en PDF desde Archivo.",
                 () -> contenido, () -> mostrar("progreso", "progreso.fxml", true)));
-        pasos.add(new Tutorial.Paso("Cuando necesites ayuda",
-                "Puedes repetir este recorrido cuando quieras desde Ayuda, Tutorial de uso (F1).",
+        pasos.add(new Tutorial.Paso("Retos y logros",
+                "Pon a prueba lo aprendido con un desafío de 60 segundos y un cuestionario teórico, y mira los "
+                        + "logros que vas desbloqueando. En Práctica, el modo tutor te da pistas sin revelar la respuesta.",
+                () -> contenido, () -> mostrar("retos", "retos.fxml", true)));
+        pasos.add(new Tutorial.Paso("Ajustes y ayuda",
+                "En Ver puedes cambiar el tema, el tamaño de letra y activar el alto contraste. Este recorrido se repite "
+                        + "desde Ayuda, Tutorial de uso (F1).",
                 () -> nodoMenu("Ayuda")));
         tutorial = new Tutorial(envoltura, pasos, () -> guardarTutorialVisto(true));
         tutorial.iniciar();
@@ -486,6 +528,35 @@ public class MainApp extends Application {
             Preferences.userNodeForPackage(MainApp.class).putBoolean(CLAVE_TUTORIAL_VISTO, visto);
         } catch (RuntimeException e) {
             LOG.log(Level.WARNING, "No se pudo guardar que el tutorial ya se mostró", e);
+        }
+    }
+
+    /** Aplica el tamaño de letra y el alto contraste elegidos; se recuerdan entre ejecuciones. */
+    private void aplicarAccesibilidad() {
+        if (envoltura == null || raizActual == null) {
+            return;
+        }
+        envoltura.setStyle("-fx-font-size: " + TAMANOS_LETRA[tamanoLetra] + "px;");
+        raizActual.getStyleClass().remove("alto-contraste");
+        if (altoContraste) {
+            raizActual.getStyleClass().add("alto-contraste");
+        }
+    }
+
+    private static int leerEntero(String clave, int predeterminado) {
+        try {
+            return Preferences.userNodeForPackage(MainApp.class).getInt(clave, predeterminado);
+        } catch (RuntimeException e) {
+            LOG.log(Level.WARNING, "No se pudo leer una preferencia", e);
+            return predeterminado;
+        }
+    }
+
+    private static void guardarEntero(String clave, int valor) {
+        try {
+            Preferences.userNodeForPackage(MainApp.class).putInt(clave, valor);
+        } catch (RuntimeException e) {
+            LOG.log(Level.WARNING, "No se pudo guardar una preferencia", e);
         }
     }
 

@@ -2,7 +2,7 @@
 
 # AlgoMentor
 
-**Quince algoritmos interactivos, práctica con detección de errores por habilidad, intercambio de ejercicios e informes PDF de progreso.**
+**Veintidós algoritmos interactivos, retos, logros, práctica con detección de errores por habilidad, intercambio de ejercicios e informes PDF de progreso.**
 
 Programación de Aplicaciones de Escritorio · Universidad Americana (UAM) · Ingeniería de Sistemas
 
@@ -57,6 +57,11 @@ mediante Hibernate.
 |---|---|
 | Simulación | Quince algoritmos con recorrido paso a paso, descripción de la mecánica de cada ordenamiento, generación de entradas y animaciones. |
 | Guía de algoritmos | Tabla que compara los trece ordenamientos (técnica, mejor, promedio y peor caso, memoria extra, estabilidad) y explica cómo ordena cada uno. |
+| Reproducción | Reproducción automática con cuatro velocidades, vista del arreglo como barras y pseudocódigo con la línea del paso actual resaltada. |
+| Búsqueda, grafos y recursividad | Búsqueda lineal y binaria, recorridos BFS y DFS, Dijkstra, Fibonacci con memorización y Torres de Hanoi, con grafo y torres dibujados paso a paso. |
+| Retos | Desafío de 60 segundos (predecir el arreglo tras un número de cambios), cuestionario teórico de 10 preguntas generadas al azar y 12 logros. |
+| Modo tutor | En Práctica, hasta tres pistas escalonadas que no revelan la respuesta y un consejo según tu error más frecuente. |
+| Accesibilidad | Tamaño de letra (cuatro niveles) y alto contraste en el menú Ver; se recuerdan entre ejecuciones. |
 | Tutorial | Recorrido guiado que ilumina cada parte de la interfaz; se muestra la primera vez y se repite desde Ayuda, Tutorial de uso (F1). |
 | Aritmética | Fracciones exactas con `BigInteger` (`Fraccion`), sin errores de redondeo en matrices. |
 | Práctica | Evaluación de arreglos ordenados y operaciones de fila, con detección de errores. |
@@ -510,6 +515,17 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
 - **Contadores y tarjetas:** las cifras de Resumen y Progreso cuentan hasta su valor (solo animan si
   cambian, para no reiniciarse con la actualización automática) y las tarjetas se elevan con un brillo
   al pasar el cursor. Al entrar a la aplicación la pantalla se funde suavemente.
+- **Reproducción y pseudocódigo:** el simulador puede avanzar solo (lenta, normal, rápida o muy rápida),
+  mostrar el arreglo como barras con altura proporcional al valor y resaltar en `Pseudocodigo` la línea que
+  ejecuta cada paso. Cada línea declara los tipos de operación que realiza, y una prueba comprueba que todo
+  paso real de todo algoritmo tenga una línea que resaltar.
+- **Grafos y recursividad:** `AlgoritmosExtra` produce pasos con un `EstadoVisual` (celdas, grafo o torres) que
+  la vista dibuja; el grafo de ejemplo es fijo (`GrafoEjemplo`) y los recorridos son deterministas.
+- **Retos y logros:** `DesafioService`, `CuestionarioService` y `LogrosService` son lógica pura con pruebas. Los
+  mejores puntajes se guardan en las preferencias del equipo (`PuntajesLocales`), no en PostgreSQL; los logros
+  de práctica se calculan con las estadísticas ya existentes.
+- **Accesibilidad:** las fuentes del CSS usan `em`, de modo que cambiar el tamaño base escala toda la
+  interfaz; el alto contraste redefine la paleta con la clase `alto-contraste`.
 - **Tutorial:** `Tutorial` oscurece la ventana, ilumina un elemento a la vez con un hueco animado y
   coloca una tarjeta explicativa al lado (Siguiente, Anterior, Omitir; también flechas y Esc). Se muestra
   la primera vez y se repite desde Ayuda. Está inspirado en el recorrido de la calculadora de matrices.
@@ -767,10 +783,12 @@ al terminar, sin recurrir a bases de datos alternativas.
 
 | Área | Clases de prueba |
 |---|---|
-| Ordenamiento | `BubbleSortTest`, `InsertionSortTest`, `QuickSortTest`, `MergeSortTest`, `CountingSortTest`, `RadixSortTest`, `BucketSortTest`, `SelectionSortTest`, `ShellSortTest`, `HeapSortTest`, `CocktailSortTest`, `CombSortTest`, `GnomeSortTest`, `FichaAlgoritmoTest` |
+| Ordenamiento | `BubbleSortTest`, `InsertionSortTest`, `QuickSortTest`, `MergeSortTest`, `CountingSortTest`, `RadixSortTest`, `BucketSortTest`, `SelectionSortTest`, `ShellSortTest`, `HeapSortTest`, `CocktailSortTest`, `CombSortTest`, `GnomeSortTest`, `FichaAlgoritmoTest`, `PseudocodigoTest` |
 | Álgebra lineal | `GaussTest`, `GaussJordanTest`, `FraccionTest`, `FormatoMatrizTest`, `VerificadorOperacionesTest` |
 | Catálogo y ejercicios | `CatalogoAlgoritmosTest`, `CatalogoSqlTest`, `GeneradorEjerciciosTest`, `EvaluadorPracticaTest`, `EvaluadorPasoMatrizTest`, `EntradaAprendizajeTest` |
 | Persistencia y servicios | `IntentoServiceTest`, `RegistroPracticaServiceTest`, `ProgresoHabilidadServiceTest`, `PerfilServiceTest`, `HabilidadErrorResolverTest`, `CalculoProgresoTest` |
+| Búsqueda, grafos y recursividad | `AlgoritmosExtraTest` |
+| Retos, logros y tutor | `RetosServiceTest`, `TutorServiceTest`, `TutorialTest` |
 | Terminal y comparador | `ComandosTerminalTest`, `ComparadorOrdenamientosTest` |
 | Estadísticas | `EstadisticasDAOTest` |
 | Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `ReporteMapaCalorTemplateTest`, `ReporteMapaCalorServiceTest`, `MapaCalorErroresDAOTest`, `RegistroInformesTest` |

@@ -49,6 +49,15 @@
                 </HBox>
                 <Label fx:id="lblResultado" wrapText="true" />
             </VBox>
+            <VBox spacing="10" styleClass="card">
+                <Label text="Modo tutor" styleClass="section-title" />
+                <Label text="¿Atascado? Pide una pista: te orienta sin darte la respuesta. Hay hasta tres, cada una más concreta, y no afectan tu calificación." wrapText="true" styleClass="subtitle" />
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button fx:id="btnPista" text="Pedir una pista" onAction="#pedirPista" disable="true" />
+                    <Label fx:id="lblContadorPistas" />
+                </HBox>
+                <Label fx:id="lblPista" wrapText="true" styleClass="mecanica-algoritmo" visible="false" managed="false" />
+            </VBox>
         </VBox>
     </content>
 </ScrollPane>
