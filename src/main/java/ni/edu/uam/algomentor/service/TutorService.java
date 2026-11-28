@@ -21,7 +21,8 @@ public final class TutorService {
         CatalogoAlgoritmos algoritmo = CatalogoAlgoritmos.porNombre(nombreAlgoritmo);
         List<String> pistas = new ArrayList<>();
         if (algoritmo.esOrdenamiento()) {
-            pistas.add("Pista 1: " + FichaAlgoritmo.de(algoritmo).orElseThrow().mecanica());
+            pistas.add("Pista 1: este algoritmo usa la técnica «" + FichaAlgoritmo.de(algoritmo).orElseThrow().tecnica()
+                    + "». Simula un arreglo pequeño en Aprender > Simular y sigue el pseudocódigo.");
             List<Paso> cambios = algoritmo.crearOrdenamiento().ejecutar(FormatoDatos.leerArreglo(datos)).pasos().stream()
                     .filter(p -> p.tipo() == TipoOperacion.INTERCAMBIAR || p.tipo() == TipoOperacion.ESCRIBIR)
                     .toList();

@@ -11,7 +11,6 @@ class CatalogoAlgoritmosTest {
         assertEquals(13, CatalogoAlgoritmos.ordenamientos().size());
         for (var algoritmo : CatalogoAlgoritmos.values()) {
             assertSame(algoritmo, CatalogoAlgoritmos.porNombre(algoritmo.nombre()));
-            assertSame(algoritmo, CatalogoAlgoritmos.porComando(algoritmo.comando().toUpperCase(java.util.Locale.ROOT)));
             assertFalse(algoritmo.etiqueta().isBlank());
             if (algoritmo.esOrdenamiento()) assertEquals(algoritmo.nombre(), algoritmo.crearOrdenamiento().nombre());
             else assertNotNull(algoritmo.crearMatricial());

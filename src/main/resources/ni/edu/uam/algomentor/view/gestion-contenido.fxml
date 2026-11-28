@@ -19,13 +19,6 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.GestionContenidoController">
-    <top>
-        <VBox spacing="5" styleClass="page-header">
-            <Label text="AlgoMentor" styleClass="brand" />
-            <Label text="Biblioteca de ejercicios" styleClass="page-title" />
-            <Label text="Consulta los algoritmos disponibles, crea ejercicios y revisa tu historial" styleClass="subtitle" />
-        </VBox>
-    </top>
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-tabs">
             <tabs>

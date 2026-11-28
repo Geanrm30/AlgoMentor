@@ -365,7 +365,6 @@ public class MainApp extends Application {
         return new Menu("Aprender", null,
                 elemento("Simular", "Shortcut+1", () -> mostrar("simulador", "simulador.fxml", false)),
                 elemento("Práctica", "Shortcut+2", () -> mostrar("practica", "practica.fxml", true)),
-                elemento("Comandos", "Shortcut+4", () -> mostrar("terminal", "terminal.fxml", false)),
                 new SeparatorMenuItem(),
                 elemento("Guía de algoritmos", "Shortcut+8", () -> mostrar("guia", "guia-algoritmos.fxml", false)),
                 elemento("Búsqueda, grafos y recursividad", "Shortcut+Shift+8",
@@ -475,7 +474,7 @@ public class MainApp extends Application {
                 () -> tarjeta(1)));
         pasos.add(new Tutorial.Paso("Guía de algoritmos",
                 "Una tabla compara los trece métodos de ordenamiento: técnica, mejor, promedio y peor caso, memoria "
-                        + "extra y estabilidad. Al seleccionar una fila se explica su mecánica, y abajo hay una gráfica del "
+                        + "extra y estabilidad. Abajo hay una gráfica del "
                         + "crecimiento de cada complejidad. Búsquedas, grafos y recursividad están en Aprender.",
                 () -> tarjeta(0), () -> mostrar("guia", "guia-algoritmos.fxml", false)));
         pasos.add(new Tutorial.Paso("Práctica",

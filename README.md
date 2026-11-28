@@ -195,7 +195,7 @@ Tras iniciar sesión, la ventana principal tiene una barra de menú que lleva a 
 | **Archivo** | Exportar ejercicios, Importar ejercicios, Exportar informe de progreso (PDF; un administrador elige primero el perfil), Cambiar contraseña, Cerrar sesión y Salir. |
 | **Inicio** | Mi progreso. |
 | **Administración** | Resumen general e Informes (vista previa y PDF de cada informe global). Solo aparece para cuentas administradoras. |
-| **Aprender** | Simular, Práctica y Comandos. |
+| **Aprender** | Simular, Práctica, Guía de algoritmos, Búsqueda, grafos y recursividad, y Retos y logros. |
 | **Herramientas** | Comparar algoritmos, Comprobar sistema (math.js) y Biblioteca de contenido. |
 | **Ver** | Tema claro u oscuro. |
 | **Ayuda** | Acerca de AlgoMentor. |
@@ -221,14 +221,15 @@ Atajos de teclado (en macOS, `Cmd` en lugar de `Ctrl`):
 | `Ctrl+1` | Simular | `Ctrl+6` | Comprobar sistema |
 | `Ctrl+2` | Práctica | `Ctrl+7` | Biblioteca de contenido |
 | `Ctrl+3` | Mi progreso | `Ctrl+E` | Exportar informe PDF |
-| `Ctrl+4` | Comandos | `Ctrl+Shift+E` / `Ctrl+I` | Exportar / importar ejercicios |
-| `Ctrl+9` | Informes (administradores) | | |
+| `Ctrl+8` | Guía de algoritmos | `Ctrl+Shift+E` / `Ctrl+I` | Exportar / importar ejercicios |
+| `Ctrl+9` | Informes (administradores) | `Ctrl+Shift+8` | Búsqueda, grafos y recursividad |
+| `Ctrl+Shift+R` | Retos y logros | `F1` | Tutorial de uso |
 | `Ctrl+T` | Tema claro u oscuro | `Ctrl+Shift+L` / `Ctrl+Q` | Cerrar sesión / salir |
 | `Ctrl+Shift+P` | Cambiar contraseña | | |
 | `F11` | Pantalla completa | | |
 
 Las secciones con datos (Resumen, Progreso, Práctica y Biblioteca) se cargan de nuevo cada vez que se
-abren, para mostrar los cambios recientes. Simular, Comandos, Comparar y Comprobar sistema conservan
+abren, para mostrar los cambios recientes. Simular, Comparar y Comprobar sistema conservan
 lo que estabas haciendo.
 
 **Actualización automática:** Resumen y Progreso consultan la base de datos cada 10 segundos y cuando la
@@ -245,8 +246,8 @@ La aplicación inicia con el tema oscuro; usa **Ver > Tema claro** para alternar
 2. **Recorrido.** Pulsa **Anterior** o **Siguiente** para recorrer las operaciones, sus estados y
    explicaciones en español. Se distinguen las comparaciones, los intercambios, las escrituras,
    las particiones, las mezclas, los conteos y las distribuciones según el algoritmo.
-3. **Mecánica.** Al elegir un ordenamiento aparece una descripción breve de cómo ordena; la sección
-   **Aprender, Guía de algoritmos** (Ctrl+8) la amplía y compara todos los métodos en una tabla.
+3. **Mecánica.** Al elegir un ordenamiento aparece una descripción breve de cómo ordena. La sección
+   **Aprender, Guía de algoritmos** (Ctrl+8) compara todos los métodos en una tabla y en una gráfica.
 
 Quick Sort identifica el pivote en violeta. Los arreglos anchos tienen desplazamiento horizontal.
 Las operaciones matriciales usan fracciones exactas; `Clasificador` determina si el sistema tiene
@@ -293,33 +294,7 @@ cuentan en Procedimiento. `RegistroPracticaService` conecta la evaluación con `
 
 ![Práctica: corrección con el error detectado](docs/capturas/practica-error.png)
 
-### 3.3 Terminal y Comparar
-
-**Terminal.** Escribe `ayuda` para consultar los comandos educativos. No ejecuta comandos del sistema
-operativo. Además de los comandos originales, admite `ordenar quick`, `ordenar merge`, `ordenar counting`,
-`ordenar radix` y `ordenar bucket`.
-
-```text
-ordenar quick 4,-2,0,4,-7
-ordenar radix 2147483647,-2147483648,0
-```
-
-![Quick Sort ejecutado en la terminal educativa](docs/capturas/terminal-quick.png)
-
-*Traza de Quick Sort con comparaciones, particiones e intercambios.*
-
-<details>
-<summary>Más ejemplos de la terminal: Radix Sort y Gauss-Jordan</summary>
-
-![Radix Sort con enteros negativos desde la terminal](docs/capturas/terminal-radix.png)
-
-*Radix Sort: conteo de frecuencias y distribución estable, incluyendo números negativos.*
-
-![Resolución de un sistema mediante Gauss-Jordan desde la terminal](docs/capturas/terminal-jordan.png)
-
-*Gauss-Jordan resuelve el sistema y devuelve la solución exacta x1 = 4, x2 = -5.*
-
-</details>
+### 3.3 Comparar
 
 **Comparar.** Utiliza el mismo arreglo para analizar los trece ordenamientos. La tabla distingue
 comparaciones, intercambios, escrituras en el arreglo, escrituras internas de cubetas, conteos,
@@ -513,8 +488,8 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
 - **Inicio de sesión:** fondo con orbes de luz que flotan y respiran, tarjeta que entra con rebote y
   campos que aparecen en cascada; si las credenciales fallan, la tarjeta se sacude.
 - **Contadores y tarjetas:** las cifras de Resumen y Progreso cuentan hasta su valor (solo animan si
-  cambian, para no reiniciarse con la actualización automática) y las tarjetas se elevan con un brillo
-  al pasar el cursor. Al entrar a la aplicación la pantalla se funde suavemente.
+  cambian, para no reiniciarse con la actualización automática) y las tarjetas pequeñas de resumen se elevan
+  un poco al pasar el cursor. Al entrar a la aplicación la pantalla se funde suavemente.
 - **Reproducción y pseudocódigo:** el simulador puede avanzar solo (lenta, normal, rápida o muy rápida),
   mostrar el arreglo como barras con altura proporcional al valor y resaltar en `Pseudocodigo` la línea que
   ejecuta cada paso. Cada línea declara los tipos de operación que realiza, y una prueba comprueba que todo
@@ -551,7 +526,7 @@ src/main/java/ni/edu/uam/algomentor/
 │   ├── Fraccion, Clasificador        Aritmética exacta y clasificación de sistemas
 │   └── VerificadorOperaciones        Verificación de operaciones de filas
 ├── service/                         Evaluación, registro de intentos, progreso,
-│                                    comparador, terminal e informes PDF
+│                                    comparador e informes PDF
 ├── dao/                             CRUD genérico, acceso a datos y consultas HQL
 ├── model/                           Entidades persistentes del aprendizaje y cuentas
 ├── api/                             Intercambio JSON por HTTP y cliente math.js
@@ -725,7 +700,6 @@ y límites visuales con la importación JSON. Los nuevos motores rechazan arregl
   administrador antes de consultar datos globales.
 - **Consultas parametrizadas:** las consultas HQL usan parámetros con nombre (`:perfilId`,
   `:algoritmoId`); no se concatena texto del usuario en las consultas.
-- **Terminal educativa:** solo reconoce comandos propios y nunca ejecuta comandos del sistema operativo.
 - **Nombre de archivo del informe:** los caracteres no válidos del nombre del perfil se reemplazan
   antes de proponer el archivo PDF.
 - **API local:** escucha únicamente en la interfaz de loopback; valida tamaño del lote y contenido antes de la importación.
@@ -737,10 +711,9 @@ y límites visuales con la importación JSON. Los nuevos motores rechazan arregl
 
 ## 9. Pruebas
 
-De acuerdo con el [informe de ampliación del 17 de noviembre de 2026](docs/AMPLIACION_ALGORITMOS.md),
-la última verificación documentada obtuvo **190 pruebas unitarias aprobadas** y **4 pruebas de integración
-JavaFX aprobadas** (194 en la ejecución conjunta, sin fallos, errores ni omisiones).
-Las pruebas contra PostgreSQL real no se ejecutaron en esa sesión y no se declaran aprobadas.
+La última ejecución local de `mvn test` obtuvo **327 pruebas unitarias aprobadas**, sin fallos ni omisiones.
+Las pruebas de integración JavaFX (`*IT`) y las que usan PostgreSQL real necesitan pantalla y base de datos,
+y no se declaran aprobadas en esa ejecución.
 
 ### Ejecución
 
@@ -789,7 +762,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Persistencia y servicios | `IntentoServiceTest`, `RegistroPracticaServiceTest`, `ProgresoHabilidadServiceTest`, `PerfilServiceTest`, `HabilidadErrorResolverTest`, `CalculoProgresoTest` |
 | Búsqueda, grafos y recursividad | `AlgoritmosExtraTest` |
 | Retos, logros y tutor | `RetosServiceTest`, `TutorServiceTest`, `TutorialTest` |
-| Terminal y comparador | `ComandosTerminalTest`, `ComparadorOrdenamientosTest` |
+| Comparador | `ComparadorOrdenamientosTest` |
 | Estadísticas | `EstadisticasDAOTest` |
 | Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `ReporteMapaCalorTemplateTest`, `ReporteMapaCalorServiceTest`, `MapaCalorErroresDAOTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |
@@ -864,6 +837,6 @@ La rama `main` debe compilar y ejecutarse después de cada integración.
 | Geanfranco Alexander Rodriguez Mendieta | [Geanrm30](https://github.com/Geanrm30) | Estructura del proyecto y configuración de la base, esquema PostgreSQL, mapeo de las ocho entidades, `SessionFactory`, motor de algoritmos (Bubble Sort, Insertion Sort, Gauss y Gauss-Jordan, fracciones exactas, verificador de operaciones y generador de ejercicios), tema visual y animaciones. |
 | Anthony Sying Gonzalez Chow | [AnthonySGC](https://github.com/AnthonySGC) | DAO base e interfaz CRUD genérica, persistencia de algoritmos y ejercicios, consultas HQL y estadísticas, gestión y validación de perfiles, registro transaccional de intentos, errores por habilidad, progreso y prueba de integración con rollback. Ampliación de los cinco algoritmos (Quick Sort, Merge Sort, Counting Sort, Radix Sort y Bucket Sort), catálogo, integración con los módulos, migración y pruebas. |
 | Jeremy Josue Gradiz Noguera | [JJGradiz](https://github.com/JJGradiz) | Consumo de la API de repaso en la etapa inicial del proyecto; plantilla JasperReports, generación y exportación del informe PDF y sus pruebas. |
-| Claudio Antonio De La Rocha Acevedo | [Def-Claudingo](https://github.com/Def-Claudingo) | Experiencia JavaFX: navegación, simulador, práctica con evaluación de operaciones y errores por habilidad, terminal, comparador, progreso e integración de la gestión con Hibernate. Intercambio de ejercicios por API, verificación externa con math.js y mejoras de navegación y entrada de matrices. |
+| Claudio Antonio De La Rocha Acevedo | [Def-Claudingo](https://github.com/Def-Claudingo) | Experiencia JavaFX: navegación, simulador, práctica con evaluación de operaciones y errores por habilidad, comparador, progreso e integración de la gestión con Hibernate. Intercambio de ejercicios por API, verificación externa con math.js y mejoras de navegación y entrada de matrices. |
 
 Docente: José A. Durán García · Noviembre 2026

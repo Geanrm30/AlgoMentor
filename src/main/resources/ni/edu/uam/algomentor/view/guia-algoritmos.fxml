@@ -8,7 +8,7 @@
         <VBox spacing="18" styleClass="tab-content">
             <VBox spacing="10" styleClass="card">
                 <Label text="Guía de algoritmos de ordenamiento" styleClass="section-title" />
-                <Label text="Compara de un vistazo la técnica, la complejidad y las propiedades de cada método. Selecciona una fila para ver cómo ordena." wrapText="true" styleClass="subtitle" />
+                <Label text="Compara de un vistazo la técnica, la complejidad y las propiedades de cada método. Para ver cómo trabaja uno paso a paso, elígelo en Aprender > Simular." wrapText="true" styleClass="subtitle" />
                 <TableView fx:id="tabla" prefHeight="620" minHeight="620">
                     <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
                     <columns>
@@ -23,13 +23,6 @@
                     </columns>
                 </TableView>
                 <Label text="Estable: mantiene el orden de los valores repetidos. En el sitio: no necesita un arreglo auxiliar del tamaño de la entrada. n = elementos, k = rango de valores, d = dígitos, b = base." wrapText="true" styleClass="subtitle" />
-            </VBox>
-            <VBox spacing="10" styleClass="card">
-                <Label fx:id="lblNombre" text="Selecciona un algoritmo" styleClass="section-title" />
-                <Label text="Cómo ordena" styleClass="subtitle" />
-                <Label fx:id="lblMecanica" wrapText="true" />
-                <Label text="Cuándo conviene" styleClass="subtitle" />
-                <Label fx:id="lblCuando" wrapText="true" />
             </VBox>
             <VBox spacing="10" styleClass="card">
                 <Label text="Cómo crece el trabajo según el tamaño" styleClass="section-title" />

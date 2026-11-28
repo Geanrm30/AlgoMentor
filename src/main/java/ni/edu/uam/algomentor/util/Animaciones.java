@@ -213,7 +213,7 @@ public final class Animaciones {
         for (int i = 0; i < colores.length; i++) {
             Circle orbe = new Circle(radios[i]);
             orbe.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.5, true, CycleMethod.NO_CYCLE,
-                    new Stop(0, colores[i].deriveColor(0, 1, 1, 0.34)),
+                    new Stop(0, colores[i].deriveColor(0, 1, 1, 0.20)),
                     new Stop(1, colores[i].deriveColor(0, 1, 1, 0))));
             orbe.setEffect(new BoxBlur(40, 40, 2));
             orbe.centerXProperty().bind(capa.widthProperty().multiply(posicion[i][0]));
@@ -289,7 +289,7 @@ public final class Animaciones {
         aparecer.play();
     }
 
-    /** Las tarjetas se elevan al pasar el cursor por encima. */
+    /** Las tarjetas pequeñas de resumen se elevan un poco al pasar el cursor; las grandes no se mueven. */
     public static void instalarEfectosTarjeta(Scene escena) {
         escena.addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, evento -> {
             Node tarjeta = tarjetaDe(evento.getTarget());
@@ -317,8 +317,7 @@ public final class Animaciones {
     }
 
     private static Node tarjetaDe(Object objetivo) {
-        if (objetivo instanceof Node nodo && !nodo.getStyleClass().contains("tutorial-card")
-                && (nodo.getStyleClass().contains("card") || nodo.getStyleClass().contains("summary-card"))) {
+        if (objetivo instanceof Node nodo && nodo.getStyleClass().contains("summary-card")) {
             return nodo;
         }
         return null;

@@ -5,15 +5,13 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import ni.edu.uam.algomentor.engine.FichaAlgoritmo;
-import ni.edu.uam.algomentor.util.Animaciones;
 
 import java.util.function.Function;
 
-/** Tabla comparativa de los ordenamientos y, al elegir uno, la descripción de su mecánica. */
+/** Tabla comparativa de los ordenamientos y gráfica de crecimiento de las complejidades. */
 public class GuiaAlgoritmosController {
 
     @FXML private TableView<FichaAlgoritmo> tabla;
@@ -26,9 +24,6 @@ public class GuiaAlgoritmosController {
     @FXML private TableColumn<FichaAlgoritmo, String> colEstable;
     @FXML private TableColumn<FichaAlgoritmo, String> colEnSitio;
     @FXML private LineChart<Number, Number> graficoComplejidad;
-    @FXML private Label lblNombre;
-    @FXML private Label lblMecanica;
-    @FXML private Label lblCuando;
 
     @FXML
     private void initialize() {
@@ -41,8 +36,6 @@ public class GuiaAlgoritmosController {
         columna(colEstable, FichaAlgoritmo::paraEstable);
         columna(colEnSitio, FichaAlgoritmo::paraEnSitio);
         tabla.setItems(FXCollections.observableArrayList(FichaAlgoritmo.todas()));
-        tabla.getSelectionModel().selectedItemProperty().addListener((obs, anterior, ficha) -> mostrar(ficha));
-        tabla.getSelectionModel().selectFirst();
         cargarGrafico();
     }
 
@@ -73,16 +66,5 @@ public class GuiaAlgoritmosController {
 
     private void columna(TableColumn<FichaAlgoritmo, String> columna, Function<FichaAlgoritmo, String> valor) {
         columna.setCellValueFactory(c -> new ReadOnlyStringWrapper(valor.apply(c.getValue())));
-    }
-
-    private void mostrar(FichaAlgoritmo ficha) {
-        if (ficha == null) {
-            return;
-        }
-        lblNombre.setText(ficha.algoritmo().etiqueta());
-        lblMecanica.setText(ficha.mecanica());
-        lblCuando.setText(ficha.cuandoUsarlo());
-        Animaciones.entrar(lblMecanica, 0, 6);
-        Animaciones.entrar(lblCuando, 60, 6);
     }
 }

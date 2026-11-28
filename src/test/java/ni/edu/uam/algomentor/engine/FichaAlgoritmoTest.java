@@ -13,7 +13,6 @@ class FichaAlgoritmoTest {
             FichaAlgoritmo ficha = FichaAlgoritmo.de(algoritmo).orElseThrow(() -> new AssertionError(algoritmo.nombre()));
             assertFalse(ficha.mecanica().isBlank());
             assertFalse(ficha.tecnica().isBlank());
-            assertFalse(ficha.cuandoUsarlo().isBlank());
             assertFalse(ficha.mejor().isBlank() || ficha.promedio().isBlank() || ficha.peor().isBlank());
         }
     }

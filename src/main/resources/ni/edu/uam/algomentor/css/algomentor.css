@@ -162,7 +162,6 @@
 
 .text-field:focused, .text-area:focused {
     -fx-border-color: -ac-accent;
-    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.35), 12, 0.15, 0, 0);
 }
 
 .text-area {
@@ -177,15 +176,6 @@
     -fx-background-color: -ac-field;
     -fx-background-radius: 10;
     -fx-padding: 9 12;
-}
-
-.terminal-salida {
-    -fx-font-family: "Consolas";
-    -fx-font-size: 1.037em;
-}
-
-.terminal-salida .content {
-    -fx-text-fill: #86efac;
 }
 
 /* ---------- ComboBox y Spinner ---------- */
@@ -237,7 +227,7 @@
 }
 
 .combo-box-popup .list-cell:filled:hover {
-    -fx-background-color: rgba(34, 211, 238, 0.14);
+    -fx-background-color: rgba(255, 255, 255, 0.08);
 }
 
 .combo-box-popup .list-cell:filled:selected {
@@ -284,12 +274,12 @@
     -fx-background-color: linear-gradient(to right, #0891b2, #6d28d9);
     -fx-border-color: transparent;
     -fx-text-fill: #ffffff;
-    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.28), 14, 0.1, 0, 3);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 10, 0.1, 0, 3);
 }
 
 .button.primary-button:hover {
     -fx-background-color: linear-gradient(to right, #06b6d4, #7c3aed);
-    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.60), 20, 0.2, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 12, 0.1, 0, 4);
 }
 
 .button.primary-button:pressed {
@@ -427,7 +417,7 @@
 }
 
 .table-row-cell:hover {
-    -fx-background-color: rgba(34, 211, 238, 0.09);
+    -fx-background-color: rgba(255, 255, 255, 0.05);
 }
 
 .table-row-cell:selected {
@@ -543,7 +533,7 @@
     -fx-background-color: linear-gradient(to bottom right, #0891b2, #7c3aed);
     -fx-border-color: rgba(255, 255, 255, 0.35);
     -fx-text-fill: #ffffff;
-    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.65), 20, 0.25, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.30), 10, 0.15, 0, 0);
 }
 
 .valor-pivote {
@@ -1131,9 +1121,8 @@
 
 /* ---------- Efectos adicionales (las animaciones de movimiento están en Animaciones.java) ---------- */
 
-.card:hover, .summary-card:hover {
-    -fx-border-color: rgba(34, 211, 238, 0.55);
-    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.28), 26, 0.15, 0, 10);
+.summary-card:hover {
+    -fx-border-color: #3d4b78;
 }
 
 .summary-value {
@@ -1142,20 +1131,16 @@
 }
 
 .login-card {
-    -fx-effect: dropshadow(gaussian, rgba(139, 92, 246, 0.45), 40, 0.2, 0, 14);
-    -fx-border-color: rgba(34, 211, 238, 0.35);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 30, 0.15, 0, 10);
+    -fx-border-color: -ac-border;
     -fx-border-radius: 14;
-}
-
-.table-row-cell:hover {
-    -fx-background-color: rgba(34, 211, 238, 0.10);
 }
 
 /* ---------- Tutorial guiado ---------- */
 
 .tutorial-card {
     -fx-border-color: -ac-accent;
-    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.45), 30, 0.2, 0, 8);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 24, 0.15, 0, 8);
 }
 
 .tutorial-numero {
@@ -1190,9 +1175,9 @@
 .mecanica-algoritmo {
     -fx-text-fill: -ac-text-soft;
     -fx-padding: 8 12;
-    -fx-background-color: rgba(34, 211, 238, 0.08);
+    -fx-background-color: rgba(255, 255, 255, 0.04);
     -fx-background-radius: 10;
-    -fx-border-color: rgba(34, 211, 238, 0.35);
+    -fx-border-color: -ac-border;
     -fx-border-radius: 10;
 }
 
@@ -1236,7 +1221,6 @@
 
 .barra-activa {
     -fx-background-color: linear-gradient(to bottom, #22d3ee, #0e7490);
-    -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.55), 12, 0.2, 0, 0);
 }
 
 .barra-pivote {
@@ -1302,7 +1286,7 @@
 
 .nodo-nuevo { -fx-fill: #2a3556; }
 .nodo-frontera { -fx-fill: #8b5cf6; }
-.nodo-actual { -fx-fill: #22d3ee; -fx-effect: dropshadow(gaussian, rgba(34, 211, 238, 0.8), 18, 0.3, 0, 0); }
+.nodo-actual { -fx-fill: #22d3ee; }
 .nodo-visitado { -fx-fill: #34d399; }
 
 .nodo-nombre {
@@ -1333,7 +1317,7 @@
 /* ---------- Retos y logros ---------- */
 
 .resumen-reto {
-    -fx-text-fill: -ac-accent;
+    -fx-text-fill: -ac-text;
     -fx-font-size: 1.185em;
     -fx-font-weight: bold;
 }
