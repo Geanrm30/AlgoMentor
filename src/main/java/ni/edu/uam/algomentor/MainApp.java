@@ -104,7 +104,7 @@ public class MainApp extends Application {
     public void start(Stage stage) throws IOException {
         this.stage = stage;
         // El fondo de vidrio muestra lo que hay detrás de la ventana: se captura antes de que esta aparezca.
-        if (leerEntero(CLAVE_FONDO_VIDRIO, 0) == 1) {
+        if (leerEntero(CLAVE_FONDO_VIDRIO, 1) == 1) {
             boolean logrado = FondoVidrio.iniciar(javafx.stage.Screen.getPrimary().getVisualBounds(), temaClaro);
             if (logrado) {
                 FondoVidrio.vigilar(stage);
@@ -442,7 +442,7 @@ public class MainApp extends Application {
         List<BarraLateral.Grupo> grupos = new java.util.ArrayList<>();
         grupos.add(new BarraLateral.Grupo("Mi avance", List.of(
                 nav("progreso", "Mi progreso", "barras", "Ctrl+3", () -> mostrar("progreso", "progreso.fxml", true)),
-                nav("retos", "Retos y logros", "estrella", "Ctrl+Shift+R", () -> mostrar("retos", "retos.fxml", true)))));
+                nav("retos", "Retos", "estrella", "Ctrl+Shift+R", () -> mostrar("retos", "retos.fxml", true)))));
         grupos.add(new BarraLateral.Grupo("Aprender", List.of(
                 nav("simulador", "Simular", "play", "Ctrl+1", () -> mostrar("simulador", "simulador.fxml", false)),
                 nav("practica", "Práctica", "lapiz", "Ctrl+2", () -> mostrar("practica", "practica.fxml", true)),
@@ -620,44 +620,29 @@ public class MainApp extends Application {
         List<Tutorial.Paso> pasos = new java.util.ArrayList<>();
         pasos.add(new Tutorial.Paso("Bienvenido a AlgoMentor",
                 "Aprende algoritmos viéndolos paso a paso, practica con corrección automática y sigue tu progreso. "
-                        + "Este recorrido dura un minuto. Usa Siguiente, o las flechas del teclado; Esc lo cierra.",
+                        + "Usa Siguiente o las flechas del teclado; Esc cierra el recorrido.",
                 () -> barraMenus));
-        pasos.add(new Tutorial.Paso("Menús y atajos",
-                "Las secciones están en la barra lateral: el indicador te muestra dónde estás y el botón de las tres "
-                        + "rayas la contrae. Los atajos Ctrl+1 a Ctrl+8 abren las secciones y Ctrl+T cambia el tema.",
+        pasos.add(new Tutorial.Paso("La barra lateral",
+                "Aquí están todas las secciones: simulador, práctica, guía de algoritmos, búsquedas y grafos, comparador, "
+                        + "biblioteca y retos. El indicador muestra dónde estás, el botón de las tres rayas la contrae y los "
+                        + "atajos Ctrl+1 a Ctrl+8 abren las secciones principales.",
                 () -> barraLateral));
-        pasos.add(new Tutorial.Paso("Simulador: configura la entrada",
+        pasos.add(new Tutorial.Paso("Simulador",
                 "Elige un algoritmo, escribe números separados por coma (o pulsa Generar entrada) y presiona Simular. "
-                        + "Debajo aparece una descripción de cómo ordena ese método.",
-                () -> tarjeta(0), () -> mostrar("simulador", "simulador.fxml", false)));
-        pasos.add(new Tutorial.Paso("Simulador: recorre los pasos",
-                "Con Siguiente y Anterior avanzas o retrocedes, o pulsa Reproducir para verlo solo y elige la velocidad. "
-                        + "Puedes ver el arreglo como barras y, más abajo, el pseudocódigo con la línea que se ejecuta.",
-                () -> tarjeta(1)));
-        pasos.add(new Tutorial.Paso("Guía de algoritmos",
-                "Una tabla compara los trece métodos de ordenamiento: técnica, mejor, promedio y peor caso, memoria "
-                        + "extra y estabilidad. Abajo hay una gráfica del "
-                        + "crecimiento de cada complejidad. Búsquedas, grafos y recursividad están en Aprender.",
-                () -> tarjeta(0), () -> mostrar("guia", "guia-algoritmos.fxml", false)));
-        pasos.add(new Tutorial.Paso("Práctica",
-                "Elige un ejercicio y escribe tu respuesta. AlgoMentor la corrige, detecta el tipo de error (signos, "
-                        + "fracciones, aritmética o procedimiento) y lo suma a tu progreso.",
-                () -> tarjeta(0), () -> mostrar("practica", "practica.fxml", true)));
-        pasos.add(new Tutorial.Paso("Comparar algoritmos",
-                "Escribe una lista de números y compara cuántas comparaciones, intercambios y escrituras hace cada "
-                        + "método con esos mismos datos.",
-                () -> contenido, () -> mostrar("comparador", "comparador.fxml", false)));
-        pasos.add(new Tutorial.Paso("Mi progreso",
-                "Aquí ves tus aciertos, tu racha, el avance por habilidad y el historial. Puedes exportar un informe "
-                        + "en PDF desde Archivo.",
+                        + "Recorre los pasos con Siguiente y Anterior o con Reproducir, que tiene varias velocidades. Puedes ver "
+                        + "el arreglo como barras y, al costado, el pseudocódigo con la línea que se ejecuta.",
+                () -> contenido, () -> mostrar("simulador", "simulador.fxml", false)));
+        pasos.add(new Tutorial.Paso("Práctica y retos",
+                "En Práctica escribes tu respuesta y AlgoMentor la corrige y detecta tus errores; si te atascas, el modo "
+                        + "tutor da pistas sin revelar la solución. En Retos hay un desafío de 60 segundos y un cuestionario teórico.",
+                () -> contenido, () -> mostrar("practica", "practica.fxml", true)));
+        pasos.add(new Tutorial.Paso("Mi progreso y logros",
+                "Aquí ves tus aciertos, tu racha y el avance por habilidad. En la pestaña Logros se desbloquean las "
+                        + "insignias, y desde Archivo puedes exportar un informe en PDF.",
                 () -> contenido, () -> mostrar("progreso", "progreso.fxml", true)));
-        pasos.add(new Tutorial.Paso("Retos y logros",
-                "Pon a prueba lo aprendido con un desafío de 60 segundos y un cuestionario teórico, y mira los "
-                        + "logros que vas desbloqueando. En Práctica, el modo tutor te da pistas sin revelar la respuesta.",
-                () -> contenido, () -> mostrar("retos", "retos.fxml", true)));
         pasos.add(new Tutorial.Paso("Ajustes y ayuda",
-                "En Ver puedes cambiar el tema, el tamaño de letra y activar el alto contraste. Este recorrido se repite "
-                        + "desde Ayuda, Tutorial de uso (F1).",
+                "En Ver puedes cambiar el tema, el fondo, el tamaño de letra y activar el alto contraste. Este recorrido se "
+                        + "repite desde Ayuda, Tutorial de uso (F1).",
                 () -> nodoMenu("Ayuda")));
         tutorial = new Tutorial(envoltura, pasos, () -> guardarTutorialVisto(true));
         tutorial.iniciar();

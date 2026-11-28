@@ -37,6 +37,7 @@ import ni.edu.uam.algomentor.util.Fondo;
 import ni.edu.uam.algomentor.util.FondoVidrio;
 import ni.edu.uam.algomentor.util.VidrioEsmerilado;
 import ni.edu.uam.algomentor.util.FormularioLiquido;
+import ni.edu.uam.algomentor.util.Iconos;
 import ni.edu.uam.algomentor.util.LogoMarca;
 import ni.edu.uam.algomentor.util.MostrarContrasena;
 import ni.edu.uam.algomentor.util.TarjetaCristal;
@@ -61,6 +62,8 @@ public class LoginController {
     private static final double ALTO_CAMPO = 54;
     private static final double LADO_MOSAICO = 150;
     private static final long MINIMO_GIRO_MS = 800;
+    private static final String TEXTO_INICIO = "Tu cuenta tiene un perfil propio y privado.";
+    private static final String TEXTO_REGISTRO = "Usuario de 3 a 40 caracteres y contraseña de al menos 8.";
     /** Rebote con sobreimpulso: sale rápido, se pasa un poco y se asienta. */
     private static final Interpolator REBOTE = new Interpolator() {
         @Override
@@ -95,6 +98,10 @@ public class LoginController {
     private FormularioLiquido formulario;
     private List<Region> filasInicio;
     private List<Region> filasRegistro;
+    private List<CampoFlotante> camposInicio = List.of();
+    private List<CampoFlotante> camposRegistro = List.of();
+    private List<CampoFlotante> camposConError = List.of();
+    private boolean hayError;
     private String recordado;
     private boolean registro;
     private boolean ocupado;
@@ -169,6 +176,7 @@ public class LoginController {
         txtContrasena.setOnAction(evento -> enviar());
         MostrarContrasena.vincular(chkMostrarContrasena, txtContrasena);
         filasInicio = List.of(cUsuario, cContrasena, extras(62, chkMostrarContrasena, chkRecordarUsuario));
+        camposInicio = List.of(cUsuario, cContrasena);
 
         double mitad = (ANCHO - 10) / 2;
         CampoFlotante cNuevo = new CampoFlotante("Usuario (3 a 40 caracteres)", txtNuevoUsuario, ANCHO, ALTO_CAMPO);
@@ -181,6 +189,11 @@ public class LoginController {
         HBox dobles = new HBox(10, cNueva, cConfirmar);
         fijarTamano(dobles, ANCHO, ALTO_CAMPO);
         filasRegistro = List.of(cNuevo, dobles, extras(30, chkMostrarNuevaContrasena));
+        camposRegistro = List.of(cNuevo, cNueva, cConfirmar);
+        // En cuanto el usuario vuelve a escribir, el aviso de error desaparece.
+        for (var campo : List.of(txtUsuario, txtContrasena, txtNuevoUsuario, txtNuevaContrasena, txtConfirmarContrasena)) {
+            campo.textProperty().addListener((obs, antes, ahora) -> limpiarError());
+        }
     }
 
     private static VBox extras(double alto, CheckBox... casillas) {
@@ -213,8 +226,8 @@ public class LoginController {
         lblSubtitulo.setText(registro ? "Guarda tu progreso con un perfil propio y privado."
                 : "Ingresa tus credenciales para acceder a tu espacio de aprendizaje.");
         btnModo.setText(registro ? "¿Ya tienes cuenta? Iniciar sesión" : "¿Primera vez? Crear una cuenta");
-        lblEstado.setText(registro ? "Usuario de 3 a 40 caracteres y contraseña de al menos 8."
-                : "Tu cuenta tiene un perfil propio y privado.");
+        limpiarError();
+        lblEstado.setText(registro ? TEXTO_REGISTRO : TEXTO_INICIO);
     }
 
     // ---------- Flujo principal ----------
@@ -277,7 +290,7 @@ public class LoginController {
         char[] contrasena = txtNuevaContrasena.getText().toCharArray();
         char[] confirmacion = txtConfirmarContrasena.getText().toCharArray();
         if (!Arrays.equals(contrasena, confirmacion)) {
-            lblEstado.setText("Las contraseñas no coinciden.");
+            mostrarError("Las contraseñas no coinciden.", List.of(camposRegistro.get(1), camposRegistro.get(2)));
             Animaciones.sacudir(tarjeta);
             Arrays.fill(contrasena, '\0');
             Arrays.fill(confirmacion, '\0');
@@ -297,6 +310,7 @@ public class LoginController {
 
     private void ejecutarAutenticacion(String mensajeInicial, AccionAutenticacion accion) {
         ocupado = true;
+        limpiarError();
         lblEstado.setText(mensajeInicial);
         boolean[] animacionLista = {false};
         Runnable[] resultado = {null};
@@ -355,10 +369,36 @@ public class LoginController {
 
     private void fallo(String mensaje) {
         ocupado = false;
-        lblEstado.setText(mensaje);
+        mostrarError(mensaje, registro ? camposRegistro : camposInicio);
         Animaciones.sacudir(tarjeta);
         formulario.pastillaNormal(textoAbierto());
+        formulario.destacarError();
         formulario.abrir(this::enfocarInicial);
+    }
+
+    /** El mensaje sale en rojo con un ícono y los campos implicados se marcan con borde rojo. */
+    private void mostrarError(String mensaje, List<CampoFlotante> campos) {
+        limpiarError();
+        hayError = true;
+        lblEstado.setText(mensaje);
+        lblEstado.setGraphic(Iconos.crear("cerrar"));
+        lblEstado.setGraphicTextGap(8);
+        lblEstado.getStyleClass().add("login-estado-error");
+        camposConError = campos;
+        campos.forEach(campo -> campo.getStyleClass().add("campo-error"));
+        Animaciones.entrar(lblEstado, 0, 8);
+    }
+
+    private void limpiarError() {
+        if (!hayError) {
+            return;
+        }
+        hayError = false;
+        lblEstado.getStyleClass().remove("login-estado-error");
+        lblEstado.setGraphic(null);
+        camposConError.forEach(campo -> campo.getStyleClass().remove("campo-error"));
+        camposConError = List.of();
+        lblEstado.setText(registro ? TEXTO_REGISTRO : TEXTO_INICIO);
     }
 
     // ---------- Cambio de modo con transición de la tarjeta ----------

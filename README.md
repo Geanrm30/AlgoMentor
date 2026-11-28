@@ -59,7 +59,7 @@ mediante Hibernate.
 | Guía de algoritmos | Tabla que compara los trece ordenamientos (técnica, mejor, promedio y peor caso, memoria extra, estabilidad) y explica cómo ordena cada uno. |
 | Reproducción | Reproducción automática con cuatro velocidades, vista del arreglo como barras y pseudocódigo con la línea del paso actual resaltada. |
 | Búsqueda, grafos y recursividad | Búsqueda lineal y binaria, recorridos BFS y DFS, Dijkstra, Fibonacci con memorización y Torres de Hanoi, con grafo y torres dibujados paso a paso. |
-| Retos | Desafío de 60 segundos (predecir el arreglo tras un número de cambios), cuestionario teórico de 10 preguntas generadas al azar y 12 logros. |
+| Retos | Desafío de 60 segundos (predecir el arreglo tras un número de cambios), cuestionario teórico de 10 preguntas generadas al azar. Los 12 logros están en la pestaña Logros de Mi progreso. |
 | Modo tutor | En Práctica, hasta tres pistas escalonadas que no revelan la respuesta y un consejo según tu error más frecuente. |
 | Accesibilidad | Tamaño de letra (cuatro niveles) y alto contraste en el menú Ver; se recuerdan entre ejecuciones. |
 | Tutorial | Recorrido guiado que ilumina cada parte de la interfaz; se muestra la primera vez y se repite desde Ayuda, Tutorial de uso (F1). |
@@ -194,7 +194,7 @@ a solo íconos (se recuerda entre ejecuciones) y, contraída, cada ícono muestr
 
 | Grupo de la barra lateral | Secciones |
 |---|---|
-| **Mi avance** | Mi progreso y Retos y logros. |
+| **Mi avance** | Mi progreso (con la pestaña Logros) y Retos. |
 | **Aprender** | Simular, Práctica, Guía de algoritmos y Búsqueda y grafos. |
 | **Herramientas** | Comparar, Comprobar sistema (math.js) y Biblioteca. |
 | **Administración** | Resumen general e Informes. Solo aparece para cuentas administradoras. |
@@ -228,7 +228,7 @@ Atajos de teclado (en macOS, `Cmd` en lugar de `Ctrl`):
 | `Ctrl+3` | Mi progreso | `Ctrl+E` | Exportar informe PDF |
 | `Ctrl+8` | Guía de algoritmos | `Ctrl+Shift+E` / `Ctrl+I` | Exportar / importar ejercicios |
 | `Ctrl+9` | Informes (administradores) | `Ctrl+Shift+8` | Búsqueda, grafos y recursividad |
-| `Ctrl+Shift+R` | Retos y logros | `F1` | Tutorial de uso |
+| `Ctrl+Shift+R` | Retos | `F1` | Tutorial de uso |
 | `Ctrl+T` | Tema claro u oscuro | `Ctrl+Shift+L` / `Ctrl+Q` | Cerrar sesión / salir |
 | `Ctrl+Shift+P` | Cambiar contraseña | | |
 | `F11` | Pantalla completa | | |
@@ -484,6 +484,13 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
   diálogos, en versión oscura y clara. Detrás de todo hay un fondo de malla de gradiente (`Fondo`: manchas de color
   difuminadas y, en el oscuro, partículas tenues), que en la aplicación es estático y se guarda en caché para no
   gastar procesador. `Tema` aplica la misma hoja de estilos a los cuadros de alerta.
+- **Fondo de vidrio:** en Ver, Fondo se puede elegir entre la malla de color y el vidrio. Con el vidrio, `FondoVidrio`
+  captura lo que hay detrás de la ventana (el escritorio, IntelliJ...) justo antes de mostrarla, lo desenfoca y lo
+  usa de fondo, y `VidrioEsmerilado` pone en cada panel una copia aún más desenfocada, alineada con su posición, de
+  modo que se ve como vidrio esmerilado. El tinte se adapta a la luminosidad de la captura (un IDE oscuro no queda
+  negro). La captura se repite, ocultando la ventana un instante, al dejar de moverla o redimensionarla y desde
+  Ver, Fondo, Actualizar. Si no se puede capturar (por ejemplo, sin permiso de grabación de pantalla en macOS), se
+  usa la malla de color. Es una captura, no un desenfoque en vivo del sistema operativo.
 - **Barra lateral:** `BarraLateral` construye la navegación con íconos vectoriales (`Iconos`, formas SVG en el CSS) y
   un indicador que se desliza con la animación de la sección elegida. Los atajos de teclado se registran en la
   escena, de modo que siguen funcionando sin menús.
@@ -508,6 +515,8 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
   vuelven a salir y la tarjeta se sacude. Cambiar entre iniciar sesión y crear cuenta encoge la tarjeta a un
   mosaico con el logo de AlgoMentor (`LogoMarca`) y un anillo de luz, y la expande con el otro formulario, que
   pone contraseña y confirmación en dos columnas. Con un usuario recordado, la pastilla dice "Continuar como ...".
+  Si falla el inicio de sesión, el aviso sale en rojo con un ícono, los campos se marcan con borde rojo, la pastilla
+  parpadea en rojo y todo se limpia en cuanto el usuario vuelve a escribir.
   La parte superior de la tarjeta queda anclada, de modo que crece hacia abajo sin saltar, y el cuello líquido solo
   puentea los huecos entre campos, nunca cruza uno.
 - **Del login a la aplicación:** el login se disuelve con un leve acercamiento mientras la aplicación aparece debajo,
@@ -523,13 +532,16 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
 - **Grafos y recursividad:** `AlgoritmosExtra` produce pasos con un `EstadoVisual` (celdas, grafo o torres) que
   la vista dibuja; el grafo de ejemplo es fijo (`GrafoEjemplo`) y los recorridos son deterministas.
 - **Retos y logros:** `DesafioService`, `CuestionarioService` y `LogrosService` son lógica pura con pruebas. Los
-  mejores puntajes se guardan en las preferencias del equipo (`PuntajesLocales`), no en PostgreSQL; los logros
-  de práctica se calculan con las estadísticas ya existentes.
+  mejores puntajes se guardan en las preferencias del equipo (`PuntajesLocales`), no en PostgreSQL. Los logros se
+  muestran en la pestaña Logros de Mi progreso y se calculan con las estadísticas que esa pantalla ya carga, sin
+  consultas extra; solo se ven en el perfil propio.
+- **Simulador en dos columnas:** con la ventana ancha, el pseudocódigo va a un costado del estado del algoritmo; con
+  la ventana angosta pasa debajo (`SimuladorController.acomodarPseudocodigo`).
 - **Accesibilidad:** las fuentes del CSS usan `em`, de modo que cambiar el tamaño base escala toda la
   interfaz; el alto contraste redefine la paleta con la clase `alto-contraste`.
 - **Tutorial:** `Tutorial` oscurece la ventana, ilumina un elemento a la vez con un hueco animado y
   coloca una tarjeta explicativa al lado (Siguiente, Anterior, Omitir; también flechas y Esc). Se muestra
-  la primera vez y se repite desde Ayuda. Está inspirado en el recorrido de la calculadora de matrices.
+  la primera vez y se repite desde Ayuda. Son seis pasos. Está inspirado en el recorrido de la calculadora de matrices.
 - **Progreso:** las barras por habilidad se animan hasta su porcentaje y no se reinician al reutilizar celdas de la tabla.
 
 ---
@@ -792,6 +804,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Comparador | `ComparadorOrdenamientosTest` |
 | Barra lateral y efectos de botón | `EfectosBotonTest`, `InterfazLateralIT` |
 | Inicio de sesión animado | `FormularioLiquidoTest`, `LoginLiquidoIT` |
+| Fondo de vidrio | `FondoVidrioTest` |
 | Estadísticas | `EstadisticasDAOTest` |
 | Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `ReporteMapaCalorTemplateTest`, `ReporteMapaCalorServiceTest`, `MapaCalorErroresDAOTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |

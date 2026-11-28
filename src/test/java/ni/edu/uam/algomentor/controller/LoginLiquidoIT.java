@@ -104,6 +104,35 @@ class LoginLiquidoIT {
         });
     }
 
+    @Test void unErrorSeMuestraEnRojoYDesapareceAlEscribir() throws Exception {
+        Vista vista = cargar();
+        enHiloFx(() -> {
+            Label estado = campo(vista.controlador(), "lblEstado");
+            String normal = estado.getText();
+            assertFalse(estado.getStyleClass().contains("login-estado-error"));
+            var metodo = LoginController.class.getDeclaredMethod("fallo", String.class);
+            metodo.setAccessible(true);
+            metodo.invoke(vista.controlador(), "Usuario o contraseña incorrectos.");
+            assertEquals("Usuario o contraseña incorrectos.", estado.getText());
+            assertTrue(estado.getStyleClass().contains("login-estado-error"));
+            assertNotNull(estado.getGraphic(), "El aviso lleva un ícono");
+            java.util.List<?> campos = campo(vista.controlador(), "camposInicio");
+            assertEquals(2, campos.size());
+            for (Object c : campos) {
+                assertTrue(((javafx.scene.Node) c).getStyleClass().contains("campo-error"));
+            }
+            javafx.scene.control.TextField usuario = campo(vista.controlador(), "txtUsuario");
+            usuario.setText("otro");
+            assertFalse(estado.getStyleClass().contains("login-estado-error"), "Al escribir, el error se limpia");
+            assertNull(estado.getGraphic());
+            assertEquals(normal, estado.getText());
+            for (Object c : campos) {
+                assertFalse(((javafx.scene.Node) c).getStyleClass().contains("campo-error"));
+            }
+            return null;
+        });
+    }
+
     @Test void cambiarDeModoMuestraElRegistroYDejaLaTarjetaLibre() throws Exception {
         Vista vista = cargar();
         enHiloFx(() -> {

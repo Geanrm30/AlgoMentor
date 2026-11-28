@@ -286,6 +286,15 @@ public final class FormularioLiquido extends Pane {
         });
     }
 
+    /** La pastilla se pone roja un instante para indicar que algo salió mal. */
+    public void destacarError() {
+        pastilla.getStyleClass().remove("pastilla-error");
+        pastilla.getStyleClass().add("pastilla-error");
+        PauseTransition quitar = new PauseTransition(Duration.millis(1400));
+        quitar.setOnFinished(evento -> pastilla.getStyleClass().remove("pastilla-error"));
+        quitar.play();
+    }
+
     /** Vuelve la pastilla a su forma normal con el texto dado. */
     public void pastillaNormal(String texto) {
         detenerGiro();

@@ -9,26 +9,20 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-import ni.edu.uam.algomentor.dao.EstadisticasDAO;
 import ni.edu.uam.algomentor.service.CuestionarioService;
 import ni.edu.uam.algomentor.service.DesafioService;
-import ni.edu.uam.algomentor.service.LogrosService;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.EfectosBoton;
 import ni.edu.uam.algomentor.util.PuntajesLocales;
 import ni.edu.uam.algomentor.util.SesionUsuario;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /** Desafío cronometrado, cuestionario teórico y logros del perfil. */
 public class RetosController {
 
-    private static final Logger LOG = Logger.getLogger(RetosController.class.getName());
     private static final int PREGUNTAS = 10;
 
     // Desafío
@@ -51,9 +45,6 @@ public class RetosController {
     @FXML private VBox panelOpciones;
     @FXML private Label lblRetroCuestionario;
     @FXML private Button btnSiguientePregunta;
-    // Logros
-    @FXML private Label lblResumenLogros;
-    @FXML private FlowPane panelLogros;
 
     private DesafioService partida;
     private DesafioService.Pregunta preguntaActual;
@@ -79,7 +70,6 @@ public class RetosController {
                 detenerReloj();
             }
         });
-        cargarLogros();
     }
 
     // ---------- Desafío ----------
@@ -150,7 +140,6 @@ public class RetosController {
                 + partida.mejorRacha() + (record ? "\n¡Nuevo récord personal!" : ""),
                 record ? Animaciones.Estado.CORRECTO : Animaciones.Estado.NEUTRO);
         lblMejorDesafio.setText("Tu mejor puntaje: " + PuntajesLocales.mejorDesafio(perfilId));
-        cargarLogros();
     }
 
     private void detenerReloj() {
@@ -242,61 +231,5 @@ public class RetosController {
                 aciertosCuestionario >= 7 ? Animaciones.Estado.CORRECTO : Animaciones.Estado.NEUTRO);
         lblMejorCuestionario.setText("Tu mejor resultado: " + PuntajesLocales.mejorCuestionario(perfilId) + " de " + PREGUNTAS);
         btnIniciarCuestionario.setText("Jugar de nuevo");
-        cargarLogros();
-    }
-
-    // ---------- Logros ----------
-
-    @FXML
-    private void cargarLogros() {
-        Thread hilo = new Thread(() -> {
-            long intentos = 0, correctos = 0, incorrectos = 0;
-            int racha = 0, dominados = 0;
-            boolean conBase = true;
-            try {
-                EstadisticasDAO dao = new EstadisticasDAO();
-                var resumen = dao.obtenerResumenIntentos(perfilId);
-                intentos = resumen.total();
-                correctos = resumen.correctos();
-                incorrectos = resumen.incorrectos();
-                racha = LogrosService.rachaMaxima(dao.listarIntentosRecientes(perfilId, 200));
-                dominados = LogrosService.algoritmosDominados(dao.listarRendimientoPorAlgoritmo(perfilId));
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "No se pudieron leer las estadísticas para los logros", e);
-                conBase = false;
-            }
-            var datos = new LogrosService.Datos(intentos, correctos, incorrectos, racha, dominados,
-                    PuntajesLocales.mejorDesafio(perfilId), PuntajesLocales.mejorCuestionario(perfilId));
-            boolean disponible = conBase;
-            Platform.runLater(() -> mostrarLogros(LogrosService.evaluar(datos), disponible));
-        }, "algomentor-logros");
-        hilo.setDaemon(true);
-        hilo.start();
-    }
-
-    private void mostrarLogros(List<LogrosService.Logro> logros, boolean conBase) {
-        panelLogros.getChildren().clear();
-        long conseguidos = logros.stream().filter(LogrosService.Logro::desbloqueado).count();
-        lblResumenLogros.setText(conseguidos + " de " + logros.size() + " logros desbloqueados."
-                + (conBase ? "" : " No se pudo leer tu historial de práctica; revisa PostgreSQL."));
-        for (LogrosService.Logro logro : logros) {
-            VBox tarjeta = new VBox(6);
-            tarjeta.getStyleClass().addAll("card", "logro", logro.desbloqueado() ? "logro-ok" : "logro-bloqueado");
-            tarjeta.setPrefWidth(250);
-            Label titulo = new Label((logro.desbloqueado() ? "★ " : "") + logro.titulo());
-            titulo.getStyleClass().add("section-title");
-            Label descripcion = new Label(logro.descripcion());
-            descripcion.setWrapText(true);
-            ProgressBar barra = new ProgressBar(logro.progreso());
-            barra.setMaxWidth(Double.MAX_VALUE);
-            Label detalle = new Label(logro.desbloqueado() ? "¡Desbloqueado!" : logro.detalle());
-            detalle.getStyleClass().add("subtitle");
-            tarjeta.getChildren().addAll(titulo, descripcion, barra, detalle);
-            panelLogros.getChildren().add(tarjeta);
-        }
-        if (ni.edu.uam.algomentor.util.FondoVidrio.hayCaptura()) {
-            Platform.runLater(() -> ni.edu.uam.algomentor.util.VidrioEsmerilado.decorar(panelLogros));
-        }
-        Animaciones.entrarEscalonado(panelLogros.getChildren(), 16);
     }
 }

@@ -143,6 +143,18 @@
                     </TableView>
                 </content>
             </Tab>
+            <Tab fx:id="tabLogros" text="Logros" closable="false">
+                <content>
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                        <content>
+                            <VBox spacing="14" styleClass="tab-content">
+                                <Label fx:id="lblResumenLogros" text="Tus logros aparecen aquí cuando se carga tu historial." wrapText="true" styleClass="subtitle" />
+                                <FlowPane fx:id="panelLogros" hgap="14" vgap="14" />
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </content>
+            </Tab>
             <Tab text="Historial" closable="false">
                 <content>
                     <TableView fx:id="tablaHistorial">

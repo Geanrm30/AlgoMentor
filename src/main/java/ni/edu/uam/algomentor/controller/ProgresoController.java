@@ -97,6 +97,9 @@ public class ProgresoController implements Actualizable {
     @FXML private VBox panelVacio;
     @FXML private Label lblBienvenida;
     @FXML private Label lblSaludo;
+    @FXML private javafx.scene.control.Tab tabLogros;
+    @FXML private Label lblResumenLogros;
+    @FXML private javafx.scene.layout.FlowPane panelLogros;
     @FXML private Button btnVistaPrevia;
     @FXML private ComboBox<Algoritmo> cmbAlgoritmoDominio;
     @FXML private Button btnGenerarConstancia;
@@ -354,6 +357,7 @@ public class ProgresoController implements Actualizable {
                 tablaHistorial.setItems(FXCollections.observableArrayList(
                         recientes.subList(0, Math.min(INTENTOS_EN_HISTORIAL, recientes.size()))));
                 actualizarTarjetas(resumen, recientes, duracionPromedio);
+                actualizarLogros(resumen, recientes, rendimiento, perfil.getId(), propio);
                 actualizarEstadoVacio(resumen.total() == 0, propio, perfil.getNombre());
                 lblResumen.setText("Última actualización: " + LocalTime.now().format(FORMATO_HORA)
                         + (resumen.sinCalificar() > 0
@@ -422,6 +426,29 @@ public class ProgresoController implements Actualizable {
         lblRacha.setText(Integer.toString(EstadisticasDAO.rachaActual(recientes)));
         lblTiempoPromedio.setText(duracionPromedio.isPresent()
                 ? String.format("%.0f s", duracionPromedio.getAsDouble()) : "—");
+    }
+
+    /**
+     * Los logros se calculan con las estadísticas que ya se cargaron, más los mejores puntajes de los retos, que se
+     * guardan en este equipo por perfil. Para el perfil de otra persona (vista de administrador) no se muestran.
+     */
+    private void actualizarLogros(EstadisticasDAO.ResumenIntentos resumen,
+                                  List<EstadisticasDAO.IntentoReciente> recientes,
+                                  List<EstadisticasDAO.RendimientoAlgoritmo> rendimiento,
+                                  Long perfilId, boolean propio) {
+        tabLogros.setDisable(!propio);
+        if (!propio) {
+            lblResumenLogros.setText("Los logros solo se muestran en tu propio perfil.");
+            panelLogros.getChildren().clear();
+            return;
+        }
+        var datos = new ni.edu.uam.algomentor.service.LogrosService.Datos(resumen.total(), resumen.correctos(),
+                resumen.incorrectos(), ni.edu.uam.algomentor.service.LogrosService.rachaMaxima(recientes),
+                ni.edu.uam.algomentor.service.LogrosService.algoritmosDominados(rendimiento),
+                ni.edu.uam.algomentor.util.PuntajesLocales.mejorDesafio(perfilId),
+                ni.edu.uam.algomentor.util.PuntajesLocales.mejorCuestionario(perfilId));
+        ni.edu.uam.algomentor.util.PanelLogros.llenar(panelLogros, lblResumenLogros,
+                ni.edu.uam.algomentor.service.LogrosService.evaluar(datos), true);
     }
 
     private void actualizarGraficoErrores(List<EstadisticasDAO.ErrorPorTipo> errores) {

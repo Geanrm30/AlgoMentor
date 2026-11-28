@@ -1686,3 +1686,33 @@
 .button.enlace-login:hover { -fx-background-color: transparent; -fx-text-fill: -ac-text; -fx-underline: true; }
 .app-root.light-theme .button.enlace-login { -fx-background-color: transparent; -fx-text-fill: #475569; }
 .app-root.light-theme .button.enlace-login:hover { -fx-text-fill: #0f172a; }
+
+/* ---------- Errores del inicio de sesión ---------- */
+
+.campo-login.campo-error, .campo-login.campo-error:focus-within {
+    -fx-border-color: #f87171;
+    -fx-border-width: 1.6;
+    -fx-background-color: rgba(248, 113, 113, 0.09);
+    -fx-effect: dropshadow(gaussian, rgba(248, 113, 113, 0.38), 14, 0.1, 0, 0);
+}
+.campo-login.campo-error .campo-login-etiqueta { -fx-text-fill: #fca5a5; }
+.label.login-estado-error {
+    -fx-text-fill: #fecaca;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(248, 113, 113, 0.14);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(248, 113, 113, 0.55);
+    -fx-border-radius: 12;
+    -fx-padding: 9 14;
+}
+.login-estado-error .ico { -fx-background-color: #f87171; -fx-min-width: 14; -fx-pref-width: 14; -fx-max-width: 14; -fx-min-height: 14; -fx-pref-height: 14; -fx-max-height: 14; }
+.button.pastilla-error { -fx-background-color: linear-gradient(to bottom, #fca5a5, #ef4444); -fx-text-fill: #450a0a; }
+.button.pastilla-error:hover { -fx-background-color: linear-gradient(to bottom, #fca5a5, #ef4444); }
+.app-root.light-theme .campo-login.campo-error, .app-root.light-theme .campo-login.campo-error:focus-within {
+    -fx-border-color: #dc2626;
+    -fx-background-color: rgba(254, 226, 226, 0.85);
+}
+.app-root.light-theme .campo-login.campo-error .campo-login-etiqueta { -fx-text-fill: #b91c1c; }
+.app-root.light-theme .label.login-estado-error { -fx-text-fill: #991b1b; -fx-background-color: rgba(254, 226, 226, 0.9); -fx-border-color: #dc2626; }
+.app-root.light-theme .login-estado-error .ico { -fx-background-color: #dc2626; }
+.app-root.light-theme .button.pastilla-error { -fx-background-color: linear-gradient(to bottom, #ef4444, #b91c1c); -fx-text-fill: #ffffff; }

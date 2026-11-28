@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -41,6 +42,7 @@ public final class FondoVidrio {
     private static final ObjectProperty<Image> BORROSA = new SimpleObjectProperty<>();
     private static final BooleanProperty ACTIVO = new SimpleBooleanProperty(false);
     private static Image captura;
+    private static double luminosidad = 0.4;
     private static boolean claro;
     private static boolean permitido;
     private static PauseTransition espera;
@@ -71,6 +73,28 @@ public final class FondoVidrio {
         return suma / argb.length < 2 || maximo - minimo < 3;
     }
 
+    /** Luminosidad media de 0 (negro) a 1 (blanco) de una muestra de píxeles ARGB. */
+    public static double luminanciaMedia(int[] argb) {
+        if (argb == null || argb.length == 0) {
+            return 0;
+        }
+        double suma = 0;
+        for (int pixel : argb) {
+            suma += (0.2126 * ((pixel >> 16) & 0xFF) + 0.7152 * ((pixel >> 8) & 0xFF) + 0.0722 * (pixel & 0xFF)) / 255.0;
+        }
+        return suma / argb.length;
+    }
+
+    /**
+     * Opacidad del tinte que se pone encima de la captura para que el texto se lea. Un fondo oscuro necesita poco tinte
+     * (si no, queda negro y no se nota el vidrio); uno claro necesita más. {@code base} es el tinte con luminosidad media.
+     */
+    public static double opacidadTinte(double luminosidad, boolean temaClaro, double base) {
+        double l = Math.max(0, Math.min(1, luminosidad));
+        double opacidad = temaClaro ? base + 0.20 * (0.5 - l) : base * (0.35 + 1.3 * l);
+        return Math.max(temaClaro ? 0.32 : 0.10, Math.min(temaClaro ? 0.70 : 0.62, opacidad));
+    }
+
     // ---------- Captura ----------
 
     /** Toma lo que hay en {@code area} de la pantalla. Debe llamarse en el hilo de JavaFX con la ventana oculta. */
@@ -88,7 +112,12 @@ public final class FondoVidrio {
                     muestra[k++] = lector.getArgb(x, y);
                 }
             }
-            return pareceVacia(java.util.Arrays.copyOf(muestra, k)) ? null : imagen;
+            int[] util = java.util.Arrays.copyOf(muestra, k);
+            if (pareceVacia(util)) {
+                return null;
+            }
+            luminosidad = luminanciaMedia(util);
+            return imagen;
         } catch (RuntimeException e) {
             LOG.log(Level.WARNING, "No se pudo capturar lo que hay detrás de la ventana", e);
             return null;
@@ -134,7 +163,12 @@ public final class FondoVidrio {
 
     /** Vuelve a capturar cuando la ventana deja de moverse o cambiar de tamaño. */
     public static void vigilar(Stage ventana) {
+        boolean[] atento = {false};
         Runnable programar = () -> {
+            // Al abrir, la ventana cambia de posición y tamaño varias veces: eso no cuenta.
+            if (!atento[0]) {
+                return;
+            }
             if (!permitido) {
                 return;
             }
@@ -145,6 +179,13 @@ public final class FondoVidrio {
             espera.setOnFinished(evento -> recapturar(ventana, null));
             espera.play();
         };
+        ventana.showingProperty().addListener((obs, antes, ahora) -> {
+            if (ahora) {
+                PauseTransition arranque = new PauseTransition(Duration.millis(3000));
+                arranque.setOnFinished(evento -> atento[0] = true);
+                arranque.play();
+            }
+        });
         ventana.xProperty().addListener((obs, a, b) -> programar.run());
         ventana.yProperty().addListener((obs, a, b) -> programar.run());
         ventana.widthProperty().addListener((obs, a, b) -> programar.run());
@@ -202,16 +243,20 @@ public final class FondoVidrio {
     private static void aplicar(Image tomada) {
         captura = tomada;
         ultimaCaptura = System.currentTimeMillis();
-        NITIDA.set(procesar(tomada, 5, claro ? Color.rgb(255, 255, 255, 0.50) : Color.rgb(8, 10, 16, 0.50), null));
-        BORROSA.set(procesar(tomada, 13, claro ? Color.rgb(255, 255, 255, 0.46) : Color.rgb(8, 10, 16, 0.34),
-                claro ? Color.rgb(255, 255, 255, 0.10) : Color.rgb(255, 255, 255, 0.07)));
+        double fondo = opacidadTinte(luminosidad, claro, claro ? 0.50 : 0.52);
+        double panel = opacidadTinte(luminosidad, claro, claro ? 0.46 : 0.36);
+        // Si la captura es muy oscura, se le sube un poco el brillo y el contraste para que se distinga lo de atrás.
+        boolean oscura = !claro && luminosidad < 0.25;
+        NITIDA.set(procesar(tomada, 5, claro ? Color.rgb(255, 255, 255, fondo) : Color.rgb(8, 10, 16, fondo), null, oscura));
+        BORROSA.set(procesar(tomada, 13, claro ? Color.rgb(255, 255, 255, panel) : Color.rgb(8, 10, 16, panel),
+                claro ? Color.rgb(255, 255, 255, 0.10) : Color.rgb(255, 255, 255, 0.07), oscura));
     }
 
     /**
      * Reduce la captura, la desenfoca y la tiñe. Se dibuja un poco más grande que el área visible para que el borde
      * del desenfoque (que se desvanece hacia lo transparente) quede fuera.
      */
-    private static Image procesar(Image origen, double radio, Color tinte, Color brillo) {
+    private static Image procesar(Image origen, double radio, Color tinte, Color brillo, boolean realzar) {
         ImageView vista = new ImageView(origen);
         vista.setPreserveRatio(false);
         vista.setSmooth(true);
@@ -219,7 +264,14 @@ public final class FondoVidrio {
         vista.setFitHeight(ALTO_BASE + 34);
         vista.setLayoutX(-30);
         vista.setLayoutY(-17);
-        vista.setEffect(new GaussianBlur(radio));
+        GaussianBlur desenfoque = new GaussianBlur(radio);
+        if (realzar) {
+            ColorAdjust ajuste = new ColorAdjust(0, 0.25, 0.28, 0.22);   // tono, saturación, brillo, contraste
+            ajuste.setInput(desenfoque);
+            vista.setEffect(ajuste);
+        } else {
+            vista.setEffect(desenfoque);
+        }
         Group grupo = new Group(vista);
         Pane lienzo = new Pane(grupo);
         lienzo.setPrefSize(ANCHO_BASE, ALTO_BASE);

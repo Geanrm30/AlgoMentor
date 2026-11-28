@@ -17,32 +17,38 @@
                     <Button text="Generar entrada" onAction="#generarEntrada" />
                 </HBox>
             </VBox>
-            <VBox spacing="12" styleClass="card">
-                <Label text="Estado del algoritmo" styleClass="section-title" />
-                <Label text="Cian: elementos activos · Violeta: pivote de Quick Sort. Las escrituras actualizan la celda en su posición." wrapText="true" styleClass="subtitle" />
-                <CheckBox fx:id="chkBarras" text="Ver el arreglo como barras" />
-                <ScrollPane fx:id="scrollArreglo" fitToHeight="true" fitToWidth="true" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" maxHeight="110">
-                    <content><HBox fx:id="contenedorArreglo" alignment="BOTTOM_CENTER" spacing="8" /></content>
-                </ScrollPane>
-                <ScrollPane fx:id="scrollBarras" fitToHeight="true" fitToWidth="true" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" prefHeight="200" visible="false" managed="false">
-                    <content><HBox fx:id="contenedorBarras" alignment="BOTTOM_CENTER" spacing="6" /></content>
-                </ScrollPane>
-                <VBox fx:id="contenedorMatriz" alignment="CENTER" spacing="6" />
-                <Label fx:id="lblPaso" text="Prepara una entrada para empezar." wrapText="true" />
-                <Label fx:id="lblExplicacion" wrapText="true" />
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Button fx:id="btnAnterior" text="Anterior" onAction="#anterior" disable="true" />
-                    <Button fx:id="btnSiguiente" text="Siguiente" onAction="#siguiente" disable="true" styleClass="primary-button" />
-                    <Button fx:id="btnReproducir" text="Reproducir" onAction="#alternarReproduccion" disable="true" />
-                    <Label text="Velocidad" />
-                    <ComboBox fx:id="cmbVelocidad" prefWidth="240" accessibleText="Velocidad de reproducción" />
-                </HBox>
-            </VBox>
-            <VBox fx:id="panelPseudocodigo" spacing="8" styleClass="card" visible="false" managed="false">
-                <Label text="Pseudocódigo" styleClass="section-title" />
-                <Label text="La línea resaltada es la que se ejecuta en el paso actual." wrapText="true" styleClass="subtitle" />
-                <VBox fx:id="listaPseudocodigo" spacing="2" styleClass="pseudocodigo" />
-            </VBox>
+            <GridPane fx:id="zonaEstado" hgap="18" vgap="18">
+                <columnConstraints>
+                    <ColumnConstraints fx:id="columnaEstado" hgrow="ALWAYS" minWidth="320" prefWidth="320" />
+                    <ColumnConstraints fx:id="columnaPseudocodigo" hgrow="NEVER" minWidth="340" prefWidth="430" maxWidth="520" />
+                </columnConstraints>
+                <VBox spacing="12" styleClass="card" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS" GridPane.vgrow="NEVER">
+                    <Label text="Estado del algoritmo" styleClass="section-title" />
+                    <Label text="Cian: elementos activos · Violeta: pivote de Quick Sort. Las escrituras actualizan la celda en su posición." wrapText="true" styleClass="subtitle" />
+                    <CheckBox fx:id="chkBarras" text="Ver el arreglo como barras" />
+                    <ScrollPane fx:id="scrollArreglo" fitToHeight="true" fitToWidth="true" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" maxHeight="110">
+                        <content><HBox fx:id="contenedorArreglo" alignment="BOTTOM_CENTER" spacing="8" /></content>
+                    </ScrollPane>
+                    <ScrollPane fx:id="scrollBarras" fitToHeight="true" fitToWidth="true" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" prefHeight="200" visible="false" managed="false">
+                        <content><HBox fx:id="contenedorBarras" alignment="BOTTOM_CENTER" spacing="6" /></content>
+                    </ScrollPane>
+                    <VBox fx:id="contenedorMatriz" alignment="CENTER" spacing="6" />
+                    <Label fx:id="lblPaso" text="Prepara una entrada para empezar." wrapText="true" />
+                    <Label fx:id="lblExplicacion" wrapText="true" />
+                    <FlowPane hgap="10" vgap="8" alignment="CENTER_LEFT" columnHalignment="LEFT" rowValignment="CENTER">
+                        <Button fx:id="btnAnterior" text="Anterior" onAction="#anterior" disable="true" />
+                        <Button fx:id="btnSiguiente" text="Siguiente" onAction="#siguiente" disable="true" styleClass="primary-button" />
+                        <Button fx:id="btnReproducir" text="Reproducir" onAction="#alternarReproduccion" disable="true" />
+                        <Label text="Velocidad" />
+                        <ComboBox fx:id="cmbVelocidad" prefWidth="240" accessibleText="Velocidad de reproducción" />
+                    </FlowPane>
+                </VBox>
+                <VBox fx:id="panelPseudocodigo" spacing="8" styleClass="card" visible="false" managed="false" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+                    <Label text="Pseudocódigo" styleClass="section-title" />
+                    <Label text="La línea resaltada es la que se ejecuta en el paso actual." wrapText="true" styleClass="subtitle" />
+                    <VBox fx:id="listaPseudocodigo" spacing="2" styleClass="pseudocodigo" />
+                </VBox>
+            </GridPane>
         </VBox>
     </content>
 </ScrollPane>

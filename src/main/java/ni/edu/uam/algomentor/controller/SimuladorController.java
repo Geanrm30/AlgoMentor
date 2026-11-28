@@ -64,6 +64,8 @@ public class SimuladorController {
     @FXML private HBox contenedorBarras;
     @FXML private ScrollPane scrollBarras;
     @FXML private VBox panelPseudocodigo;
+    @FXML private javafx.scene.layout.GridPane zonaEstado;
+    @FXML private javafx.scene.layout.ColumnConstraints columnaPseudocodigo;
     @FXML private VBox listaPseudocodigo;
 
     private ResultadoEjecucion resultado;
@@ -79,11 +81,14 @@ public class SimuladorController {
     private static final List<String> VELOCIDADES = List.of(
             "Lenta (1,6 s por paso)", "Normal (0,9 s por paso)", "Rápida (0,4 s por paso)", "Muy rápida (0,15 s)");
     private static final int[] MILISEGUNDOS = {1600, 900, 400, 150};
+    private static final double ANCHO_MINIMO_DOS_COLUMNAS = 1020;
 
     @FXML
     private void initialize() {
         matrizVisual = new EntradaMatrizVisual();
         entradaMatriz.getChildren().add(matrizVisual);
+        zonaEstado.widthProperty().addListener((obs, antes, ahora) -> acomodarPseudocodigo());
+        panelPseudocodigo.managedProperty().addListener((obs, antes, ahora) -> acomodarPseudocodigo());
         cmbVelocidad.setItems(FXCollections.observableArrayList(VELOCIDADES));
         cmbVelocidad.getSelectionModel().select(1);
         cmbVelocidad.valueProperty().addListener((obs, antes, ahora) -> {
@@ -227,6 +232,30 @@ public class SimuladorController {
             reproduccion = null;
         }
         btnReproducir.setText("Reproducir");
+    }
+
+    /**
+     * Con la ventana ancha el pseudocódigo va a un costado del estado; si es angosta, debajo. Sin pseudocódigo
+     * (los métodos matriciales no lo tienen en pantalla) el estado usa todo el ancho.
+     */
+    private void acomodarPseudocodigo() {
+        boolean hayPseudocodigo = panelPseudocodigo.isManaged();
+        boolean alCostado = zonaEstado.getWidth() >= ANCHO_MINIMO_DOS_COLUMNAS;
+        if (hayPseudocodigo && alCostado) {
+            javafx.scene.layout.GridPane.setColumnIndex(panelPseudocodigo, 1);
+            javafx.scene.layout.GridPane.setRowIndex(panelPseudocodigo, 0);
+            columnaPseudocodigo.setMinWidth(340);
+            columnaPseudocodigo.setPrefWidth(430);
+            columnaPseudocodigo.setMaxWidth(520);
+            zonaEstado.setHgap(18);
+        } else {
+            javafx.scene.layout.GridPane.setColumnIndex(panelPseudocodigo, 0);
+            javafx.scene.layout.GridPane.setRowIndex(panelPseudocodigo, 1);
+            columnaPseudocodigo.setMinWidth(0);
+            columnaPseudocodigo.setPrefWidth(0);
+            columnaPseudocodigo.setMaxWidth(0);
+            zonaEstado.setHgap(0);
+        }
     }
 
     private void cargarPseudocodigo(CatalogoAlgoritmos algoritmo) {

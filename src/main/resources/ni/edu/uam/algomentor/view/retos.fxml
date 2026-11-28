@@ -28,6 +28,7 @@
                                     <Button fx:id="btnResponderDesafio" text="Responder" onAction="#responderDesafio" disable="true" styleClass="primary-button" />
                                 </HBox>
                                 <Label fx:id="lblRetroDesafio" wrapText="true" />
+                                <Label text="Lo que consigas cuenta para tus logros, en Mi progreso." wrapText="true" styleClass="subtitle" />
                             </VBox>
                         </VBox>
                     </content>
@@ -54,24 +55,6 @@
                                 <Label fx:id="lblRetroCuestionario" wrapText="true" />
                                 <Button fx:id="btnSiguientePregunta" text="Siguiente pregunta" onAction="#siguientePregunta" visible="false" managed="false" styleClass="primary-button" />
                             </VBox>
-                        </VBox>
-                    </content>
-                </ScrollPane>
-            </content>
-        </Tab>
-        <Tab text="Logros">
-            <content>
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
-                    <content>
-                        <VBox spacing="18" styleClass="tab-content">
-                            <HBox spacing="12" alignment="CENTER_LEFT">
-                                <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                    <Label text="Tus logros" styleClass="section-title" />
-                                    <Label fx:id="lblResumenLogros" text="Cargando…" wrapText="true" styleClass="subtitle" />
-                                </VBox>
-                                <Button text="Actualizar" onAction="#cargarLogros" />
-                            </HBox>
-                            <FlowPane fx:id="panelLogros" hgap="14" vgap="14" />
                         </VBox>
                     </content>
                 </ScrollPane>
