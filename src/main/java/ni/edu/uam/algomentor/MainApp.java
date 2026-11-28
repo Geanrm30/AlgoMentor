@@ -52,6 +52,8 @@ import ni.edu.uam.algomentor.service.ResumenAdministracionService;
 import ni.edu.uam.algomentor.util.Actualizable;
 import ni.edu.uam.algomentor.util.BarraLateral;
 import ni.edu.uam.algomentor.util.Fondo;
+import ni.edu.uam.algomentor.util.FondoVidrio;
+import ni.edu.uam.algomentor.util.VidrioEsmerilado;
 import ni.edu.uam.algomentor.util.Iconos;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.ConfiguracionLogs;
@@ -85,6 +87,7 @@ public class MainApp extends Application {
     private BorderPane raizActual;
     private BarraLateral barraLateral;
     private static final String CLAVE_NAV_CONTRAIDA = "nav.contraida";
+    private static final String CLAVE_FONDO_VIDRIO = "fondo.vidrio";
     private StackPane envoltura;
     private MenuBar barraMenus;
     private Tutorial tutorial;
@@ -100,6 +103,15 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
+        // El fondo de vidrio muestra lo que hay detrás de la ventana: se captura antes de que esta aparezca.
+        if (leerEntero(CLAVE_FONDO_VIDRIO, 0) == 1) {
+            boolean logrado = FondoVidrio.iniciar(javafx.stage.Screen.getPrimary().getVisualBounds(), temaClaro);
+            if (logrado) {
+                FondoVidrio.vigilar(stage);
+            } else {
+                LOG.info("No se pudo capturar lo que hay detrás de la ventana; se usa el fondo de malla de color.");
+            }
+        }
         try {
             CatalogoPersistidoService.completarCatalogo();
         } catch (RuntimeException e) {
@@ -147,7 +159,11 @@ public class MainApp extends Application {
         controller.setAlAutenticar(this::mostrarAplicacion);
         if (temaClaro) {
             login.getStyleClass().addAll("app-root", "light-theme");
-            if (login instanceof StackPane panel) {
+        }
+        if (login instanceof StackPane panel) {
+            if (FondoVidrio.activo()) {
+                FondoVidrio.instalar(panel);
+            } else if (temaClaro) {
                 Fondo.instalarLogin(panel, true);
             }
         }
@@ -175,7 +191,7 @@ public class MainApp extends Application {
         instalarMenuContextual();
 
         envoltura = new StackPane(raiz);
-        Fondo.instalar(envoltura, temaClaro, false);
+        instalarFondo();
         raizActual = raiz;
         instalarAtajos(stage.getScene());
         aplicarAccesibilidad();
@@ -260,6 +276,16 @@ public class MainApp extends Application {
         contenidoVisible.setOnFinished(evento -> contenido.getChildren().stream().findFirst()
                 .ifPresent(Animaciones::entrarContenido));
         contenidoVisible.play();
+    }
+
+    /** Fondo de vidrio (lo que hay detrás de la ventana) o, si no está disponible o se desactivó, la malla de color. */
+    private void instalarFondo() {
+        if (FondoVidrio.activo()) {
+            FondoVidrio.instalar(envoltura);
+        } else {
+            Fondo.instalar(envoltura, temaClaro, false);
+        }
+        Platform.runLater(() -> VidrioEsmerilado.decorar(envoltura));
     }
 
     private void mostrarResumenGeneral() {
@@ -504,7 +530,8 @@ public class MainApp extends Application {
             if (temaClaro) {
                 raiz.getStyleClass().add("light-theme");
             }
-            Fondo.instalar(envoltura, temaClaro, false);
+            FondoVidrio.cambiarTema(temaClaro);
+            instalarFondo();
         });
         CheckMenuItem pantallaCompleta = new CheckMenuItem("Pantalla completa");
         pantallaCompleta.setAccelerator(KeyCombination.keyCombination("F11"));
@@ -532,7 +559,32 @@ public class MainApp extends Application {
             guardarEntero(CLAVE_ALTO_CONTRASTE, altoContraste ? 1 : 0);
             aplicarAccesibilidad();
         });
-        return new Menu("Ver", null, tema, contraste, letra, new SeparatorMenuItem(), pantallaCompleta);
+        Menu fondo = new Menu("Fondo");
+        ToggleGroup tipoFondo = new ToggleGroup();
+        RadioMenuItem vidrio = new RadioMenuItem("Vidrio (se ve lo que hay detrás de la ventana)");
+        RadioMenuItem malla = new RadioMenuItem("Malla de color");
+        vidrio.setToggleGroup(tipoFondo);
+        malla.setToggleGroup(tipoFondo);
+        (FondoVidrio.activo() ? vidrio : malla).setSelected(true);
+        vidrio.setOnAction(evento -> {
+            guardarEntero(CLAVE_FONDO_VIDRIO, 1);
+            FondoVidrio.activar(true, stage, logrado -> {
+                if (!logrado) {
+                    malla.setSelected(true);
+                    new Alert(Alert.AlertType.INFORMATION,
+                            "No se pudo capturar lo que hay detrás de la ventana en este equipo; se usa la malla de color.")
+                            .showAndWait();
+                }
+                instalarFondo();
+            });
+        });
+        malla.setOnAction(evento -> {
+            guardarEntero(CLAVE_FONDO_VIDRIO, 0);
+            FondoVidrio.activar(false, stage, logrado -> instalarFondo());
+        });
+        MenuItem actualizarFondo = elemento("Actualizar el fondo de vidrio", () -> FondoVidrio.recapturar(stage, null));
+        fondo.getItems().addAll(vidrio, malla, new SeparatorMenuItem(), actualizarFondo);
+        return new Menu("Ver", null, tema, fondo, contraste, letra, new SeparatorMenuItem(), pantallaCompleta);
     }
 
     private Menu crearMenuAyuda() {

@@ -34,6 +34,8 @@ import ni.edu.uam.algomentor.service.AutenticacionService;
 import ni.edu.uam.algomentor.util.Animaciones;
 import ni.edu.uam.algomentor.util.CampoFlotante;
 import ni.edu.uam.algomentor.util.Fondo;
+import ni.edu.uam.algomentor.util.FondoVidrio;
+import ni.edu.uam.algomentor.util.VidrioEsmerilado;
 import ni.edu.uam.algomentor.util.FormularioLiquido;
 import ni.edu.uam.algomentor.util.LogoMarca;
 import ni.edu.uam.algomentor.util.MostrarContrasena;
@@ -103,6 +105,15 @@ public class LoginController {
     private void initialize() {
         Fondo.instalarLogin(raiz, false);
         TarjetaCristal.instalar(tarjeta, 34);
+        if (FondoVidrio.hayCaptura()) {
+            VidrioEsmerilado.instalar(tarjeta, 16, (ancho, alto) -> {
+                Polygon forma = new Polygon();
+                for (double[] punto : TarjetaCristal.puntos(ancho, alto, 34)) {
+                    forma.getPoints().addAll(punto[0], punto[1]);
+                }
+                return forma;
+            });
+        }
         cabecera.getChildren().addAll(LogoMarca.crear(28), etiquetaMarca());
 
         formulario = new FormularioLiquido(ANCHO, pastilla);

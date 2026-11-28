@@ -304,6 +304,9 @@ public final class Animaciones {
 
     public static void entrarContenido(Node raiz) {
         EfectosBoton.decorar(raiz);
+        if (FondoVidrio.hayCaptura() && raiz instanceof Parent contenedor) {
+            VidrioEsmerilado.decorar(contenedor);
+        }
         if (raiz.getScene() != null && raiz instanceof Parent padre) {
             padre.applyCss();
         }

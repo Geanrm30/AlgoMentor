@@ -294,6 +294,9 @@ public class RetosController {
             tarjeta.getChildren().addAll(titulo, descripcion, barra, detalle);
             panelLogros.getChildren().add(tarjeta);
         }
+        if (ni.edu.uam.algomentor.util.FondoVidrio.hayCaptura()) {
+            Platform.runLater(() -> ni.edu.uam.algomentor.util.VidrioEsmerilado.decorar(panelLogros));
+        }
         Animaciones.entrarEscalonado(panelLogros.getChildren(), 16);
     }
 }
