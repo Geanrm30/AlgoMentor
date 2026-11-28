@@ -484,13 +484,11 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
   diálogos, en versión oscura y clara. Detrás de todo hay un fondo de malla de gradiente (`Fondo`: manchas de color
   difuminadas y, en el oscuro, partículas tenues), que en la aplicación es estático y se guarda en caché para no
   gastar procesador. `Tema` aplica la misma hoja de estilos a los cuadros de alerta.
-- **Fondo de vidrio:** en Ver, Fondo se puede elegir entre la malla de color y el vidrio. Con el vidrio, `FondoVidrio`
-  captura lo que hay detrás de la ventana (el escritorio, IntelliJ...) justo antes de mostrarla, lo desenfoca y lo
-  usa de fondo, y `VidrioEsmerilado` pone en cada panel una copia aún más desenfocada, alineada con su posición, de
-  modo que se ve como vidrio esmerilado. El tinte se adapta a la luminosidad de la captura (un IDE oscuro no queda
-  negro). La captura se repite, ocultando la ventana un instante, al dejar de moverla o redimensionarla y desde
-  Ver, Fondo, Actualizar. Si no se puede capturar (por ejemplo, sin permiso de grabación de pantalla en macOS), se
-  usa la malla de color. Es una captura, no un desenfoque en vivo del sistema operativo.
+- **Vidrio esmerilado:** el fondo morado de siempre (la malla de color con cintas tenues) se dibuja una sola vez
+  como imagen (`FondoVidrio`) y es el fondo de la ventana. Cada panel (`VidrioEsmerilado`) lleva por dentro una copia
+  muy desenfocada de esa misma imagen, colocada justo donde estaría el fondo y siguiéndolo al desplazarse, de modo que
+  a través del panel el fondo se ve difuminado y en los huecos entre paneles, nítido. En Ver, Fondo se puede cambiar a
+  tarjetas translúcidas sin vidrio. El efecto se calcula con imágenes, sin pedirle nada al sistema operativo.
 - **Barra lateral:** `BarraLateral` construye la navegación con íconos vectoriales (`Iconos`, formas SVG en el CSS) y
   un indicador que se desliza con la animación de la sección elegida. Los atajos de teclado se registran en la
   escena, de modo que siguen funcionando sin menús.
@@ -804,7 +802,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Comparador | `ComparadorOrdenamientosTest` |
 | Barra lateral y efectos de botón | `EfectosBotonTest`, `InterfazLateralIT` |
 | Inicio de sesión animado | `FormularioLiquidoTest`, `LoginLiquidoIT` |
-| Fondo de vidrio | `FondoVidrioTest` |
+| Fondo de vidrio | `FondoVidrioIT` |
 | Estadísticas | `EstadisticasDAOTest` |
 | Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `ReporteMapaCalorTemplateTest`, `ReporteMapaCalorServiceTest`, `MapaCalorErroresDAOTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |

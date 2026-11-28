@@ -27,10 +27,13 @@ public final class VidrioEsmerilado {
         if (raiz == null) {
             return;
         }
-        for (Node nodo : raiz.lookupAll(".card, .lateral, .summary-card")) {
-            if (nodo instanceof Pane panel && !panel.getProperties().containsKey(MARCA)
-                    && !nodo.getStyleClass().contains("tutorial-card")) {
-                instalar(panel, nodo.getStyleClass().contains("lateral") ? 26 : 20, null);
+        // lookupAll no admite varios selectores separados por comas, así que se busca cada clase por separado.
+        for (String selector : new String[]{".card", ".lateral", ".summary-card"}) {
+            for (Node nodo : raiz.lookupAll(selector)) {
+                if (nodo instanceof Pane panel && !panel.getProperties().containsKey(MARCA)
+                        && !nodo.getStyleClass().contains("tutorial-card")) {
+                    instalar(panel, nodo.getStyleClass().contains("lateral") ? 26 : 20, null);
+                }
             }
         }
     }

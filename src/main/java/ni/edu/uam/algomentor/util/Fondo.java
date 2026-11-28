@@ -53,6 +53,14 @@ public final class Fondo {
     /** Fondo del inicio de sesión: la malla de siempre con cintas brillantes que derivan despacio. */
     public static void instalarLogin(StackPane contenedor, boolean claro) {
         contenedor.getChildren().removeIf(nodo -> nodo.getStyleClass().contains(CLASE));
+        contenedor.getChildren().add(0, mallaConCintas(claro, true, 1.0));
+    }
+
+    /**
+     * La malla de color con cintas brillantes. {@code intensidad} (0 a 1) atenúa las cintas; {@code animado} las hace
+     * derivar despacio. Sin animación sirve para dibujar el fondo una sola vez como imagen.
+     */
+    public static Pane mallaConCintas(boolean claro, boolean animado, double intensidad) {
         Pane capa = malla(claro, false);
         capa.setCache(false);
         Group cintas = new Group();
@@ -73,7 +81,7 @@ public final class Fondo {
             cinta.setStrokeLineCap(StrokeLineCap.ROUND);
             Color base = Color.web(colores[i]);
             cinta.setStroke(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-                    new Stop(0, base.deriveColor(0, 1, 1, 0)), new Stop(0.5, base.deriveColor(0, 1, 1, claro ? 0.28 : 0.30)),
+                    new Stop(0, base.deriveColor(0, 1, 1, 0)), new Stop(0.5, base.deriveColor(0, 1, 1, (claro ? 0.28 : 0.30) * intensidad)),
                     new Stop(1, base.deriveColor(0, 1, 1, 0))));
             cinta.setStrokeWidth(t[10]);
             cinta.setEffect(new BoxBlur(26, 26, 2));
@@ -82,7 +90,7 @@ public final class Fondo {
             borde.setFill(null);
             borde.setStrokeWidth(2);
             borde.setStroke(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-                    new Stop(0, base.deriveColor(0, 1, 1, 0)), new Stop(0.5, base.deriveColor(0, 1, 1, claro ? 0.55 : 0.85)),
+                    new Stop(0, base.deriveColor(0, 1, 1, 0)), new Stop(0.5, base.deriveColor(0, 1, 1, (claro ? 0.55 : 0.85) * intensidad)),
                     new Stop(1, base.deriveColor(0, 1, 1, 0))));
             borde.setEffect(new DropShadow(14, base.deriveColor(0, 1, 1, 0.8)));
             Group grupo = new Group(cinta, borde);
@@ -94,11 +102,13 @@ public final class Fondo {
             derivar.setAutoReverse(true);
             derivar.setCycleCount(Animation.INDEFINITE);
             derivar.setInterpolator(Interpolator.EASE_BOTH);
-            derivar.play();
+            if (animado) {
+                derivar.play();
+            }
             cintas.getChildren().add(grupo);
         }
         capa.getChildren().add(1, cintas);
-        contenedor.getChildren().add(0, capa);
+        return capa;
     }
 
     public static Pane malla(boolean claro, boolean animado) {

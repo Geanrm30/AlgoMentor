@@ -103,15 +103,9 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
-        // El fondo de vidrio muestra lo que hay detrás de la ventana: se captura antes de que esta aparezca.
-        if (leerEntero(CLAVE_FONDO_VIDRIO, 1) == 1) {
-            boolean logrado = FondoVidrio.iniciar(javafx.stage.Screen.getPrimary().getVisualBounds(), temaClaro);
-            if (logrado) {
-                FondoVidrio.vigilar(stage);
-            } else {
-                LOG.info("No se pudo capturar lo que hay detrás de la ventana; se usa el fondo de malla de color.");
-            }
-        }
+        // El vidrio esmerilado se dibuja sobre el fondo morado: se prepara una vez, antes de cargar ninguna pantalla.
+        FondoVidrio.preparar(temaClaro);
+        FondoVidrio.activar(leerEntero(CLAVE_FONDO_VIDRIO, 1) == 1);
         try {
             CatalogoPersistidoService.completarCatalogo();
         } catch (RuntimeException e) {
@@ -530,7 +524,7 @@ public class MainApp extends Application {
             if (temaClaro) {
                 raiz.getStyleClass().add("light-theme");
             }
-            FondoVidrio.cambiarTema(temaClaro);
+            FondoVidrio.preparar(temaClaro);
             instalarFondo();
         });
         CheckMenuItem pantallaCompleta = new CheckMenuItem("Pantalla completa");
@@ -561,29 +555,22 @@ public class MainApp extends Application {
         });
         Menu fondo = new Menu("Fondo");
         ToggleGroup tipoFondo = new ToggleGroup();
-        RadioMenuItem vidrio = new RadioMenuItem("Vidrio (se ve lo que hay detrás de la ventana)");
-        RadioMenuItem malla = new RadioMenuItem("Malla de color");
+        RadioMenuItem vidrio = new RadioMenuItem("Vidrio esmerilado");
+        RadioMenuItem plano = new RadioMenuItem("Tarjetas translúcidas (sin vidrio)");
         vidrio.setToggleGroup(tipoFondo);
-        malla.setToggleGroup(tipoFondo);
-        (FondoVidrio.activo() ? vidrio : malla).setSelected(true);
+        plano.setToggleGroup(tipoFondo);
+        (FondoVidrio.activo() ? vidrio : plano).setSelected(true);
         vidrio.setOnAction(evento -> {
             guardarEntero(CLAVE_FONDO_VIDRIO, 1);
-            FondoVidrio.activar(true, stage, logrado -> {
-                if (!logrado) {
-                    malla.setSelected(true);
-                    new Alert(Alert.AlertType.INFORMATION,
-                            "No se pudo capturar lo que hay detrás de la ventana en este equipo; se usa la malla de color.")
-                            .showAndWait();
-                }
-                instalarFondo();
-            });
+            FondoVidrio.activar(true);
+            instalarFondo();
         });
-        malla.setOnAction(evento -> {
+        plano.setOnAction(evento -> {
             guardarEntero(CLAVE_FONDO_VIDRIO, 0);
-            FondoVidrio.activar(false, stage, logrado -> instalarFondo());
+            FondoVidrio.activar(false);
+            instalarFondo();
         });
-        MenuItem actualizarFondo = elemento("Actualizar el fondo de vidrio", () -> FondoVidrio.recapturar(stage, null));
-        fondo.getItems().addAll(vidrio, malla, new SeparatorMenuItem(), actualizarFondo);
+        fondo.getItems().addAll(vidrio, plano);
         return new Menu("Ver", null, tema, fondo, contraste, letra, new SeparatorMenuItem(), pantallaCompleta);
     }
 
