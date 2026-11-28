@@ -17,6 +17,14 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.transform.Scale;
+
 import java.util.Random;
 
 /** Fondo de malla de gradiente (manchas de color difuminadas) con partículas tenues en el tema oscuro. */
@@ -40,6 +48,57 @@ public final class Fondo {
     public static void instalar(StackPane contenedor, boolean claro, boolean animado) {
         contenedor.getChildren().removeIf(nodo -> nodo.getStyleClass().contains(CLASE));
         contenedor.getChildren().add(0, malla(claro, animado));
+    }
+
+    /** Fondo del inicio de sesión: la malla de siempre con cintas brillantes que derivan despacio. */
+    public static void instalarLogin(StackPane contenedor, boolean claro) {
+        contenedor.getChildren().removeIf(nodo -> nodo.getStyleClass().contains(CLASE));
+        Pane capa = malla(claro, false);
+        capa.setCache(false);
+        Group cintas = new Group();
+        Scale escala = new Scale();
+        escala.xProperty().bind(capa.widthProperty().divide(1600));
+        escala.yProperty().bind(capa.heightProperty().divide(900));
+        cintas.getTransforms().add(escala);
+        double[][] trazos = {
+                {-100, 700, 300, 420, 700, 900, 1100, 560, 1700, 330, 120},
+                {-100, 520, 350, 260, 800, 700, 1300, 380, 1700, 180, 80},
+                {-100, 880, 500, 760, 900, 500, 1200, 760, 1700, 640, 60}};
+        String[] colores = claro ? new String[]{"#818cf8", "#38bdf8", "#c084fc"} : new String[]{"#22d3ee", "#6366f1", "#8b5cf6"};
+        for (int i = 0; i < trazos.length; i++) {
+            double[] t = trazos[i];
+            Path cinta = new Path(new MoveTo(t[0], t[1]), new CubicCurveTo(t[2], t[3], t[4], t[5], t[6], t[7]),
+                    new CubicCurveTo(t[8] - 300, t[7] + 100, t[8] - 150, t[9], t[8], t[9]));
+            cinta.setFill(null);
+            cinta.setStrokeLineCap(StrokeLineCap.ROUND);
+            Color base = Color.web(colores[i]);
+            cinta.setStroke(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, base.deriveColor(0, 1, 1, 0)), new Stop(0.5, base.deriveColor(0, 1, 1, claro ? 0.28 : 0.30)),
+                    new Stop(1, base.deriveColor(0, 1, 1, 0))));
+            cinta.setStrokeWidth(t[10]);
+            cinta.setEffect(new BoxBlur(26, 26, 2));
+            Path borde = new Path(new MoveTo(t[0], t[1]), new CubicCurveTo(t[2], t[3], t[4], t[5], t[6], t[7]),
+                    new CubicCurveTo(t[8] - 300, t[7] + 100, t[8] - 150, t[9], t[8], t[9]));
+            borde.setFill(null);
+            borde.setStrokeWidth(2);
+            borde.setStroke(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, base.deriveColor(0, 1, 1, 0)), new Stop(0.5, base.deriveColor(0, 1, 1, claro ? 0.55 : 0.85)),
+                    new Stop(1, base.deriveColor(0, 1, 1, 0))));
+            borde.setEffect(new DropShadow(14, base.deriveColor(0, 1, 1, 0.8)));
+            Group grupo = new Group(cinta, borde);
+            grupo.setCache(true);
+            grupo.setCacheHint(CacheHint.SPEED);
+            TranslateTransition derivar = new TranslateTransition(Duration.seconds(11 + i * 3), grupo);
+            derivar.setByX(i % 2 == 0 ? 60 : -60);
+            derivar.setByY(i % 2 == 0 ? -34 : 30);
+            derivar.setAutoReverse(true);
+            derivar.setCycleCount(Animation.INDEFINITE);
+            derivar.setInterpolator(Interpolator.EASE_BOTH);
+            derivar.play();
+            cintas.getChildren().add(grupo);
+        }
+        capa.getChildren().add(1, cintas);
+        contenedor.getChildren().add(0, capa);
     }
 
     public static Pane malla(boolean claro, boolean animado) {

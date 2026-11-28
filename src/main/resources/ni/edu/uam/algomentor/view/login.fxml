@@ -3,38 +3,16 @@
 <?import javafx.scene.layout.*?>
 
 <StackPane fx:id="raiz" styleClass="login-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.algomentor.controller.LoginController">
-    <VBox fx:id="tarjeta" maxWidth="430" maxHeight="-Infinity" spacing="18" styleClass="login-card">
-        <VBox spacing="5">
-            <Label text="AlgoMentor" styleClass="brand" />
-            <Label text="Accede a tu espacio de aprendizaje" styleClass="page-title" wrapText="true" />
-            <Label text="Inicia sesión o crea una cuenta para guardar tu progreso." styleClass="subtitle" wrapText="true" />
+    <StackPane fx:id="tarjeta" prefWidth="420" maxWidth="420" maxHeight="-Infinity" styleClass="login-card">
+        <VBox fx:id="contenido" spacing="14">
+            <HBox fx:id="cabecera" spacing="10" alignment="CENTER_LEFT" />
+            <VBox spacing="4">
+                <Label fx:id="lblTitulo" text="Bienvenido de nuevo" styleClass="login-titulo" wrapText="true" />
+                <Label fx:id="lblSubtitulo" styleClass="subtitle" wrapText="true" />
+            </VBox>
+            <VBox fx:id="contenedorFormulario" />
+            <Button fx:id="btnModo" styleClass="enlace-login" maxWidth="Infinity" />
+            <Label fx:id="lblEstado" wrapText="true" />
         </VBox>
-        <TabPane tabClosingPolicy="UNAVAILABLE" styleClass="content-tabs">
-            <tabs>
-                <Tab text="Iniciar sesión">
-                    <content>
-                        <VBox spacing="12" styleClass="tab-content">
-                            <TextField fx:id="txtUsuario" promptText="Usuario" />
-                            <PasswordField fx:id="txtContrasena" promptText="Contraseña" onAction="#iniciarSesion" />
-                            <CheckBox fx:id="chkMostrarContrasena" text="Mostrar contraseña" />
-                            <CheckBox fx:id="chkRecordarUsuario" text="Recordar mi usuario en este equipo" />
-                            <Button fx:id="btnIniciarSesion" text="Entrar" onAction="#iniciarSesion" styleClass="primary-button" maxWidth="Infinity" />
-                        </VBox>
-                    </content>
-                </Tab>
-                <Tab text="Crear cuenta">
-                    <content>
-                        <VBox spacing="12" styleClass="tab-content">
-                            <TextField fx:id="txtNuevoUsuario" promptText="Usuario (3 a 40 caracteres)" />
-                            <PasswordField fx:id="txtNuevaContrasena" promptText="Contraseña (mínimo 8 caracteres)" />
-                            <PasswordField fx:id="txtConfirmarContrasena" promptText="Confirmar contraseña" onAction="#registrar" />
-                            <CheckBox fx:id="chkMostrarNuevaContrasena" text="Mostrar contraseñas" />
-                            <Button fx:id="btnRegistrar" text="Crear cuenta" onAction="#registrar" styleClass="primary-button" maxWidth="Infinity" />
-                        </VBox>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
-        <Label fx:id="lblEstado" text="Tu cuenta tendrá un perfil propio y privado." wrapText="true" />
-    </VBox>
+    </StackPane>
 </StackPane>

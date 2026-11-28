@@ -143,7 +143,7 @@ public class MainApp extends Application {
         if (temaClaro) {
             login.getStyleClass().addAll("app-root", "light-theme");
             if (login instanceof StackPane panel) {
-                Fondo.instalar(panel, true, true);
+                Fondo.instalarLogin(panel, true);
             }
         }
         return login;

@@ -500,8 +500,14 @@ pulsa **Generar ejercicio**, revisa los datos y guarda. El ejercicio queda dispo
   desplazamiento) y las celdas activas pulsan. Las escrituras se animan en su posición, sin simular
   intercambios inexistentes; el pivote de Quick Sort se resalta en violeta. En las matrices se resaltan
   las celdas que cambiaron.
-- **Inicio de sesión:** fondo con orbes de luz que flotan y respiran, tarjeta que entra con rebote y
-  campos que aparecen en cascada; si las credenciales fallan, la tarjeta se sacude.
+- **Inicio de sesión:** tarjeta de vidrio con dos esquinas cortadas en diagonal (`TarjetaCristal`) sobre un fondo
+  de malla con cintas brillantes que derivan despacio (`Fondo.instalarLogin`). Empieza solo con una pastilla; al
+  pulsarla, los campos brotan de ella como líquido, con un cuello que se estira y se afina (`FormularioLiquido`).
+  Al enviar, los campos se funden de vuelta en la pastilla, que se encoge a un círculo con un giro mientras se
+  verifica (como mínimo 0,8 s, para que se vea) y termina en verde con un check y el nombre; si falla, los campos
+  vuelven a salir y la tarjeta se sacude. Cambiar entre iniciar sesión y crear cuenta encoge la tarjeta a un
+  mosaico con el logo de AlgoMentor (`LogoMarca`) y un anillo de luz, y la expande con el otro formulario, que
+  pone contraseña y confirmación en dos columnas. Con un usuario recordado, la pastilla dice "Continuar como ...".
 - **Contadores y tarjetas:** las cifras de Resumen y Progreso cuentan hasta su valor (solo animan si
   cambian, para no reiniciarse con la actualización automática) y las tarjetas pequeñas de resumen se elevan
   un poco al pasar el cursor. Al entrar a la aplicación la pantalla se funde suavemente.
@@ -727,7 +733,7 @@ y límites visuales con la importación JSON. Los nuevos motores rechazan arregl
 ## 9. Pruebas
 
 La última ejecución local (`mvn test` más las pruebas de interfaz JavaFX bajo un display virtual) obtuvo
-**345 pruebas aprobadas**, sin fallos ni omisiones. Las pruebas que usan PostgreSQL real
+**351 pruebas aprobadas**, sin fallos ni omisiones. Las pruebas que usan PostgreSQL real
 (`PersistenciaAprendizajeIT` y `NuevosAlgoritmosPostgresIT`) necesitan la base de datos y no se declaran
 aprobadas en esa ejecución.
 
@@ -780,6 +786,7 @@ al terminar, sin recurrir a bases de datos alternativas.
 | Retos, logros y tutor | `RetosServiceTest`, `TutorServiceTest`, `TutorialTest` |
 | Comparador | `ComparadorOrdenamientosTest` |
 | Barra lateral y efectos de botón | `EfectosBotonTest`, `InterfazLateralIT` |
+| Inicio de sesión animado | `FormularioLiquidoTest`, `LoginLiquidoIT` |
 | Estadísticas | `EstadisticasDAOTest` |
 | Informe PDF | `ReporteProgresoTemplateTest`, `ReporteProgresoServiceTest`, `RankingYInformeTest`, `ReporteCatalogoTemplateTest`, `ReporteCatalogoServiceTest`, `ReporteMapaCalorTemplateTest`, `ReporteMapaCalorServiceTest`, `MapaCalorErroresDAOTest`, `RegistroInformesTest` |
 | Roles y cuentas | `AutorizacionServiceTest`, `AutenticacionServiceTest`, `LimitadorIntentosTest` |
